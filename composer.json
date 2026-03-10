@@ -1,0 +1,20 @@
+{
+    "name": "fiad/sgni",
+    "description": "Sistema de Gestión de Nuevo Ingreso - FIAD UABC",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Fiad\\Sgni\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ErickRamos37",
+            "email": "erick.ramos37@uabc.edu.mx"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.5"
+    }
+}
