@@ -1,1 +1,15 @@
-@import "bootstrap/scss/bootstrap";     // Importacion del framework de diseño Bootstrap
+// Colores Personalizados para Bootstrap
+$primary: #00723F;    // Color primario
+$secondary: #F1B500;  // Color secundario
+$danger: #ff0000;     // Color de error/peligro
+$success: #00ff00;    // Color de éxito 
+
+// Color de fondo de la página web:
+$body-bg: #f4f6f9;
+
+// Color del texto por defecto:
+$body-color: #333333; 
+
+
+// Importacion del framework de diseño Bootstrap
+@import "bootstrap/scss/bootstrap";
