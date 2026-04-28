@@ -35,34 +35,26 @@
             <hr>
 
             <ul class="nav nav-pills flex-column mb-auto">
-                
                 <li class="nav-item mb-2">
-                    <a href="{{ route('dashboard') }}" 
-                       class="nav-link {{ request()->routeIs('dashboard') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                    <a href="#" class="nav-link text-dark bg-secondary fw-bold shadow-sm">
                         Dashboard
                     </a>
                 </li>
-                
                 <li class="nav-item mb-1">
-                    <a href="{{ route('grupos.importar') }}" 
-                       class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos
+                    <a href="#" class="nav-link text-white hover-opacity">
+                        Crear Grupo (Manual)
                     </a>
                 </li>
-                
                 <li class="nav-item mb-1">
-                    <a href="{{ route('asistencias.importar') }}" 
-                       class="nav-link {{ request()->routeIs('asistencias.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                    <a href="#" class="nav-link text-white">
                         Registro de Asistencia
                     </a>
                 </li>
-                
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Cierre y Lista Final
                     </a>
                 </li>
-                
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Alta de Profesores
