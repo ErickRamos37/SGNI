@@ -51,6 +51,11 @@
                     </a>
                 </li>
                 <li class="nav-item mb-1">
+                    <a href="http://127.0.0.1:8000/vista_alumno" class="nav-link text-white">
+                        Estatus de Alumno
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Cierre y Lista Final
                     </a>
