@@ -13,7 +13,7 @@ Route::get('/login', function () {
 
 // Ruta básica para el dashboard
 Route::get('/dashboard', function () {
-    return view('welcome'); // Por ahora lo mandamos a welcome, luego se debera actualizar por la vista real
+    return view('dashboard');
 })->name('dashboard');
 
 Route::get('/grupos/importar', function () {
