@@ -23,3 +23,8 @@ Route::get('/grupos/importar', function () {
 Route::get('/asistencias/importar', function () {
     return view('attendance.importar_asistencias');
 })->name('asistencias.importar');
+
+Route::get('/cierre', function () {
+    return view('grupos_finales_.cierre');
+})->name('cierre');
+
