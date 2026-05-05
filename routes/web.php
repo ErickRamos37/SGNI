@@ -25,6 +25,6 @@ Route::get('/asistencias/importar', function () {
 })->name('asistencias.importar');
 
 Route::get('/cierre', function () {
-    return view('grupos_finales_.cierre');
+    return view('grupos_finales.cierre');
 })->name('cierre');
 
