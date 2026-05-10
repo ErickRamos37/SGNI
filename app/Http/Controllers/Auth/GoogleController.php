@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
-// use Illuminate\Support\Facades\Session; // Para manejar la sesión manual
+use Illuminate\Support\Facades\Session; // Para manejar la sesión manual
 
 class GoogleController extends Controller
 {
@@ -26,12 +26,12 @@ class GoogleController extends Controller
 
             // 2. SIMULAR LOGIN (Guardar en sesión en lugar de DB)
             // Guardamos un array con la info que necesitamos
-            // Session::put('usuario_temp', [
-            //     'nombre' => $googleUser->name,
-            //     'correo' => $googleUser->email,
-            //     'avatar' => $googleUser->avatar,
-            //     'is_logged' => true
-            // ]);
+            Session::put('usuario_temp', [
+                'nombre' => $googleUser->name,
+                'correo' => $googleUser->email,
+                'avatar' => $googleUser->avatar,
+                'is_logged' => true
+            ]);
 
             // 3. Redirigir al Dashboard
             return redirect()->route('dashboard');
@@ -42,9 +42,9 @@ class GoogleController extends Controller
     }
 
     // Método para cerrar sesión manualmente
-    // public function logout()
-    // {
-    //     Session::forget('usuario_temp');
-    //     return redirect()->route('login');
-    // }
+    public function logout()
+    {
+        Session::forget('usuario_temp');
+        return redirect()->route('login');
+    }
 }

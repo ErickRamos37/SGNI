@@ -19,15 +19,10 @@
                 <p class="text-muted small">Bienvenido, accede con tu cuenta institucional.</p>
             </div>
 
-            <div class="d-grid">
-                {{-- Busca el botón de Google en tu código y cambia el href --}}
-                <div class="d-grid">
-                    <a href="{{ route('login.google') }}" class="btn btn-outline-dark py-2 d-flex align-items-center justify-content-center rounded-3 shadow-sm">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                            alt="Google" width="20" class="me-2">
-                        Continuar con Google
-                    </a>
-                </div>
+            <div class="d-grid mb-4">
+                <a href="{{ route('login.google') }}" class="btn btn-outline-dark py-2 d-flex align-items-center justify-content-center rounded-3 shadow-sm">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20" class="me-2">
+                    Continuar con Google
                 </a>
             </div>
 
