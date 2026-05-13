@@ -73,21 +73,20 @@
             <hr>
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    {{-- Comprobamos si hay avatar en la sesión, si no, mostramos un ícono genérico --}}
-                    @if(Session::has('usuario_temp') && isset(Session::get('usuario_temp')['avatar']))
+                    <!-- @if(Session::has('usuario_temp') && isset(Session::get('usuario_temp')['avatar']))
                     <img src="{{ Session::get('usuario_temp')['avatar'] }}" alt="Foto de perfil" width="32" height="32" class="rounded-circle me-2 shadow-sm">
                     @else
                     <div class="bg-secondary text-dark rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 32px; height: 32px;">
                         U
                     </div>
                     @endif
-
-                    {{-- Mostramos el nombre guardado en la sesión --}}
+ -->
+                    <!-- Mostramos el nombre guardado en la sesión -->
                     <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
                 </a>
 
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    {{-- Mostramos el correo como texto inactivo para que sepa qué cuenta está usando --}}
+                    <!-- Mostramos el correo como texto inactivo para que sepa qué cuenta está usando -->
                     <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
                             {{ Session::get('usuario_temp')['correo'] ?? 'correo@uabc.edu.mx' }}
                         </span></li>
@@ -95,7 +94,7 @@
                         <hr class="dropdown-divider">
                     </li>
 
-                    {{-- Botón de Cerrar Sesión seguro (Vía POST) --}}
+                    <!-- Botón de Cerrar Sesión seguro (POST) -->
                     <li>
                         <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
                             @csrf
