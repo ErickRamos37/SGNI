@@ -35,34 +35,34 @@
             <hr>
 
             <ul class="nav nav-pills flex-column mb-auto">
-                
+
                 <li class="nav-item mb-2">
-                    <a href="{{ route('dashboard') }}" 
-                       class="nav-link {{ request()->routeIs('dashboard') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                    <a href="{{ route('dashboard') }}"
+                        class="nav-link {{ request()->routeIs('dashboard') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Dashboard
                     </a>
                 </li>
-                
+
                 <li class="nav-item mb-1">
-                    <a href="{{ route('grupos.importar') }}" 
-                       class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                    <a href="{{ route('grupos.importar') }}"
+                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Crear Grupos
                     </a>
                 </li>
-                
+
                 <li class="nav-item mb-1">
-                    <a href="{{ route('asistencias.importar') }}" 
-                       class="nav-link {{ request()->routeIs('asistencias.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                    <a href="{{ route('asistencias.importar') }}"
+                        class="nav-link {{ request()->routeIs('asistencias.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Registro de Asistencia
                     </a>
                 </li>
-                
+
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Cierre y Lista Final
                     </a>
                 </li>
-                
+
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Alta de Profesores
@@ -72,9 +72,38 @@
 
             <hr>
             <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                    <strong>Usuario FIAD</strong>
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- @if(Session::has('usuario_temp') && isset(Session::get('usuario_temp')['avatar']))
+                    <img src="{{ Session::get('usuario_temp')['avatar'] }}" alt="Foto de perfil" width="32" height="32" class="rounded-circle me-2 shadow-sm">
+                    @else
+                    <div class="bg-secondary text-dark rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 32px; height: 32px;">
+                        U
+                    </div>
+                    @endif
+ -->
+                    <!-- Mostramos el nombre guardado en la sesión -->
+                    <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
                 </a>
+
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <!-- Mostramos el correo como texto inactivo para que sepa qué cuenta está usando -->
+                    <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
+                            {{ Session::get('usuario_temp')['correo'] ?? 'correo@uabc.edu.mx' }}
+                        </span></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <!-- Botón de Cerrar Sesión seguro (POST) -->
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger fw-bold">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </div>
 
@@ -84,4 +113,5 @@
 
     </div>
 </body>
+
 </html>

@@ -2,19 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
-
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
 
 // Rutas del referentes al inicio de sesion
-Route::get('/login', function () {
+Route::get('/', function () {
     return view('auth.login');
 })->name('login');
 
 // Ruta para iniciar el proceso
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('login.google');
-
 // Ruta de retorno (Callback)
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
@@ -23,21 +19,24 @@ Route::get('/auth/error', function () {
     return view('auth.error_institucional');
 })->name('auth.error');
 
+Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 
-// Ruta básica para el dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard.dashboard');
-})->name('dashboard');
+// Grupo de Rutas Protegidas (Solo para usuarios logueados)
+Route::middleware([ValidarSesionGoogle::class])->group(function () {
+    // Ruta para el dashboard
+    Route::get('/dashboard', function () {
+        return view('dashboard.dashboard');
+    })->name('dashboard');
 
-Route::get('/grupos/importar', function () {
-    return view('groups.importar_alumnos');
-})->name('grupos.importar');
+    Route::get('/grupos/importar', function () {
+        return view('groups.importar_alumnos');
+    })->name('grupos.importar');
 
-Route::get('/asistencias/importar', function () {
-    return view('attendance.importar_asistencias');
-})->name('asistencias.importar');
+    Route::get('/asistencias/importar', function () {
+        return view('attendance.importar_asistencias');
+    })->name('asistencias.importar');
 
-Route::get('/cierre', function () {
-    return view('grupos_finales.cierre');
-})->name('cierre');
-
+    Route::get('/cierre', function () {
+        return view('grupos_finales.cierre');
+    })->name('cierre');
+});
