@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\AlumnoController;
 use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
+
 
 // Rutas del referentes al inicio de sesion
 Route::get('/', function () {
@@ -28,10 +30,6 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
         return view('dashboard.dashboard');
     })->name('dashboard');
 
-    Route::get('/grupos/importar', function () {
-        return view('groups.importar_alumnos');
-    })->name('grupos.importar');
-
     Route::get('/asistencias/importar', function () {
         return view('attendance.importar_asistencias');
     })->name('asistencias.importar');
@@ -39,4 +37,10 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     Route::get('/cierre', function () {
         return view('grupos_finales.cierre');
     })->name('cierre');
+
+        Route::get('/grupos/importar', function () {
+        return view('groups.importar_alumnos');
+    })->name('grupos.importar');
+
+    Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 });
