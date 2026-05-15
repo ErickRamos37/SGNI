@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
 
 
@@ -38,6 +39,18 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
         return view('grupos_finales.cierre');
     })->name('cierre');
 
+        // Alta y vista de los usuarios
+        Route::get('/usuarios/alta', function () {
+        return view('usuarios.alta_usuarios');
+    })->name('usuarios.alta');
+
+    Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
+
+        Route::get('/usuarios/lista', function () {
+        return view('usuarios.lista_usuarios');
+    })->name('usuarios.lista');
+    
+    // Importación de excel para la creación de los grupos
         Route::get('/grupos/importar', function () {
         return view('groups.importar_alumnos');
     })->name('grupos.importar');
