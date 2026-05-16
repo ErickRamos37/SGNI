@@ -42,5 +42,9 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
         return view('groups.importar_alumnos');
     })->name('grupos.importar');
 
+    Route::get('/psicologo', function () {
+        return view('panel_psicologia.psicologo');
+    })->name('psicologo');
+
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 });

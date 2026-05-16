@@ -64,6 +64,13 @@
                 </li>
 
                 <li class="nav-item mb-1">
+                    <a href="{{ route('psicologo') }}"
+                        class="nav-link {{ request()->routeIs('psicologo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Panel Psicologico
+                    </a>
+                </li>
+               
+                <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Alta de Profesores
                     </a>
