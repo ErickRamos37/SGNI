@@ -13,6 +13,8 @@ return new class extends Migration {
         Schema::create('seguimiento_academico', function (Blueprint $table) {
             $table->id('id_seguimiento');
             $table->text('comentarios')->nullable();
+
+            // llaves foraneas
             $table->integer('matricula')->unsigned();
             $table->foreign('matricula')->references('matricula')->on('alumno')
                 ->references('matricula')

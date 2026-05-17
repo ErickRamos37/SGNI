@@ -14,6 +14,8 @@ public function up(): void
         $table->id('id_asistencia');
         $table->date('fecha');
         $table->boolean('asistio');
+
+        // llaves foraneas
         $table->unsignedBigInteger('id_grupo');
         $table->foreign('id_grupo')->references('id_grupo')->on('grupos');
         $table->integer('matricula')->unsigned();

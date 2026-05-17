@@ -19,6 +19,8 @@ return new class extends Migration {
             $table->string('telefono', 10)->unique();
             $table->smallInteger('puntaje_ingreso')->nullable();
             $table->string('correo_institucional', 125)->unique()->nullable();
+
+            // llaves foraneas
             $table->unsignedBigInteger('id_carrera');
             $table->foreign('id_carrera')->references('id_carrera')->on('carrera');
             $table->unsignedBigInteger('id_grupo_induccion')->nullable();
@@ -27,7 +29,7 @@ return new class extends Migration {
             $table->foreign('id_grupo_propedeutico')->references('id_grupo')->on('grupos');
             $table->unsignedBigInteger('id_grupo_definitivo')->nullable();
             $table->foreign('id_grupo_definitivo')->references('id_grupo')->on('grupos');
-            $table->unsignedBigInteger('id_resultados_propedeutico');
+            $table->unsignedBigInteger('id_resultados_propedeutico')->nullable();
             $table->foreign('id_resultados_propedeutico', 'fk_res_prop')
                 ->references('id_resultados_propedeutico')
                 ->on('resultados_propedeutico');

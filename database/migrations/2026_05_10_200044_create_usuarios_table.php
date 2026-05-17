@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->string('ap_pat', 25);
             $table->string('ap_mat', 25)->nullable();
             $table->string('correo_institucional', 100)->unique();
+
+            // llaves foraneas
             $table->unsignedTinyInteger('id_rol');
             $table->foreign('id_rol')
                 ->references('id_rol')
