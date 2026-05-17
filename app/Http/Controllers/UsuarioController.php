@@ -11,9 +11,11 @@ class UsuarioController extends Controller
     // 1. Mostrar el formulario de alta
     public function create()
     {
-        // Traemos todos los roles para llenar el <select> dinámicamente
+        // 1. Extraemos de la base de datos todos los roles
         $roles = Rol::all();
-        return view('usuarios.create', compact('roles'));
+
+        // 2. Se abre la vista y le "inyectamos" la variable $roles usando compact()
+        return view('usuarios.alta_usuarios', compact('roles'));
     }
 
     // 2. Procesar el registro
@@ -25,7 +27,7 @@ class UsuarioController extends Controller
             'nombre' => 'required|string|max:255',
             'ap_pat' => 'required|string|max:255',
             'correo_institucional' => 'required|email|unique:usuarios,correo_institucional',
-            'id_rol' => 'required|exists:roles,id' // Verifica que el rol exista en la tabla roles
+            'id_rol' => 'required|exists:roles,id_rol'
         ]);
 
         // GUARDADO
@@ -34,5 +36,15 @@ class UsuarioController extends Controller
         // Redirección con mensaje de éxito (usando tus flash messages)
         return redirect()->route('usuarios.index')
                          ->with('success', 'El usuario ha sido registrado exitosamente.');
+    }
+
+    // Mostrar la lista de usuarios
+    public function index()
+    {
+        // Traemos todos los usuarios junto con su rol asociado
+        $usuarios = Usuario::with('rol')->get();
+        
+        // Asumiendo que renombraste tu archivo a lista_usuarios.blade.php
+        return view('usuarios.lista_usuarios', compact('usuarios')); 
     }
 }

@@ -39,12 +39,12 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
         return view('grupos_finales.cierre');
     })->name('cierre');
 
-        // Alta y vista de los usuarios
-        Route::get('/usuarios/alta', function () {
-        return view('usuarios.alta_usuarios');
-    })->name('usuarios.alta');
+    // Alta de los usuarios
+    Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
 
     Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
+    // Tabla de los usuarios
+    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
 
         Route::get('/usuarios/lista', function () {
         return view('usuarios.lista_usuarios');

@@ -4,16 +4,15 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-                <h2 class="fw-bold text-dark">Alta de Personal - Registro</h2>
-                <p class="text-muted">Registre nuevo personal docente o administrativo</p>
+            <h2 class="fw-bold text-dark">Alta de Personal - Registro</h2>
+            <p class="text-muted">Registre nuevo personal docente o administrativo</p>
 
             <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-body p-4 p-md-5">
                     <h5 class="fw-bold text-primary mb-4 text-uppercase"><i class="bi bi-person-plus me-2"></i> Registrar Docente en Sistema</h5>
 
                     <form action="{{ route('usuarios.store') }}" method="POST">
-                        @csrf 
-                        
+                        @csrf
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small text-uppercase text-muted">Número de Empleado</label>
@@ -44,13 +43,12 @@
                         <div class="mb-5 p-4 border rounded bg-white shadow-sm">
                             <label class="form-label fw-bold text-primary mb-3 text-uppercase"><i class="bi bi-shield-lock me-2"></i>Rol en el Sistema</label>
                             <p class="small text-muted mb-3">Seleccione el nivel de acceso que tendrá este usuario.</p>
-                            
-                            <select name="id_rol" class="form-select form-select-lg border-primary border-opacity-50" required>
+
+                            <select name="id_rol" class="form-select border-primary border-opacity-50" required>
                                 <option value="" selected disabled>-- Seleccione un rol --</option>
-                                <option value="1">Docente</option>
-                                <option value="2">Directivo</option>
-                                <option value="3">Psicopedagogía</option>
-                                <option value="4">Administrador</option>
+                                @foreach($roles as $rol)
+                                <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol }}</option>
+                                @endforeach
                             </select>
                         </div>
 

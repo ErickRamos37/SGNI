@@ -8,11 +8,13 @@ class Usuario extends Model
 {
     protected $table = 'usuarios';
 
-    // IMPORTANTE: La PK es 'num_empleado'
     protected $primaryKey = 'num_empleado';
-
-    // El número de empleado no es autoincrementable en la BD
-    public $incrementing = false;
+    public $incrementing = false; // El número de empleado se le asigna manualmente
+    
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
 
     protected $fillable = [
         'num_empleado',
@@ -22,10 +24,4 @@ class Usuario extends Model
         'correo_institucional',
         'id_rol'
     ];
-
-    // Relación: Un usuario pertenece a un Rol
-    public function rol()
-    {
-        return $this->belongsTo(Rol::class, 'id_rol');
-    }
 }

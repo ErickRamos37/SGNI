@@ -37,14 +37,33 @@
                                 </tr>
                             </thead>
                             <tbody class="small">
+                                @if($usuarios->isEmpty())
                                 <tr>
-                                    <td class="px-4 fw-bold text-dark">12345</td>
-                                    <td>José Manuel</td>
-                                    <td>García López</td>
-                                    <td class="text-muted">jose.garcia@uabc.edu.mx</td>
-                                    <td><span class="badge bg-light text-dark border">Docente</span></td>
-                                    <td class="text-muted">2026-01-15</td>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                        No hay personal registrado en el sistema.
+                                    </td>
                                 </tr>
+                                @else
+                                @foreach($usuarios as $usuario)
+                                <tr>
+                                    <td class="px-4 fw-bold text-dark">{{ $usuario->num_empleado }}</td>
+                                    <td>{{ $usuario->nombre }}</td>
+                                    <td>{{ $usuario->ap_pat }} {{ $usuario->ap_mat }}</td>
+                                    <td class="text-muted">{{ $usuario->correo_institucional }}</td>
+
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ $usuario->rol ? $usuario->rol->nombre_rol : 'Sin rol asignado' }}
+                                        </span>
+                                    </td>
+
+                                    <td class="text-muted">
+                                        {{ $usuario->created_at ? $usuario->created_at->format('Y-m-d') : 'Sin fecha' }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>
