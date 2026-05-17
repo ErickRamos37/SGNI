@@ -42,5 +42,21 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
         return view('groups.importar_alumnos');
     })->name('grupos.importar');
 
+    Route::get('/psicologo', function () {
+        return view('panel_psicologia.psicologo');
+    })->name('psicologo');
+
+    Route::get('/crear_grupo', function () {
+        return view('groups.crear_grupos_cursos.crear_grupo');
+    })->name('crear_grupo');
+
+    Route::get('/curso_prope', function () {
+        return view('groups.crear_grupos_cursos.curso_prope');
+    })->name('curso_prope');
+
+    Route::get('/curso_induc', function () {
+        return view('groups.crear_grupos_cursos.curso_induc');
+    })->name('curso_induc');
+
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 });
