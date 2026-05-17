@@ -6,7 +6,7 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <div>
-                    <h2 class="fw-bold text-dark mb-1">Alta de Personal - Lista</h2>
+                    <h2 class="fw-bold text-dark mb-1">Personal - Lista</h2>
                     <p class="text-muted mb-0">Listado completo de personal registrado</p>
                 </div>
                 <div class="w-25">
@@ -33,7 +33,7 @@
                                     <th class="py-3">Correo</th>
                                     <th class="py-3">Rol</th>
                                     <!-- <th class="py-3">Estado</th> -->
-                                    <th class="py-3">Fecha Registro</th>
+                                    <!-- <th class="py-3">Fecha Registro</th> -->
                                 </tr>
                             </thead>
                             <tbody class="small">
@@ -51,16 +51,8 @@
                                     <td>{{ $usuario->nombre }}</td>
                                     <td>{{ $usuario->ap_pat }} {{ $usuario->ap_mat }}</td>
                                     <td class="text-muted">{{ $usuario->correo_institucional }}</td>
-
-                                    <td>
-                                        <span class="badge bg-light text-dark border">
-                                            {{ $usuario->rol ? $usuario->rol->nombre_rol : 'Sin rol asignado' }}
-                                        </span>
-                                    </td>
-
-                                    <td class="text-muted">
-                                        {{ $usuario->created_at ? $usuario->created_at->format('Y-m-d') : 'Sin fecha' }}
-                                    </td>
+                                    <td>{{ $usuario->rol ? $usuario->rol->nombre_rol : 'Sin rol asignado' }}</td>
+                                    <!-- <td class="text-muted"> {{ $usuario->created_at ? $usuario->created_at->format('Y-m-d') : 'Sin fecha' }}</td> -->
                                 </tr>
                                 @endforeach
                                 @endif

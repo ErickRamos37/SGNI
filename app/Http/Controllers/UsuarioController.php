@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use App\Models\Rol;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreUsuarioRequest;
 
 class UsuarioController extends Controller
 {
@@ -19,23 +19,16 @@ class UsuarioController extends Controller
     }
 
     // 2. Procesar el registro
-    public function store(Request $request)
+    public function store(StoreUsuarioRequest $request)
     {
-        // VALIDACIÓN: Fundamental para la integridad de los datos
-        $request->validate([
-            'num_empleado' => 'required|numeric|unique:usuarios,num_empleado',
-            'nombre' => 'required|string|max:255',
-            'ap_pat' => 'required|string|max:255',
-            'correo_institucional' => 'required|email|unique:usuarios,correo_institucional',
-            'id_rol' => 'required|exists:roles,id_rol'
+        $usuario = Usuario::create($request->all());
+
+        // Respondemos con un JSON (ideal para nuestra petición Fetch/AJAX del frontend)
+        return response()->json([
+            'success' => true,
+            'message' => 'El usuario ha sido registrado exitosamente.',
+            'data' => $usuario
         ]);
-
-        // GUARDADO
-        Usuario::create($request->all());
-
-        // Redirección con mensaje de éxito (usando tus flash messages)
-        return redirect()->route('usuarios.index')
-                         ->with('success', 'El usuario ha sido registrado exitosamente.');
     }
 
     // Mostrar la lista de usuarios
@@ -44,7 +37,6 @@ class UsuarioController extends Controller
         // Traemos todos los usuarios junto con su rol asociado
         $usuarios = Usuario::with('rol')->get();
         
-        // Asumiendo que renombraste tu archivo a lista_usuarios.blade.php
         return view('usuarios.lista_usuarios', compact('usuarios')); 
     }
 }
