@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('turnos', function (Blueprint $table)
         {
-            $table->tinyInteger('id_turno')->unsigned()->primary();
+            $table->tinyIncrements('id_turno')->unsigned()->primary();
             $table->string('tipo_turno', 20);
             $table->timestamps();
         });
