@@ -51,6 +51,13 @@
                 </li>
 
                 <li class="nav-item mb-1">
+                    <a href="{{ route('crear_grupo') }}"
+                        class="nav-link {{ request()->routeIs('crear_grupo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Crear Grupos Nuevo
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1">
                     <a href="{{ route('asistencias.importar') }}"
                         class="nav-link {{ request()->routeIs('asistencias.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Registro de Asistencia
