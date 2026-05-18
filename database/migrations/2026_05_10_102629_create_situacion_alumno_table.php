@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('situacion_alumno', function (Blueprint $table)
         {
             $table->tinyIncrements('id_situacion_alum')->unsigned()->primary();
-            $table->string('Situacion_alumnocol', 45);
+            $table->string('tipo_situacion', 45);
             $table->timestamps();
         });
     }
