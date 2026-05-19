@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
-
+use App\Http\Controllers\CalificacionController;
 
 // Rutas del referentes al inicio de sesion
 Route::get('/', function () {
@@ -26,10 +26,6 @@ Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 
 // Grupo de Rutas Protegidas (Solo para usuarios logueados)
 Route::middleware([ValidarSesionGoogle::class])->group(function () {
-    // Ruta para el dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard.dashboard');
-    })->name('dashboard');
 
     Route::get('/asistencias/importar', function () {
         return view('attendance.importar_asistencias');
@@ -39,19 +35,12 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
         return view('grupos_finales.cierre');
     })->name('cierre');
 
-    // Alta de los usuarios
-    Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
-
-    Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
-    // Tabla de los usuarios
-    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
-
-        Route::get('/usuarios/lista', function () {
+    Route::get('/usuarios/lista', function () {
         return view('usuarios.lista_usuarios');
     })->name('usuarios.lista');
-    
+
     // Importación de excel para la creación de los grupos
-        Route::get('/grupos/importar', function () {
+    Route::get('/grupos/importar', function () {
         return view('groups.importar_alumnos');
     })->name('grupos.importar');
 
@@ -72,4 +61,19 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     })->name('curso_induc');
 
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
+
+    Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
+    Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
+
+    Route::prefix('calificaciones')->name('calificaciones.')->group(function () {
+
+        Route::get('/captura', [CalificacionController::class, 'showCaptura'])->name('captura');
+        Route::post('/upload', [CalificacionController::class, 'upload'])->name('upload');
+        Route::get('/mostrar/{id_grupo?}', [CalificacionController::class, 'indexByGrupo'])->name('mostrar');
+        Route::post('/update-batch', [CalificacionController::class, 'updateBatch'])->name('updateBatch');
+    });
+
+    Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
+    Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
 });
