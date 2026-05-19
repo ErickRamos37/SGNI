@@ -33,7 +33,7 @@
                                     @if($alumno->resultadosPropedeutico || $alumno->asistencias()->where('id_grupo', 1)->exists())
                                         @php $contPrope++; @endphp
                                         <tr class="border-bottom">
-                                            <td class="fw-bold ps-3 py-3 text-secondary">{{ $alumno->matricula }}</td>
+                                            <td class="fw-bold ps-3 py-3 text-black">{{ $alumno->matricula }}</td>
                                             <td class="fw-semibold text-dark">{{ $alumno->nombre_completo }}</td>
                                             <td class="text-muted">{{ $alumno->correo_institucional ?? 'Sin Correo' }}</td>
                                             <td class="text-center">
@@ -77,7 +77,7 @@
 
             <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-body p-4 p-md-5">
-                    <h5 class="fw-bold text-uppercase text-success mb-4 small tracking-wide">
+                    <h5 class="fw-bold text-uppercase text-primary mb-4 small tracking-wide">
                         2. MONITOREO - CURSO DE INDUCCIÓN
                     </h5>
                     
@@ -85,7 +85,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-uppercase text-secondary small fw-bold border-bottom">
                                 <tr>
-                                    <th scope="col" class="ps-3 py-3">Matrícula</th>
+                                    <th scope="col" class="ps-3 py-3 ">Matrícula</th>
                                     <th scope="col" class="py-3">Nombre del Alumno</th>
                                     <th scope="col" class="py-3">Correo Institucional</th>
                                     <th scope="col" class="py-3 text-center">Estatus de Riesgo</th>
@@ -99,7 +99,7 @@
                                     @if($alumno->asistencias()->where('id_grupo', 2)->exists() || !$alumno->resultadosPropedeutico)
                                         @php $contInduc++; @endphp
                                         <tr class="border-bottom">
-                                            <td class="fw-bold ps-3 py-3 text-secondary">{{ $alumno->matricula }}</td>
+                                            <td class="fw-bold ps-3 py-3 text-black">{{ $alumno->matricula }}</td>
                                             <td class="fw-semibold text-dark">{{ $alumno->nombre_completo }}</td>
                                             <td class="text-muted">{{ $alumno->correo_institucional ?? 'Sin Correo' }}</td>
                                             <td class="text-center">
