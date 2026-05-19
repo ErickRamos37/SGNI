@@ -29,6 +29,12 @@ class AlumnoController extends Controller
     {
         Excel::import(new AlumnosImport, $request->file('archivo_excel'));
 
+        $request->validate([
+            'curso' => 'required|string',
+            'archivo_excel' => 'required|mimes:xlsx,xls'
+        ]);
+
+        Excel::import(new AlumnosImport, $request->file('archivo_excel'));
         return redirect()->back()->with('success', '¡La lista de alumnos se procesó y guardó correctamente en la base de datos!');
     }
 
