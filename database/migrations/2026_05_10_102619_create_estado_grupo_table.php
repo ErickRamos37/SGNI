@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('estado_grupo', function (Blueprint $table) {
-            $table->tinyInteger('id_estado')->unsigned()->primary();
+            $table->tinyIncrements('id_estado')->unsigned()->primary();
             $table->string('nombre_estado', 10);
             $table->timestamps();
         });
