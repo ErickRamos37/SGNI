@@ -64,7 +64,7 @@
                     </a>
                 </li>
 
-                
+
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Alta de Profesores
@@ -78,13 +78,13 @@
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 
                     <!-- Mostramos el nombre guardado en la sesión -->
-                    <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
+                    <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }}</strong>
                 </a>
 
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                     <!-- Mostramos el correo como texto inactivo para que sepa qué cuenta está usando -->
                     <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
-                            {{ Session::get('usuario_temp')['correo'] ?? 'correo@uabc.edu.mx' }}
+                            {{ Auth::user()->correo_institucional }}
                         </span></li>
                     <li>
                         <hr class="dropdown-divider">
