@@ -35,18 +35,11 @@
             <hr>
 
             <ul class="nav nav-pills flex-column mb-auto">
-
+                @auth
                 <li class="nav-item mb-2">
                     <a href="{{ route('dashboard') }}"
                         class="nav-link {{ request()->routeIs('dashboard') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item mb-1">
-                    <a href="{{ route('grupos.importar') }}"
-                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos
                     </a>
                 </li>
 
@@ -57,30 +50,33 @@
                     </a>
                 </li>
 
+                @if(Auth::user()->rol->nombre_rol === 'Administrador')
+                <li class="nav-item mb-1">
+                    <a href="{{ route('grupos.importar') }}"
+                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Crear Grupos
+                    </a>
+                </li>
+
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Cierre y Lista Final
                     </a>
                 </li>
 
+                
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Alta de Profesores
                     </a>
                 </li>
+                @endif
             </ul>
 
             <hr>
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <!-- @if(Session::has('usuario_temp') && isset(Session::get('usuario_temp')['avatar']))
-                    <img src="{{ Session::get('usuario_temp')['avatar'] }}" alt="Foto de perfil" width="32" height="32" class="rounded-circle me-2 shadow-sm">
-                    @else
-                    <div class="bg-secondary text-dark rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 32px; height: 32px;">
-                        U
-                    </div>
-                    @endif
- -->
+
                     <!-- Mostramos el nombre guardado en la sesión -->
                     <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
                 </a>
@@ -105,6 +101,7 @@
                     </li>
                 </ul>
             </div>
+            @endauth
         </div>
 
         <main class="flex-grow-1 p-4 bg-light overflow-auto">
