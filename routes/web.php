@@ -72,4 +72,16 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     })->name('curso_induc');
 
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
+
+    Route::get('/asistencia/paselista', function () {
+        return view('asistencia.paselista'); 
+    })->name('asistencia.paselista');
+
+    Route::get('/asistencia/grupal', function () {
+        return view('asistencia.grupal'); 
+    })->name('asistencia.grupal');
+
+    Route::get('/cierre', function () {
+        return view('grupos_finales.cierre');   
+    })->name('cierre');
 });
