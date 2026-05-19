@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SGNI - UABC FIAD</title>
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
@@ -66,6 +68,20 @@
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Alta de Profesores
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('alumnos.info') }}"
+                        class="nav-link {{ request()->routeIs('alumnos.info') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Información Estudiantil
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('alumnos.nuevo') }}"
+                        class="nav-link {{ request()->routeIs('alumnos.nuevo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Alta de Alumnos
                     </a>
                 </li>
             </ul>

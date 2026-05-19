@@ -2,35 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\BuscarAlumnoRequest;
+use App\Http\Requests\ImportarAlumnosRequest; 
+use App\Http\Requests\StoreAlumnoRequest;
+use App\Models\Alumno;
 use App\Imports\AlumnosImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AlumnoController extends Controller
 {
-    public function importar(Request $request)
+    public function buscar(BuscarAlumnoRequest $request)
     {
-        // 1. Se valida por seguridad que el usuario realmente haya enviado lo que se pide
-        $request->validate([
-            'curso' => 'required|string',
-            'archivo_excel' => 'required|mimes:xlsx,xls' // Solo se permiten archivos Excel
-        ]);
+        $alumno = Alumno::with('carrera')->find($request->matricula);
 
-        // 2. Se extrae el archivo que viene en la petición
-        // $archivo = $request->file('archivo_excel');
+        if (!$alumno) {
+            return response()->json(['message' => 'Alumno no encontrado'], 404);
+        }
 
-        // 3. Mostramos los datos recibidos
-        // dd([
-        //     'Mensaje' => '¡Conexión exitosa!',
-        //     'Curso Seleccionado' => $request->curso,
-        //     'Nombre del Archivo' => $archivo->getClientOriginalName(),
-        //     'Tamaño (Bytes)' => $archivo->getSize(),
-        // ]);
+        return response()->json([
+            'success' => true,
+            'alumno' => $alumno
+        ], 200);
+    }
 
-        // 2. Se pasa la clase especialista y el archivo subido
+    public function importar(ImportarAlumnosRequest $request)
+    {
         Excel::import(new AlumnosImport, $request->file('archivo_excel'));
 
-        // 3. Redirigir de vuelta a la página con un mensaje de éxito
         return redirect()->back()->with('success', '¡La lista de alumnos se procesó y guardó correctamente en la base de datos!');
+    }
+
+    public function store(StoreAlumnoRequest $request)
+    {
+        $datos = $request->validated();
+        
+        // Inyecciones obligatorias para que MySQL sea feliz
+        $datos['correo_institucional'] = $datos['matricula'] . '@uabc.edu.mx';
+        $datos['puntaje_ingreso'] = 0;
+        
+        // Le mandamos el ID 1 que acabamos de crear en el Seeder
+        $datos['id_resultados_propedeutico'] = 1; 
+
+        $alumno = Alumno::create($datos);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Alumno registrado correctamente',
+            'alumno' => $alumno
+        ], 201);
     }
 }

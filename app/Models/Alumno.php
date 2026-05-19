@@ -18,6 +18,7 @@ class Alumno extends Model
     // 3. Indica que la matrícula no es autoincrementable
     public $incrementing = false;
 
+    public $timestamps = false;
     // 4. Campos que se permiten llenar desde el Excel
     protected $fillable = [
         'matricula',
@@ -28,4 +29,13 @@ class Alumno extends Model
         'telefono',
         'id_carrera',
     ];
+
+    public function carrera()
+    {
+        // belongsTo significa que un Alumno "pertenece a" una Carrera.
+        // El primer parámetro es el modelo de Carrera.
+        // El segundo es cómo se llama la columna de la llave foránea en tu tabla alumno (ej. 'id_carrera').
+        // El tercero es la llave primaria en la tabla carrera (ej. 'id_carrera').
+        return $this->belongsTo(Carrera::class, 'id_carrera', 'id_carrera');
+    }
 }
