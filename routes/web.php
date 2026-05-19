@@ -77,3 +77,7 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
     Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
 });
+
+Route::get('/asistencia', function () {
+    return view('Asistencia.Asistencia');
+});
