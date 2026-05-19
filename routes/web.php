@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
-
+use App\Http\Controllers\SeguimientoController;
 
 // Rutas del referentes al inicio de sesion
 Route::get('/', function () {
@@ -72,4 +72,6 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     })->name('curso_induc');
 
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
+
+    Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
 });
