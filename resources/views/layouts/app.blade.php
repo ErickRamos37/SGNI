@@ -57,13 +57,28 @@
                     </a>
                 </li>
 
-                <li class="nav-item mb-1">
-                    <a href="{{ route('asistencias.importar') }}"
-                        class="nav-link {{ request()->routeIs('asistencias.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Registro de Asistencia
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link dropdown-toggle {{ request()->routeIs('asistencia.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        style="cursor: pointer;">
+                        <span>Registro de Asistencia</span>
                     </a>
-                </li>
 
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
+                        <li>
+                            <a class="dropdown-item fw-bold text-dark py-2 mb-1 rounded-2" href="{{ route('asistencia.paselista') }}">
+                                Pase de Lista
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item fw-bold text-dark py-2 rounded-2" href="{{ route('asistencia.grupal') }}">
+                                Mostrar Grupo con Asistencias
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link text-white">
                         Cierre y Lista Final
@@ -87,20 +102,10 @@
             <hr>
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <!-- @if(Session::has('usuario_temp') && isset(Session::get('usuario_temp')['avatar']))
-                    <img src="{{ Session::get('usuario_temp')['avatar'] }}" alt="Foto de perfil" width="32" height="32" class="rounded-circle me-2 shadow-sm">
-                    @else
-                    <div class="bg-secondary text-dark rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 32px; height: 32px;">
-                        U
-                    </div>
-                    @endif
- -->
-                    <!-- Mostramos el nombre guardado en la sesión -->
                     <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
                 </a>
 
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <!-- Mostramos el correo como texto inactivo para que sepa qué cuenta está usando -->
                     <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
                             {{ Session::get('usuario_temp')['correo'] ?? 'correo@uabc.edu.mx' }}
                         </span></li>
@@ -108,7 +113,6 @@
                         <hr class="dropdown-divider">
                     </li>
 
-                    <!-- Botón de Cerrar Sesión seguro (POST) -->
                     <li>
                         <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
                             @csrf
