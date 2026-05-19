@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BuscarAlumnoRequest;
-use App\Http\Requests\ImportarAlumnosRequest; 
+use App\Http\Requests\ImportarAlumnosRequest;
 use App\Http\Requests\StoreAlumnoRequest;
 use App\Models\Alumno;
 use App\Imports\AlumnosImport;
@@ -41,13 +41,9 @@ class AlumnoController extends Controller
     public function store(StoreAlumnoRequest $request)
     {
         $datos = $request->validated();
-        
-        // Inyecciones obligatorias para que MySQL sea feliz
         $datos['correo_institucional'] = $datos['matricula'] . '@uabc.edu.mx';
         $datos['puntaje_ingreso'] = 0;
-        
-        // Le mandamos el ID 1 que acabamos de crear en el Seeder
-        $datos['id_resultados_propedeutico'] = 1; 
+        $datos['id_resultados_propedeutico'] = 1;
 
         $alumno = Alumno::create($datos);
 

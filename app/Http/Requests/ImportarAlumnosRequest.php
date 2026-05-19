@@ -8,14 +8,14 @@ class ImportarAlumnosRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Cambiar a true para permitir el flujo
+        return true;
     }
 
     public function rules(): array
     {
         return [
             'curso' => 'required|string',
-            'archivo_excel' => 'required|mimes:xlsx,xls' // Solo se permiten archivos Excel
+            'archivo_excel' => 'required|mimes:xlsx,xls'
         ];
     }
 

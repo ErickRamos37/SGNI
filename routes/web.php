@@ -63,27 +63,27 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 
     Route::get('/alumnos/info', function () {
-        return view('alumnos.info'); 
+        return view('alumnos.info');
     })->name('alumnos.info');
 
     Route::post('/alumnos/buscar', [AlumnoController::class, 'buscar'])->name('alumnos.buscar');
 
     Route::get('/alumnos/nuevo', function () {
-        return view('alumnos.nuealum'); 
+        return view('alumnos.nuealum');
     })->name('alumnos.nuevo');
 
     // 2. Ruta POST para que el JavaScript envíe los datos a la BD
     Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
     Route::get('/asistencia/paselista', function () {
-        return view('asistencia.paselista'); 
+        return view('asistencia.paselista');
     })->name('asistencia.paselista');
 
     Route::get('/asistencia/grupal', function () {
-        return view('asistencia.grupal'); 
+        return view('asistencia.grupal');
     })->name('asistencia.grupal');
 
     Route::get('/cierre', function () {
-        return view('grupos_finales.cierre');   
+        return view('grupos_finales.cierre');
     })->name('cierre');
     Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
     Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
