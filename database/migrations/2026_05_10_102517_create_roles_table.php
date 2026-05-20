@@ -14,7 +14,7 @@ public function up(): void
     Schema::create('cursos', function (Blueprint $table)
     {
         $table->id('id_curso');
-        $table->string('nombre_curso', 20);
+        $table->string('nombre_curso', 40);
         $table->date('fecha_inicio');
         $table->date('fecha_fin');
         $table->timestamps();

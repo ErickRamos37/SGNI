@@ -15,6 +15,8 @@ public function up(): void
     {
         $table->id('id_grupo');
         $table->string('nombre_grupo', 25);
+
+        // llaves foraneas
         $table->unsignedTinyInteger('id_turno');
         $table->foreign('id_turno')->references('id_turno')->on('turnos');
         $table->unsignedBigInteger('id_curso');

@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->id('id_resultados_propedeutico');
             $table->decimal('examen_inicial', 5, 2)->nullable();
             $table->decimal('examen_final', 5, 2)->nullable();
+
+            // llaves foraneas
             $table->unsignedBigInteger('id_curso');
             $table->foreign('id_curso')
                 ->references('id_curso')

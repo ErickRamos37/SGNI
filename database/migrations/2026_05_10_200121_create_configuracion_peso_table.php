@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->id('id_configuracion');
             $table->string('tipo_configuracion', 45);
             $table->decimal('valor', 5, 2);
+
+            // llaves foraneas
             $table->unsignedBigInteger('id_curso');
             $table->foreign('id_curso')
                 ->references('id_curso')
