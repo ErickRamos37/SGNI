@@ -1,77 +1,109 @@
 @extends('layouts.app')
 
 @section('contenido')
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="fw-bold text-primary">Importar Reporte de Asistencias</h1>
-            <p class="text-muted">Cargue el archivo Excel con los porcentajes de asistencia por alumno para el curso seleccionado.</p>
-            
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-body p-4 p-md-5">
-                    <form action="#" method="POST" enctype="multipart/form-data">
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Curso</label>
-                                <select class="form-select form-select-lg border-2" required>
-                                    <option value="" selected disabled>Seleccione el curso...</option>
-                                    <option>Curso de Matemáticas</option>
-                                    <option>Curso de Inducción</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Grupo</label>
-                                <select class="form-select form-select-lg border-2" required>
-                                    <option value="" selected disabled>Seleccione el grupo...</option>
-                                    <option>Grupo A - Ingeniería</option>
-                                    <option>Grupo B - Arquitectura</option>
-                                </select>
-                            </div>
-                        </div>
+    <div class="container py-2">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
 
-                        <!-- <div class="mb-5">
-                            <label class="form-label fw-bold">Archivo Excel (.xlsx)</label>
-                            <div class="bg-light border rounded-3 p-4">
-                                <input type="file" class="form-control form-control-lg border-0 bg-transparent" accept=".xlsx, .xls" required>
-                                <div class="mt-2 text-muted small ps-2">
-                                    <i class="bi bi-info-circle me-1"></i> Asegúrese de que el archivo contenga la columna de porcentajes.
+                <h2 class="text-center fw-bold text-dark mb-2 display-6">
+                    Cargar Excel con Asistencias
+                </h2>
+                <p class="text-center body-color mb-4 fs-5">
+                    Importe el archivo de calificaciones del grupo.
+                </p>
+
+                <div class="text-center mb-4">
+                    <a href="{{ route('calificaciones.exportar', $grupo->id_grupo ?? ($grupo->id ?? 1)) }}"
+                        class="btn btn-warning text-white fw-bold btn-sm shadow-sm rounded-3">
+                        <i class="bi bi-download me-1"></i> DESCARGAR FORMATO
+                    </a>
+                </div>
+
+                <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4 bg-white">
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>¡Revisa el archivo!</strong>
+                            <ul class="mb-0 mt-1 small">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('calificaciones.upload') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+
+                        <div class="p-5 text-center position-relative mb-4 border border-2 border-dashed border-warning rounded-4 bg-light"
+                            id="dropzone-area">
+
+                            <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-white shadow-sm bg-warning"
+                                style="width: 65px; height: 65px;">
+                                <i class="bi bi-upload fs-3"></i>
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1">Haga clic aqui para seleccionar
+                                <div id="file-name-badge" class="d-none mb-3">
+                                    <span class="badge bg-warning text-dark p-2 fs-6 rounded-3 shadow-sm fw-semibold">
+                                        <i class="bi bi-file-earmark-check-fill me-2"></i>
+                                        <span id="file-name-text"></span>
+                                    </span>
                                 </div>
-                            </div>
-                        </div> -->
 
-                        <div class="mb-5">
-                            <label class="form-label fw-bold mb-3">Archivo Excel (.xlsx)</label>
-                            <div class="border border-2 border-dashed rounded-4 p-5 text-center bg-light">
-                                <i class="bi bi-file-earmark-excel display-1 text-primary mb-3"></i>
-                                <h5>Arrastre el archivo Excel aquí o haga clic para seleccionar</h5>
-                                <input type="file" class="form-control mt-3" accept=".xlsx, .xls" required>
-                                <div class="mt-2 text-muted small ps-2">
-                                    <i class="bi bi-info-circle me-1"></i> Asegúrese de que el archivo contenga la columna de porcentajes.
+                                <div
+                                    class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-white border rounded-3 shadow-sm text-muted small">
+                                    <i class="bi bi-file-earmark-spreadsheet-fill text-warning"></i>
+                                    <span>Formato: .xlsx o .xls (Excel)</span>
                                 </div>
-                            </div>
-                            <a href="#" class="text-decoration-none text-muted small border-bottom border-secondary">
-                                Descargar plantilla de ejemplo
-                            </a>
+
+                                <input type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required
+                                    class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;">
                         </div>
 
-                        <!-- <div class="d-flex flex-column align-items-center gap-3 mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-3 shadow-sm" style="min-width: 300px;">
-                                <i class="bi bi-check-circle-fill me-2"></i> Subir Asistencias
-                            </button>
-                            <a href="#" class="text-decoration-none text-muted small border-bottom border-secondary">
-                                Descargar plantilla de ejemplo
-                            </a>
-                        </div> -->
+                        <div class="alert alert-info border-0 mb-0 p-3 rounded-3 shadow-sm text-start" role="alert">
+                            <p class="mb-0 fs-6 text-dark">
+                                <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
+                                <span class="text-muted fw-semibold">Matrícula, Nombre, Asistencia
+                                </span>
+                            </p>
+                        </div>
 
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-3 shadow-sm">
-                                <i class="bi bi-check-circle-fill me-2"></i> Subir Asistencias
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold px-5 py-3 shadow-sm rounded-3">
+                                <i class="bi bi-cloud-arrow-up-fill me-2"></i>
+                                Subir Calificaciones
                             </button>
                         </div>
+
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
-</div>
+
+    <script>
+        document.getElementById('archivo_excel').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : '';
+            const badge = document.getElementById('file-name-badge');
+            const helpText = document.getElementById('file-help-text');
+            const textSpan = document.getElementById('file-name-text');
+            if (fileName) {
+                textSpan.textContent = fileName;
+                badge.classList.remove('d-none');
+                helpText.classList.add('d-none');
+            } else {
+                badge.classList.add('d-none');
+                helpText.classList.remove('d-none');
+            }
+        });
+    </script>
 @endsection

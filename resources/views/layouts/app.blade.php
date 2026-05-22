@@ -104,19 +104,27 @@
 
                 <!-- --- VISTAS DEL ADMINISTRADOR --- -->
                 @if(Auth::user()->rol->nombre_rol === 'Administrador')
-                <li class="nav-item mb-1">
-                    <a href="{{ route('grupos.importar') }}"
-                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link dropdown-toggle {{ request()->routeIs('grupos.*') || request()->routeIs('crear_grupo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                        <span>Crear Grupos</span>
                     </a>
-                </li>
 
-                <li class="nav-item mb-1">
-                    <a href="{{ route('crear_grupo') }}"
-                        class="nav-link {{ request()->routeIs('crear_grupo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos Nuevo
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
+                <li>
+                    <a class="dropdown-item fw-bold {{ request()->routeIs('crear_grupo') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
+                        href="{{ route('crear_grupo') }}">
+                        Crear Grupo
                     </a>
                 </li>
+                <li>
+                    <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.generados') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
+                        href="{{ route('curso_prope_creado') }}">
+                        Grupos Generados
+                    </a>
+                </li>
+            </ul>
 
                 <li class="nav-item mb-1">
                     <a href="{{ route('alumnos.nuevo') }}"

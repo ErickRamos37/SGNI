@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
+use App\Http\Middleware\CheckRole; // Importa el Middleware
 use App\Http\Controllers\CalificacionController;
 
 // --- Rutas del referentes al inicio de sesion ---
@@ -112,4 +112,22 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
     Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
+
+
+    Route::get('/grupos/generados', function () {
+        return view('groups.grupos_generados');
+    })->name('grupos.generados');
+
+    Route::get('/grupos/prope-creado', function () {
+        return view('groups.crear_grupos_cursos.curso_prope_creado');
+    })->name('curso_prope_creado');
+
+    Route::get('/grupos/induc-creado', function () {
+        return view('groups.crear_grupos_cursos.curso_induc_creado');
+    })->name('curso_induc_creado');
+
+    Route::get('/grupos/ver-lista', function () {
+        return view('groups.crear_grupos_cursos.lista_grupo'); // Asegúrate de poner la ruta correcta a tu nuevo archivo
+    })->name('lista_grupo');
+
 });

@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+// Importamos la clase Authenticatable de Laravel nativo
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Usuario extends Authenticatable
 {
-    use HasFactory, Notifiable;
-
     protected $table = 'usuarios';
 
     protected $primaryKey = 'num_empleado';
     public $incrementing = false; // El número de empleado se le asigna manualmente
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
 
     protected $fillable = [
         'num_empleado',
@@ -23,15 +25,4 @@ class Usuario extends Authenticatable
         'correo_institucional',
         'id_rol'
     ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    public function rol()
-    {
-        // El segundo parámetro es la FK en usuarios, el tercero es la PK en roles
-        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
-    }
 }
