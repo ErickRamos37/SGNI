@@ -36,13 +36,6 @@
 
             <ul class="nav nav-pills flex-column mb-auto">
 
-                <li class="nav-item mb-2">
-                    <a href="{{ route('dashboard') }}"
-                        class="nav-link {{ request()->routeIs('dashboard') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Dashboard
-                    </a>
-                </li>
-
                 <li class="nav-item mb-1">
                     <a href="{{ route('grupos.importar') }}"
                         class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">

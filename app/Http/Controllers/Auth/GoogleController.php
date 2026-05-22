@@ -34,7 +34,7 @@ class GoogleController extends Controller
             ]);
 
             // 3. Redirigir al Dashboard
-            return redirect()->route('dashboard');
+            return redirect()->route('crear_grupo');
 
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Error en la conexión.');
