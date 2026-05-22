@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SGNI - UABC FIAD</title>
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
@@ -38,7 +40,70 @@
             <hr>
 
             <ul class="nav nav-pills flex-column mb-auto">
+                @auth
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link dropdown-toggle {{ request()->routeIs('asistencia.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                        <span>Registro de Asistencia</span>
+                    </a>
 
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
+                        <li>
+                            <a class="dropdown-item fw-bold text-dark py-2 mb-1 rounded-2"
+                                href="{{ route('asistencia.paselista') }}">
+                                Pase de Lista
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item fw-bold text-dark py-2 rounded-2"
+                                href="{{ route('asistencia.grupal') }}">
+                                Mostrar Grupo con Asistencias
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link dropdown-toggle {{ request()->routeIs('calificaciones.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="{{ request()->routeIs('calificaciones.*') ? 'true' : 'false' }}"
+                        style="cursor: pointer;">
+                        <span>Captura de Calificaciones</span>
+                    </a>
+
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
+                        <li>
+                            <a class="dropdown-item fw-bold {{ request()->routeIs('calificaciones.captura') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
+                                href="{{ route('calificaciones.captura') }}">
+                                Captura
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item fw-bold {{ request()->routeIs('calificaciones.mostrar') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
+                                href="{{ route('calificaciones.mostrar') }}">
+                                Mostrar Calificaciones Capturadas
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('psicologo') }}"
+                        class="nav-link {{ request()->routeIs('psicologo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Panel Psicologico
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="{{ route('alumnos.info') }}"
+                        class="nav-link {{ request()->routeIs('alumnos.info') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Información Estudiantil
+                    </a>
+                </li>
+
+                <!-- --- VISTAS DEL ADMINISTRADOR --- -->
+                @if(Auth::user()->rol->nombre_rol === 'Administrador')
                 <li class="nav-item mb-1">
                     <a href="{{ route('grupos.importar') }}"
                         class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
@@ -53,79 +118,32 @@
                     </a>
                 </li>
 
-                <li class="nav-item mb-1 dropdown dropend">
-                    <a href="#"
-                        class="nav-link dropdown-toggle {{ request()->routeIs('asistencia.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
-                        data-bs-toggle="dropdown" 
-                        aria-expanded="false"
-                        style="cursor: pointer;">
-                        <span>Registro de Asistencia</span>
-                    </a>
-
-                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
-                        <li>
-                            <a class="dropdown-item fw-bold text-dark py-2 mb-1 rounded-2" href="{{ route('asistencia.paselista') }}">
-                                Pase de Lista
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item fw-bold text-dark py-2 rounded-2" href="{{ route('asistencia.grupal') }}">
-                                Mostrar Grupo con Asistencias
-                            </a>
-                        </li>
-                    </ul>
-                </li>
                 <li class="nav-item mb-1">
-                    <a class="nav-link text-white d-flex justify-content-between align-items-center {{ request()->routeIs('calificaciones.*') ? 'fw-bold' : '' }}"
-                        data-bs-toggle="collapse" href="#submenu-calificaciones" role="button"
-                        aria-expanded="{{ request()->routeIs('calificaciones.*') ? 'true' : 'false' }}">
-                        <span>Captura de Calificaciones</span>
-                        <small class="text-white-50 small">▼</small>
-                    </a>
-
-                    <div class="collapse {{ request()->routeIs('calificaciones.*') ? 'show' : '' }}"
-                        id="submenu-calificaciones">
-                        <div class="d-flex flex-column gap-1 ps-3 border-start border-secondary ms-3 mt-1">
-
-                            <a href="{{ route('calificaciones.captura') }}"
-                                class="nav-link py-1 px-3 {{ request()->routeIs('calificaciones.captura') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white-50 small' }}">
-                                • Captura
-                            </a>
-
-                            <a href="{{ route('calificaciones.mostrar') }}"
-                                class="nav-link py-1 px-3 {{ request()->routeIs('calificaciones.mostrar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white-50 small' }}">
-                                • Mostrar Calificaciones Capturadas
-                            </a>
-
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="{{ route('psicologo') }}"
-                        class="nav-link {{ request()->routeIs('psicologo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Panel Psicologico
+                    <a href="{{ route('alumnos.nuevo') }}"
+                        class="nav-link {{ request()->routeIs('alumnos.nuevo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Alta de Alumnos
                     </a>
                 </li>
 
                 <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
+                    <a href="{{ route('usuarios.lista_usuarios') }}" class="nav-link {{ request()->routeIs('usuarios.lista_usuarios') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Alta de Profesores
                     </a>
                 </li>
+                @endif
             </ul>
 
             <hr>
 
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
+                    <!-- Mostramos el nombre guardado en la sesión -->
+                    <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>
                 </a>
 
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                     <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
-                            {{ Session::get('usuario_temp')['correo'] ?? 'correo@uabc.edu.mx' }}
+                            {{ Auth::user()->correo_institucional }}
                         </span></li>
                     <li>
                         <hr class="dropdown-divider">
@@ -141,6 +159,7 @@
                     </li>
                 </ul>
             </div>
+            @endauth
         </div>
 
         <main class="flex-grow-1 p-4 bg-light overflow-auto">
