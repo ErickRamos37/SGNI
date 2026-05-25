@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\Usuario;
+//use App\Models\Usuario;
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Usuario; // Importar el modelo Usuario
+use Illuminate\Support\Facades\Session;
 
 class GoogleController extends Controller
 {
@@ -52,16 +53,16 @@ class GoogleController extends Controller
                 case 'administrador':
                 case 'admin':
                     return redirect()->route('usuarios.lista_usuarios');
-                
+
                 case 'profesor':
                 case 'docente':
                     // Aquí lo mandas a tus vistas de asistencia que armaste
                     return redirect()->route('asistencia.grupal');
-                
+
                 case 'psicologo':
                 case 'psicóloga':
                     return redirect()->route('psicologo');
-                
+
                 default:
                     // Si le pusieron un rol raro como "invitado"
                     return redirect()->route('login')->with('error', 'El rol "' . $nombreRol . '" no tiene una pantalla asignada.');
