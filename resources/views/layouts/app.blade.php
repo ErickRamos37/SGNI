@@ -40,21 +40,7 @@
             <hr>
 
             <ul class="nav nav-pills flex-column mb-auto">
-
-                <li class="nav-item mb-1">
-                    <a href="{{ route('grupos.importar') }}"
-                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos
-                    </a>
-                </li>
-
-                <li class="nav-item mb-1">
-                    <a href="{{ route('crear_grupo') }}"
-                        class="nav-link {{ request()->routeIs('crear_grupo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos Nuevo
-                    </a>
-                </li>
-
+                @auth
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link dropdown-toggle {{ request()->routeIs('asistencia.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
@@ -77,6 +63,7 @@
                         </li>
                     </ul>
                 </li>
+
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link dropdown-toggle {{ request()->routeIs('calificaciones.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
@@ -101,23 +88,33 @@
                         </li>
                     </ul>
                 </li>
+
                 <li class="nav-item mb-1">
                     <a href="{{ route('psicologo') }}"
                         class="nav-link {{ request()->routeIs('psicologo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Panel Psicologico
                     </a>
                 </li>
-
-                <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
-                        Alta de Profesores
-                    </a>
-                </li>
-
                 <li class="nav-item mb-1">
                     <a href="{{ route('alumnos.info') }}"
                         class="nav-link {{ request()->routeIs('alumnos.info') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Información Estudiantil
+                    </a>
+                </li>
+
+                <!-- --- VISTAS DEL ADMINISTRADOR --- -->
+                @if(Auth::user()->rol->nombre_rol === 'Administrador')
+                <li class="nav-item mb-1">
+                    <a href="{{ route('grupos.importar') }}"
+                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Crear Grupos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('crear_grupo') }}"
+                        class="nav-link {{ request()->routeIs('crear_grupo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Crear Grupos Nuevo
                     </a>
                 </li>
 
@@ -161,31 +158,30 @@
             <hr>
 
             <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <strong>{{ Session::get('usuario_temp')['nombre'] ?? 'Usuario' }}</strong>
-                    </a>
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- Mostramos el nombre guardado en la sesión -->
+                    <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>
+                </a>
 
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                        <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
-                                {{ Session::get('usuario_temp')['correo'] ?? 'correo@uabc.edu.mx' }}
-                            </span></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><span class="dropdown-item-text text-white-50" style="font-size: 0.85rem;">
+                            {{ Auth::user()->correo_institucional }}
+                        </span></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
 
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger fw-bold">
-                                    Cerrar sesión
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger fw-bold">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
+            @endauth
         </div>
 
         <main class="flex-grow-1 p-4 bg-light overflow-auto">

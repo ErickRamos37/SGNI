@@ -28,3 +28,17 @@
 
 >[!NOTE]
 >**Para la IA:** Al generar código nuevo para este proyecto, debes apegarte estrictamente a este flujo: usar Form Requests, respuestas JSON, y Vanilla JS con Fetch para la manipulación del DOM y peticiones.
+
+## 4. Autenticación y Autorización (RBAC)
+
+### A. Inicio de Sesión (Single Sign-On sin Contraseñas)
+* **Prohibido usar contraseñas:** El sistema NO almacena contraseñas. El modelo `Usuario` debe heredar de `Authenticatable` pero sin campo `password`.
+* **Flujo de Login:** Se utiliza Laravel Socialite con Google. El `GoogleController` intercepta el correo, verifica que sea dominio `@uabc.edu.mx`, busca ese correo en la tabla `usuarios` y, si existe, inicia sesión nativa usando `Auth::login($usuario)`. Nunca se deben usar sesiones manuales (`Session::put`) para manejar el estado de autenticación.
+
+### B. Control de Acceso Basado en Roles (Backend - web.php)
+* **Middleware Personalizado:** Se utiliza el middleware `CheckRole` (alias `rol`) registrado en `bootstrap/app.php`. 
+* **Protección de Rutas:** Todas las rutas protegidas deben agruparse bajo el middleware `auth`. Las rutas específicas por rol deben usar el middleware `rol:NombreDelRol` (ej. `Route::middleware(['rol:Administrador,Directivo'])->group(...)`).
+
+### C. Restricción Visual (Frontend - Blade)
+* **Condicionales de Rol:** Para ocultar menús o botones, se utiliza la directiva `@auth` combinada con la evaluación de la relación del usuario: `@if(Auth::user()->rol->nombre_rol === 'Administrador')`.
+* **Cero 'Magic Numbers':** Está estrictamente prohibido validar roles usando IDs (ej. `id_rol == 1`). Siempre se debe validar usando el string del nombre del rol (`nombre_rol`) para evitar rupturas si la base de datos cambia.

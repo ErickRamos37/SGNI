@@ -8,7 +8,7 @@ use App\Http\Middleware\ValidarSesionGoogle;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
 
-// Rutas del referentes al inicio de sesion
+// --- Rutas del referentes al inicio de sesion ---
 Route::get('/', function () {
     return view('auth.login');
 })->name('login');
@@ -25,8 +25,25 @@ Route::get('/auth/error', function () {
 
 Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 
-// Grupo de Rutas Protegidas (Solo para usuarios logueados)
-Route::middleware([ValidarSesionGoogle::class])->group(function () {
+// --- Grupo de Rutas Protegidas (Solo para usuarios logueados) ---
+Route::middleware(['auth'])->group(function () {
+    
+    // Rutas EXCLUSIVAS para Administradores
+    Route::middleware(['rol:Administrador'])->group(function () {
+        // Alta de los usuarios
+        Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
+
+        Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
+        // Tabla de los usuarios
+        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
+
+        Route::get('/usuarios/lista', function () {
+            return view('usuarios.lista_usuarios');
+        })->name('usuarios.lista');
+    });
+
+    // Si se quiere agregar una ruta para Administrador Y Directivo:
+    // Route::middleware(['rol:Administrador,Directivo'])->group(...)
 
     Route::get('/asistencias/importar', function () {
         return view('attendance.importar_asistencias');
@@ -35,10 +52,6 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
     Route::get('/cierre', function () {
         return view('grupos_finales.cierre');
     })->name('cierre');
-
-    Route::get('/usuarios/lista', function () {
-        return view('usuarios.lista_usuarios');
-    })->name('usuarios.lista');
 
     // Importación de excel para la creación de los grupos
     Route::get('/grupos/importar', function () {
