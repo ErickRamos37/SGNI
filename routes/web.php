@@ -4,8 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Middleware\ValidarSesionGoogle; // Importa el Middleware
+use App\Http\Middleware\ValidarSesionGoogle;
 use App\Http\Controllers\CalificacionController;
+use App\Http\Controllers\CierreController;
 
 // Rutas del referentes al inicio de sesion
 Route::get('/', function () {
@@ -99,4 +100,16 @@ Route::middleware([ValidarSesionGoogle::class])->group(function () {
 
     Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
     Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
+
+    Route::get('/grupos_final/criterios', function () {
+        return view('grupos_final.criterios');
+    })->name('grupos_final.criterios');
+
+    Route::get('/grupos_final/grupos_finales', function () {
+        return view('grupos_final.grupos_finales');
+    })->name('grupos_final.grupos_finales');
+
+    Route::get('/grupos_final/modo_lectura', function () {
+        return view('grupos_final.modo_lectura');
+    })->name('grupos_final.modo_lectura');
 });
