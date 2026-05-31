@@ -7,7 +7,7 @@
     <p class="text-muted mb-0">Listado de todos los grupos creados para Propedéutico e Inducción</p>
 </div>
 
-{{-- TABS CON COLORES OFICIALES (SECONDARY) --}}
+{{-- TABS CON COLORES OFICIALES --}}
 <div class="mb-4">
     <div class="d-inline-flex rounded-pill border bg-white shadow-sm p-1 gap-1">
         <a href="{{ route('curso_prope_creado') }}"
@@ -21,13 +21,14 @@
     </div>
 </div>
 
-{{-- TABLA PROPEDÉUTICO --}}
-<div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-    
-    {{-- HEADER DE LA TABLA (PRIMARY = VERDE UABC) --}}
-    <div class="px-4 py-3 bg-primary">
+{{-- ========================================== --}}
+{{-- TABLA 1: GRUPOS DE INGENIERÍA              --}}
+{{-- ========================================== --}}
+<div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-5">
+    <div class="px-4 py-3 bg-primary d-flex align-items-center">
+        <i class="bi bi-gear-fill text-warning fs-4 me-2"></i>
         <h5 class="text-white fw-bold mb-0 text-uppercase">
-            Grupos de Propedéutico
+            Grupos de Ingeniería
         </h5>
     </div>
 
@@ -37,144 +38,106 @@
                 <tr>
                     <th class="px-4 py-3 text-uppercase small fw-bold text-muted">Nombre del Grupo</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Programa</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted">Semana</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Turno</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Total Estudiantes</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Lista</th>
                 </tr>
             </thead>
             <tbody>
-                
-                {{-- Fila 1 --}}
+                @forelse($gruposInge as $grupo)
                 <tr>
-                    <td class="px-4 py-3 fw-semibold">Propedéutico Mañana 1-A</td>
+                    <td class="px-4 py-3 fw-semibold">{{ $grupo->nombre_grupo }}</td>
                     <td class="py-3">
-                        {{-- TEXT-SECONDARY = AMARILLO --}}
                         <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Propedéutico
+                            <i class="bi bi-file-earmark-text"></i> Ingeniería
                         </span>
                     </td>
                     <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Primera Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        {{-- BG-SECONDARY = PASTILLA AMARILLA --}}
-                        <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">
-                            Mañana
-                        </span>
+                        @if($grupo->id_turno == 1)
+                            <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">Mañana</span>
+                        @else
+                            <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">Tarde</span>
+                        @endif
                     </td>
                     <td class="py-3">
                         <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">30</span>
+                            <i class="bi bi-people text-muted"></i> 
+                            <span class="fw-bold fs-6">{{ $grupo->alumnos_count }}</span>
                         </span>
                     </td>
                     <td class="py-3">
-                        {{-- BTN-PRIMARY = BOTÓN VERDE UABC --}}
-                        <a href="{{ route('lista_grupo') }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
+                        <a href="{{ route('lista_grupo', $grupo->id_grupo) }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
                             <i class="bi bi-eye"></i> Ver Lista
                         </a>
                     </td>
                 </tr>
-
-                {{-- Fila 2 --}}
+                @empty
                 <tr>
-                    <td class="px-4 py-3 fw-semibold">Propedéutico Mañana 1-B</td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Propedéutico
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Primera Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">
-                            Mañana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">28</span>
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <a href="{{ route('lista_grupo') }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-eye"></i> Ver Lista
-                        </a>
-                    </td>
+                    <td colspan="5" class="text-center py-4 text-muted">No se han generado grupos de Ingeniería aún.</td>
                 </tr>
-
-                {{-- Fila 3 --}}
-                <tr>
-                    <td class="px-4 py-3 fw-semibold">Propedéutico Tarde 1-A</td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Propedéutico
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Primera Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        {{-- Turno Tarde: Usamos bg-light con texto oscuro para contrastar con el amarillo --}}
-                        <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">
-                            Tarde
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">32</span>
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <a href="{{ route('lista_grupo') }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-eye"></i> Ver Lista
-                        </a>
-                    </td>
-                </tr>
-
-                {{-- Fila 4 --}}
-                <tr>
-                    <td class="px-4 py-3 fw-semibold">Propedéutico Tarde 1-B</td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Propedéutico
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Primera Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">
-                            Tarde
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">29</span>
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <a href="{{ route('lista_grupo') }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-eye"></i> Ver Lista
-                        </a>
-                    </td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
+</div>
 
-    {{-- FOOTER DE LA TABLA --}}
-    <div class="px-4 py-3 bg-light border-top">
-        <small class="text-muted">4 grupos mostrados &bull; Total de estudiantes: 119</small>
+{{-- ========================================== --}}
+{{-- TABLA 2: GRUPOS DE ARQUITECTURA Y DISEÑO   --}}
+{{-- ========================================== --}}
+<div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+    <div class="px-4 py-3 bg-primary d-flex align-items-center">
+        <i class="bi bi-palette-fill text-warning fs-4 me-2"></i>
+        <h5 class="text-white fw-bold mb-0 text-uppercase">
+            Grupos de Arquitectura y Diseño
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="px-4 py-3 text-uppercase small fw-bold text-muted">Nombre del Grupo</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">Programa</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">Turno</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">Total Estudiantes</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">Lista</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($gruposArqui as $grupo)
+                <tr>
+                    <td class="px-4 py-3 fw-semibold">{{ $grupo->nombre_grupo }}</td>
+                    <td class="py-3">
+                        <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
+                            <i class="bi bi-file-earmark-text"></i> Arquitectura
+                        </span>
+                    </td>
+                    <td class="py-3">
+                        @if($grupo->id_turno == 1)
+                            <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">Mañana</span>
+                        @else
+                            <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">Tarde</span>
+                        @endif
+                    </td>
+                    <td class="py-3">
+                        <span class="d-flex align-items-center gap-2">
+                            <i class="bi bi-people text-muted"></i> 
+                            <span class="fw-bold fs-6">{{ $grupo->alumnos_count }}</span>
+                        </span>
+                    </td>
+                    <td class="py-3">
+                        <a href="{{ route('lista_grupo', $grupo->id_grupo) }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-eye"></i> Ver Lista
+                        </a>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No se han generado grupos de Arquitectura aún.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 

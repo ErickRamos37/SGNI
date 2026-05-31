@@ -6,6 +6,9 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\CheckRole; // Importa el Middleware
 use App\Http\Controllers\CalificacionController;
+use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\GrupoController;
+use App\Models\Grupo;
 
 // --- Rutas del referentes al inicio de sesion ---
 Route::get('/', function () {
@@ -41,12 +44,13 @@ Route::middleware(['auth'])->group(function () {
         })->name('usuarios.lista');
     });
 
-    // Si se quiere agregar una ruta para Administrador Y Directivo:
-    // Route::middleware(['rol:Administrador,Directivo'])->group(...)
-
+    
     Route::get('/asistencias/importar', function () {
         return view('attendance.importar_asistencias');
     })->name('asistencias.importar');
+    // RUTAS DE ASISTENCIA
+    Route::post('/asistencias/procesar', [AsistenciaController::class, 'procesar'])->name('asistencias.procesar');
+    Route::post('/asistencias/guardar-masivo', [AsistenciaController::class, 'guardarMasivo'])->name('asistencias.guardarMasivo');
 
     Route::get('/cierre', function () {
         return view('grupos_finales.cierre');
@@ -56,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/grupos/importar', function () {
         return view('groups.importar_alumnos');
     })->name('grupos.importar');
+    
+    Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
 
     Route::get('/psicologo', function () {
         return view('panel_psicologia.psicologo');
@@ -65,13 +71,13 @@ Route::middleware(['auth'])->group(function () {
         return view('groups.crear_grupos_cursos.crear_grupo');
     })->name('crear_grupo');
 
-    Route::get('/curso_prope', function () {
-        return view('groups.crear_grupos_cursos.curso_prope');
-    })->name('curso_prope');
+    Route::get('/curso_prope', [GrupoController::class, 'showCursoPrope'])->name('curso_prope');
+    Route::post('/grupos/guardar-profesores', [GrupoController::class, 'guardarProfesores'])->name('grupos.guardar_profesores');
 
-    Route::get('/curso_induc', function () {
-        return view('groups.crear_grupos_cursos.curso_induc');
-    })->name('curso_induc');
+    Route::get('/curso_induc', [GrupoController::class, 'showCursoInduc'])->name('curso_induc');
+    Route::post('/grupos-induc/store', [GrupoController::class, 'storeInduc'])->name('grupos_induc.store');
+
+    Route::get('/grupos/induc-creado', [GrupoController::class, 'showInducCreado'])->name('curso_induc_creado');
 
     Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 
@@ -87,20 +93,9 @@ Route::middleware(['auth'])->group(function () {
 
     // 2. Ruta POST para que el JavaScript envíe los datos a la BD
     Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
-    Route::get('/asistencia/paselista', function () {
-        return view('asistencia.paselista');
-    })->name('asistencia.paselista');
+    Route::get('/asistencia/paselista', [AsistenciaController::class, 'paselista'])->name('asistencia.paselista');
 
-    Route::get('/asistencia/grupal', function () {
-        return view('asistencia.grupal');
-    })->name('asistencia.grupal');
-
-    Route::get('/cierre', function () {
-        return view('grupos_finales.cierre');
-    })->name('cierre');
-    Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
-    Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
-    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
+    Route::get('/asistencia/grupal', [AsistenciaController::class, 'grupal'])->name('asistencia.grupal');
 
     Route::prefix('calificaciones')->name('calificaciones.')->group(function () {
 
@@ -118,16 +113,12 @@ Route::middleware(['auth'])->group(function () {
         return view('groups.grupos_generados');
     })->name('grupos.generados');
 
-    Route::get('/grupos/prope-creado', function () {
-        return view('groups.crear_grupos_cursos.curso_prope_creado');
-    })->name('curso_prope_creado');
+    Route::get('/grupos/{id_grupo}/descargar-lista', [GrupoController::class, 'descargarLista'])->name('grupos.descargar_lista');
 
-    Route::get('/grupos/induc-creado', function () {
-        return view('groups.crear_grupos_cursos.curso_induc_creado');
-    })->name('curso_induc_creado');
+    Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
 
-    Route::get('/grupos/ver-lista', function () {
-        return view('groups.crear_grupos_cursos.lista_grupo'); // Asegúrate de poner la ruta correcta a tu nuevo archivo
-    })->name('lista_grupo');
+
+   // Borra la que tienes y pon esta:
+    Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
 
 });

@@ -7,7 +7,7 @@
     <p class="text-muted mb-0">Listado de todos los grupos creados para Propedéutico e Inducción</p>
 </div>
 
-{{-- TABS CON COLORES OFICIALES --}}
+{{-- TABS CON COLORES OFICIALES (Aquí Inducción está activo) --}}
 <div class="mb-4">
     <div class="d-inline-flex rounded-pill border bg-white shadow-sm p-1 gap-1">
         <a href="{{ route('curso_prope_creado') }}"
@@ -21,13 +21,14 @@
     </div>
 </div>
 
-{{-- TABLA INDUCCIÓN --}}
-<div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-    
-    {{-- HEADER DE LA TABLA (PRIMARY = VERDE UABC) --}}
-    <div class="px-4 py-3 bg-primary">
+{{-- ========================================== --}}
+{{-- TABLA: GRUPOS GENERALES DE INDUCCIÓN       --}}
+{{-- ========================================== --}}
+<div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-5">
+    <div class="px-4 py-3 bg-primary d-flex align-items-center">
+        <i class="bi bi-people-fill text-warning fs-4 me-2"></i>
         <h5 class="text-white fw-bold mb-0 text-uppercase">
-            Grupos de Inducción
+            Grupos Generales (Inducción)
         </h5>
     </div>
 
@@ -37,110 +38,46 @@
                 <tr>
                     <th class="px-4 py-3 text-uppercase small fw-bold text-muted">Nombre del Grupo</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Programa</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted">Semana</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Turno</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Total Estudiantes</th>
                     <th class="py-3 text-uppercase small fw-bold text-muted">Lista</th>
                 </tr>
             </thead>
             <tbody>
-                
-                {{-- Fila 1 --}}
+                @forelse($gruposInduc as $grupo)
                 <tr>
-                    <td class="px-4 py-3 fw-semibold">Inducción Mañana 2-A</td>
+                    <td class="px-4 py-3 fw-semibold">{{ $grupo->nombre_grupo }}</td>
                     <td class="py-3">
                         <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Inducción
+                            <i class="bi bi-diagram-3-fill"></i> Tronco Común General
                         </span>
                     </td>
                     <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Segunda Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">
-                            Mañana
-                        </span>
+                        @if($grupo->id_turno == 1)
+                            <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">Mañana</span>
+                        @else
+                            <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">Tarde</span>
+                        @endif
                     </td>
                     <td class="py-3">
                         <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">33</span>
+                            <i class="bi bi-people text-muted"></i> 
+                            <span class="fw-bold fs-6">{{ $grupo->alumnos_count }}</span>
                         </span>
                     </td>
                     <td class="py-3">
-                        <a href="#" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
+                        <a href="{{ route('lista_grupo', $grupo->id_grupo) }}" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
                             <i class="bi bi-eye"></i> Ver Lista
                         </a>
                     </td>
                 </tr>
-
-                {{-- Fila 2 --}}
+                @empty
                 <tr>
-                    <td class="px-4 py-3 fw-semibold">Inducción Mañana 2-B</td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Inducción
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Segunda Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">
-                            Mañana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">31</span>
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <a href="#" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-eye"></i> Ver Lista
-                        </a>
-                    </td>
+                    <td colspan="5" class="text-center py-4 text-muted">No se han generado grupos de Inducción aún.</td>
                 </tr>
-
-                {{-- Fila 3 --}}
-                <tr>
-                    <td class="px-4 py-3 fw-semibold">Inducción Tarde 2-A</td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-secondary fw-semibold">
-                            <i class="bi bi-file-earmark-text"></i> Inducción
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2 text-muted">
-                            <i class="bi bi-calendar3"></i> Segunda Semana
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">
-                            Tarde
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <span class="d-flex align-items-center gap-2">
-                            <i class="bi bi-people text-muted"></i> <span class="fw-bold fs-6">35</span>
-                        </span>
-                    </td>
-                    <td class="py-3">
-                        <a href="#" class="btn btn-sm btn-primary fw-semibold px-3 py-2 rounded-2 d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-eye"></i> Ver Lista
-                        </a>
-                    </td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
-    </div>
-
-    {{-- FOOTER DE LA TABLA --}}
-    <div class="px-4 py-3 bg-light border-top">
-        <small class="text-muted">3 grupos mostrados &bull; Total de estudiantes: 99</small>
     </div>
 </div>
 

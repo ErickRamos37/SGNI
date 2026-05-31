@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ResultadosPropedeutico;
-use App\Models\Grupo;
+use App\Models\Grupo; // <-- Importación que ya tenían ellos
 
 class Alumno extends Model
 {
@@ -15,27 +15,30 @@ class Alumno extends Model
     protected $primaryKey = 'matricula';
     public $incrementing = false;
 
-    public $timestamps = false;
-    // 4. Campos que se permiten llenar desde el Excel
+    public $timestamps = false; 
     protected $keyType = 'string';
+    
+    
     protected $fillable = [
         'matricula',
         'nombre',
         'ap_pat',
         'ap_mat',
         'id_grupo_propedeutico',
-        'id_resultados_propedeutico'
+        'id_resultados_propedeutico',
+        'correo_alternativo',  
+        'telefono',            
+        'id_carrera',          
+        'id_grupo_induccion'   
     ];
+
 
     public function carrera()
     {
-        // belongsTo significa que un Alumno "pertenece a" una Carrera.
-        // El primer parámetro es el modelo de Carrera.
-        // El segundo es cómo se llama la columna de la llave foránea en tu tabla alumno (ej. 'id_carrera').
-        // El tercero es la llave primaria en la tabla carrera (ej. 'id_carrera').
         return $this->belongsTo(Carrera::class, 'id_carrera', 'id_carrera');
     }
-        public function resultadosPropedeutico()
+
+    public function resultadosPropedeutico()
     {
         return $this->belongsTo(ResultadosPropedeutico::class, 'id_resultados_propedeutico');
     }
