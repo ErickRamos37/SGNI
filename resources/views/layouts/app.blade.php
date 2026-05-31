@@ -133,12 +133,34 @@
                     </a>
                 </li>
 
-                <li class="nav-item mb-1">
-                    <a href="{{ route('usuarios.lista_usuarios') }}" class="nav-link {{ request()->routeIs('usuarios.lista_usuarios') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Alta de Profesores
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link dropdown-toggle {{ request()->routeIs('grupos.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                        <span>Cierre y Grupos Finales</span>
                     </a>
+
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 260px;">
+                        <li>
+                            <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.criterios') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
+                                href="{{ route('grupos_final.criterios') }}">
+                                Criterios y Creación
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.finales') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
+                                href="{{ route('grupos_final.grupos_finales') }}">
+                                Grupos Finales
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item fw-bold {{ request()->routeIs('grupos_final.modo_lectura') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
+                                href="{{ route('grupos_final.modo_lectura') }}">
+                                Modo Lectura
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-                @endif
             </ul>
 
             <hr>
