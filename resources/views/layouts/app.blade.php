@@ -160,7 +160,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li>@endif
             </ul>
 
             <hr>
