@@ -22,4 +22,3 @@ class ResultadosPropedeutico extends Model
         return $this->hasMany(Alumno::class, 'id_resultados_propedeutico', 'id_resultados_propedeutico');
     }
 }
-
