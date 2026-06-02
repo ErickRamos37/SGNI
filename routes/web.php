@@ -11,8 +11,9 @@ use App\Models\Grupo;
 use App\Http\Middleware\ValidarSesionGoogle;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
+use App\Http\Controllers\SeguimientoController;
 
-// --- Rutas del referentes al inicio de sesion ---
+// Rutas del referentes al inicio de sesion
 Route::get('/', function () {
     return view('auth.login');
 })->name('login');
@@ -43,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/usuarios/lista', [UsuarioController::class, 'index'])->name('usuarios.lista');
     });
 
+// Grupo de Rutas Protegidas (Solo para usuarios logueados)
+Route::middleware([ValidarSesionGoogle::class])->group(function () {
 
     Route::get('/asistencias/importar', function () {
         return view('attendance.importar_asistencias');
@@ -54,6 +57,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cierre', function () {
         return view('grupos_finales.cierre');
     })->name('cierre');
+
+    Route::get('/usuarios/lista', function () {
+        return view('usuarios.lista_usuarios');
+    })->name('usuarios.lista');
 
     // Importación de excel para la creación de los grupos
     Route::get('/grupos/importar', function () {
@@ -82,12 +89,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/alumnos/info', function () {
         return view('alumnos.info');
+    Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
+    Route::get('/alumnos/info', function () {
+        return view('alumnos.info'); 
     })->name('alumnos.info');
 
     Route::post('/alumnos/buscar', [AlumnoController::class, 'buscar'])->name('alumnos.buscar');
 
     Route::get('/alumnos/nuevo', function () {
         return view('alumnos.nuealum');
+        return view('alumnos.nuealum'); 
     })->name('alumnos.nuevo');
 
     // 2. Ruta POST para que el JavaScript envíe los datos a la BD
@@ -95,6 +106,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/asistencia/paselista', [AsistenciaController::class, 'paselista'])->name('asistencia.paselista');
 
     Route::get('/asistencia/grupal', [AsistenciaController::class, 'grupal'])->name('asistencia.grupal');
+    Route::get('/asistencia/paselista', function () {
+        return view('asistencia.paselista'); 
+    })->name('asistencia.paselista');
+
+    Route::get('/asistencia/grupal', function () {
+        return view('asistencia.grupal'); 
+    })->name('asistencia.grupal');
+
+    Route::get('/cierre', function () {
+        return view('grupos_finales.cierre');   
+    })->name('cierre');
+    Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
+    Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
 
     Route::prefix('calificaciones')->name('calificaciones.')->group(function () {
 

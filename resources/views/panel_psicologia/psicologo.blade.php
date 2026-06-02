@@ -5,132 +5,167 @@
     <div class="row">
         <div class="col-12">
             
-            <h1 class="fw-bold mb-1 text-primary">Panel de Seguimiento Psicológico</h1>
-            <p class="text-muted mb-4">Monitoreo de riesgo académico, asistencias y documentación</p>
+            <h1 class="fw-bold mb-1 text-black">Panel de Seguimiento Psicológico</h1>
+            <p class="text-muted mb-4">Monitoreo cronológico por grupos de riesgo académico, asistencias y documentación institucional</p>
             
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-body p-4 p-md-5">
+            {{-- ========================================== --}}
+            {{-- SECCIÓN 1: MONITOREO - CURSO PROPEDÉUTICO  --}}
+            {{-- ========================================== --}}
+            <div class="mb-5">
+                <h3 class="fw-bold text-uppercase text-black mb-4 fs-5 tracking-wide">
+                    1. Monitoreo - Curso Propedéutico
+                </h3>
+
+                @php $contPrope = 0; @endphp
+
+                @foreach($gruposPropedeutico as $grupo)
+                    @php $contPrope++; @endphp
                     
-                    <h5 class="fw-bold text-uppercase text-secondary mb-4 small tracking-wide">
-                        TABLA DE SEGUIMIENTO DE RIESGO
-                    </h5>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-uppercase text-secondary small fw-bold">
-                                <tr>
-                                    <th class="ps-3 py-3">Matrícula</th>
-                                    <th class="py-3">Nombre del Alumno</th>
-                                    <th class="py-3">Correo Institucional</th>
-                                    <th class="py-3">Programa</th>
-                                    <th class="py-3 text-center">Estatus de Riesgo</th>
-                                    <th class="py-3 text-center">% Asistencias</th>
-                                    <th class="py-3 text-center pe-3">Mejoría</th>
-                                </tr>
-                            </thead>
-                            <tbody class="small text-dark">
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123456</td>
-                                    <td>Ana María González López</td>
-                                    <td class="text-muted">ana.gonzalez@uabc.edu.mx</td>
-                                    <td>Propedéutico</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-danger px-3 py-2 text-uppercase fw-bold text-white tracking-wider">Riesgo Alto</span>
-                                    </td>
-                                    <td class="text-center fw-bold py-3 text-danger bg-danger bg-opacity-10">63%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+10</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123457</td>
-                                    <td>Carlos Javier Ramírez Torres</td>
-                                    <td class="text-muted">carlos.ramirez@uabc.edu.mx</td>
-                                    <td>Propedéutico</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-danger px-3 py-2 text-uppercase fw-bold text-white tracking-wider">Riesgo Alto</span>
-                                    </td>
-                                    <td class="text-center fw-bold py-3 text-warning bg-warning bg-opacity-10">75%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+8</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123458</td>
-                                    <td>María Elena Sánchez Cruz</td>
-                                    <td class="text-muted">maria.sanchez@uabc.edu.mx</td>
-                                    <td>Inducción</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-secondary px-3 py-2 text-uppercase fw-bold text-dark tracking-wider">Riesgo Medio</span>
-                                    </td>
-                                    <td class="text-center fw-bold py-3 text-warning bg-warning bg-opacity-10">78%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+8</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123459</td>
-                                    <td>José Luis Hernández Pérez</td>
-                                    <td class="text-muted">jose.hernandez@uabc.edu.mx</td>
-                                    <td>Propedéutico</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-secondary px-3 py-2 text-uppercase fw-bold text-dark tracking-wider">Riesgo Medio</span>
-                                    </td>
-                                    <td class="text-center py-3">89%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+7</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123460</td>
-                                    <td>Laura Patricia Morales García</td>
-                                    <td class="text-muted">laura.morales@uabc.edu.mx</td>
-                                    <td>Inducción</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-success px-3 py-2 text-uppercase fw-bold text-white tracking-wider">Regular</span>
-                                    </td>
-                                    <td class="text-center py-3 fw-bold">100%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+7</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123461</td>
-                                    <td>Roberto Carlos Jiménez Vega</td>
-                                    <td class="text-muted">roberto.jimenez@uabc.edu.mx</td>
-                                    <td>Propedéutico</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-success px-3 py-2 text-uppercase fw-bold text-white tracking-wider">Regular</span>
-                                    </td>
-                                    <td class="text-center py-3 fw-bold">100%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+7</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123462</td>
-                                    <td>Gabriela Fernández Ruiz</td>
-                                    <td class="text-muted">gabriela.fernandez@uabc.edu.mx</td>
-                                    <td>Inducción</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-danger px-3 py-2 text-uppercase fw-bold text-white tracking-wider">Riesgo Alto</span>
-                                    </td>
-                                    <td class="text-center fw-bold py-3 text-danger bg-danger bg-opacity-10">50%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+8</td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fw-bold ps-3 py-3">00123463</td>
-                                    <td>Diego Alejandro Castro Mendoza</td>
-                                    <td class="text-muted">diego.castro@uabc.edu.mx</td>
-                                    <td>Inducción</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-success px-3 py-2 text-uppercase fw-bold text-white tracking-wider">Regular</span>
-                                    </td>
-                                    <td class="text-center py-3 fw-bold">100%</td>
-                                    <td class="text-center fw-bold text-primary pe-3 fs-5">+6</td>
-                                </tr>
-                                
-                            </tbody>
-                        </table>
+                    <div class="card border-1 rounded-3 mb-4" style="border-color: #dee2e6;">
+                        <div class="card-header bg-light border-bottom py-3">
+                            <h5 class="fw-bold text-dark mb-0 text-uppercase small tracking-wide">
+                                Grupo: {{ $grupo->nombre_grupo }}
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light text-uppercase text-secondary small fw-bold border-bottom">
+                                        <tr>
+                                            <th scope="col" class="ps-3 py-3">Matrícula</th>
+                                            <th scope="col" class="py-3">Nombre del Alumno</th>
+                                            <th scope="col" class="py-3">Correo Institucional</th>
+                                            <th scope="col" class="py-3 text-center">Estatus de Riesgo</th>
+                                            <th scope="col" class="py-3 text-center">% Asistencias (Propé)</th>
+                                            <th scope="col" class="py-3 text-center pe-3">Mejoría Exámenes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="small text-dark">
+                                        @forelse($grupo->alumnos as $alumno)
+                                            <tr class="border-bottom">
+                                                <td class="fw-bold ps-3 py-3 text-black">{{ $alumno->matricula }}</td>
+                                                <td class="fw-semibold text-dark">{{ $alumno->nombre_completo }}</td>
+                                                <td class="text-muted">{{ $alumno->correo_institucional ?? 'Sin Correo' }}</td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $situacion = $alumno->seguimientoAcademico->situacionAlum->Situacion_alumnocol ?? 'Regular';
+                                                        if (str_contains(strtolower($situacion), 'alto')) {
+                                                            $badgeColor = 'bg-danger text-white';
+                                                        } elseif (str_contains(strtolower($situacion), 'medio')) {
+                                                            $badgeColor = 'bg-warning text-dark';
+                                                        } else {
+                                                            $badgeColor = 'bg-primary text-white';
+                                                        }
+                                                    @endphp
+                                                    <span class="badge rounded-pill {{ $badgeColor }} px-3 py-2 text-uppercase fw-bold">
+                                                        {{ $situacion }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center fw-bold">
+                                                    @php $pctP = $alumno->porcentaje_asistencia_propedeutico; @endphp
+                                                    <span class="d-inline-block px-3 py-1 rounded {{ $pctP < 70 ? 'text-danger bg-danger' : ($pctP <= 85 ? 'text-warning bg-warning' : 'text-primary bg-primary') }} bg-opacity-10">
+                                                        {{ $pctP }}%
+                                                    </span>
+                                                </td>
+                                                <td class="text-center fw-bold text-primary pe-3 fs-5">
+                                                    {{ $alumno->mejoria }}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4 text-muted">No hay alumnos asignados a este grupo.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+                @endforeach
+
+                @if($contPrope === 0)
+                    <div class="alert alert-secondary border-1 text-center py-4 rounded-3">
+                        No hay grupos registrados en el Curso Propedéutico.
+                    </div>
+                @endif
+            </div>
+
+            {{-- ========================================== --}}
+            {{-- SECCIÓN 2: MONITOREO - CURSO DE INDUCCIÓN  --}}
+            {{-- ========================================== --}}
+            <div class="mb-5">
+                <h3 class="fw-bold text-uppercase text-black mb-4 fs-5 tracking-wide">
+                    2. Monitoreo - Curso de Inducción
+                </h3>
+
+                @php $contInduc = 0; @endphp
+
+                @foreach($gruposInduccion as $grupo)
+                    @php $contInduc++; @endphp
                     
-                </div>
+                    <div class="card border-1 rounded-3 mb-4" style="border-color: #dee2e6;">
+                        <div class="card-header bg-light border-bottom py-3">
+                            <h5 class="fw-bold text-dark mb-0 text-uppercase small tracking-wide">
+                                Grupo: {{ $grupo->nombre_grupo }}
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light text-uppercase text-secondary small fw-bold border-bottom">
+                                        <tr>
+                                            <th scope="col" class="ps-3 py-3">Matrícula</th>
+                                            <th scope="col" class="py-3">Nombre del Alumno</th>
+                                            <th scope="col" class="py-3">Correo Institucional</th>
+                                            <th scope="col" class="py-3 text-center">Estatus de Riesgo</th>
+                                            <th scope="col" class="py-3 text-center pe-3">% Asistencias (Induc)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="small text-dark">
+                                        @forelse($grupo->alumnos as $alumno)
+                                            <tr class="border-bottom">
+                                                <td class="fw-bold ps-3 py-3 text-black">{{ $alumno->matricula }}</td>
+                                                <td class="fw-semibold text-dark">{{ $alumno->nombre_completo }}</td>
+                                                <td class="text-muted">{{ $alumno->correo_institucional ?? 'Sin Correo' }}</td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $situacion = $alumno->seguimientoAcademico->situacionAlum->Situacion_alumnocol ?? 'Regular';
+                                                        if (str_contains(strtolower($situacion), 'alto')) {
+                                                            $badgeColor = 'bg-danger text-white';
+                                                        } elseif (str_contains(strtolower($situacion), 'medio')) {
+                                                            $badgeColor = 'bg-warning text-dark';
+                                                        } else {
+                                                            $badgeColor = 'bg-primary text-white';
+                                                        }
+                                                    @endphp
+                                                    <span class="badge rounded-pill {{ $badgeColor }} px-3 py-2 text-uppercase fw-bold">
+                                                        {{ $situacion }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center fw-bold pe-3">
+                                                    @php $pctI = $alumno->porcentaje_asistencia_induccion; @endphp
+                                                    <span class="d-inline-block px-3 py-1 rounded {{ $pctI < 70 ? 'text-danger bg-danger' : ($pctI <= 85 ? 'text-warning bg-warning' : 'text-primary bg-primary') }} bg-opacity-10">
+                                                        {{ $pctI }}%
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center py-4 text-muted">No hay alumnos asignados a este grupo.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+
+                @if($contInduc === 0)
+                    <div class="alert alert-secondary border-1 text-center py-4 rounded-3">
+                        No hay grupos registrados en el Curso de Inducción.
+                    </div>
+                @endif
             </div>
             
         </div>
