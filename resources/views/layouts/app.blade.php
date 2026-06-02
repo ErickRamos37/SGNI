@@ -41,14 +41,6 @@
 
             <ul class="nav nav-pills flex-column mb-auto">
                 @auth
-                
-                <li class="nav-item mb-1">
-                    <a href="{{ route('psicologo') }}"
-                        class="nav-link {{ request()->routeIs('psicologo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Mis Grupos
-                    </a>
-                </li>
-                
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link dropdown-toggle {{ request()->routeIs('asistencia.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
@@ -60,7 +52,7 @@
                         <li>
                             <a class="dropdown-item fw-bold text-dark py-2 mb-1 rounded-2"
                                 href="{{ route('asistencia.paselista') }}">
-                                Pasar Lista
+                                Pase de Lista
                             </a>
                         </li>
                         <li>
@@ -79,11 +71,6 @@
                         aria-expanded="{{ request()->routeIs('calificaciones.*') ? 'true' : 'false' }}"
                         style="cursor: pointer;">
                         <span>Captura de Calificaciones</span>
-
-                <li class="nav-item mb-1">
-                    <a href="{{ route('grupos.importar') }}"
-                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Crear Grupos
                     </a>
 
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
@@ -96,13 +83,11 @@
                         <li>
                             <a class="dropdown-item fw-bold {{ request()->routeIs('calificaciones.mostrar') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
                                 href="{{ route('calificaciones.mostrar') }}">
-                                Mostrar Calificaciones
+                                Mostrar Calificaciones Capturadas
                             </a>
                         </li>
                     </ul>
                 </li>
-
-                
 
                 <li class="nav-item mb-1">
                     <a href="{{ route('psicologo') }}"
@@ -123,23 +108,23 @@
                     <a href="#"
                         class="nav-link dropdown-toggle {{ request()->routeIs('grupos.*') || request()->routeIs('crear_grupo') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
                         data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                        <span>Cursos Iniciales</span>
+                        <span>Crear Grupos</span>
                     </a>
 
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
-                        <li>
-                            <a class="dropdown-item fw-bold {{ request()->routeIs('crear_grupo') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
-                                href="{{ route('crear_grupo') }}">
-                                Crear Grupo
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.generados') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
-                                href="{{ route('curso_prope_creado') }}">
-                                Lista de Grupos
-                            </a>
-                        </li>
-                    </ul>
+                <li>
+                    <a class="dropdown-item fw-bold {{ request()->routeIs('crear_grupo') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
+                        href="{{ route('crear_grupo') }}">
+                        Crear Grupo
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.generados') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
+                        href="{{ route('curso_prope_creado') }}">
+                        Grupos Generados
+                    </a>
+                </li>
+            </ul>
 
                 <li class="nav-item mb-1">
                     <a href="{{ route('alumnos.nuevo') }}"
@@ -148,47 +133,31 @@
                     </a>
                 </li>
 
-                <li class="nav-item mb-1 dropdown dropend">
-                    <a href="#"
-                        class="nav-link dropdown-toggle {{ request()->routeIs('usuarios.alta_usuarios') || request()->routeIs('usuarios.lista') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
-                        data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                        <span>Personal</span>
+                <li class="nav-item mb-1">
+                    <a href="{{ route('usuarios.lista') }}"
+                        class="nav-link {{ request()->routeIs('usuarios.lista') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Alta de Personal
                     </a>
-
-                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
-                        <li>
-                            <a class="dropdown-item fw-bold {{ request()->routeIs('usuarios.alta_usuarios') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
-                                href="{{ route('usuarios.alta_usuarios') }}">
-                                Alta Personal
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item fw-bold {{ request()->routeIs('usuarios.lista') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
-                                href="{{ route('usuarios.lista') }}">
-                                Lista del Personal
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link dropdown-toggle {{ request()->routeIs('grupos.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"
                         data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                        <span>Grupos Primer Semestre</span>
+                        <span>Cierre y Grupos Finales</span>
                     </a>
 
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 260px;">
                         <li>
                             <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.criterios') ? 'text-primary bg-light' : 'text-dark' }} py-2 mb-1 rounded-2"
                                 href="{{ route('grupos_final.criterios') }}">
-                                Crear grupos
+                                Criterios y Creación
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.finales') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
                                 href="{{ route('grupos_final.grupos_finales') }}">
-                                Lista de Grupos
+                                Grupos Finales
                             </a>
                         </li>
                         <li>
