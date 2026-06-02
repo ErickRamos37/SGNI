@@ -27,9 +27,8 @@ class GoogleController extends Controller
         // Búsqueda del usuario en la BD
         $usuarioDB = Usuario::with('rol')->where('correo_institucional', $googleUser->email)->first();
 
-        if (!$usuarioDB) {
-            return redirect()->route('login')->with('error', 'Tu correo no está registrado...');
-        }
+            // 3. Redirigir al Dashboard
+            return redirect()->route('crear_grupo');
 
         // Iniciar sesión en el sistema
         Auth::login($usuarioDB);

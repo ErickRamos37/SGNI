@@ -71,6 +71,11 @@
                         aria-expanded="{{ request()->routeIs('calificaciones.*') ? 'true' : 'false' }}"
                         style="cursor: pointer;">
                         <span>Captura de Calificaciones</span>
+
+                <li class="nav-item mb-1">
+                    <a href="{{ route('grupos.importar') }}"
+                        class="nav-link {{ request()->routeIs('grupos.importar') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Crear Grupos
                     </a>
 
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 ms-2" style="min-width: 250px;">
