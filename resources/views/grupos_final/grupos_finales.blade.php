@@ -211,7 +211,9 @@
 
                     <div
                         class="card-footer bg-light px-4 py-3 border-top border-light rounded-bottom-3 text-muted small fw-bold">
-                        9 grupos mostrados - Total de estudiantes asignados: 288
+                        {{ $grupos->count() }} grupos mostrados -
+                        Total de estudiantes asignados:
+                        {{ $grupos->sum('alumnos_definitivos_count') }}
                     </div>
 
                 </div>

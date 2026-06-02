@@ -47,4 +47,10 @@ class Alumno extends Model
     {
         return $this->belongsTo(Grupo::class, 'id_grupo_propedeutico');
     }
+
+    public function grupoDefinitivo()
+    {
+        return $this->belongsTo(Grupo::class, 'id_grupo_definitivo', 'id_grupo');
+    }
+
 }

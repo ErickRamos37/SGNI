@@ -14,9 +14,9 @@ class Grupo extends Model
     protected $fillable = [
         'nombre_grupo',
         'id_curso',
-        'id_turno',      
-        'num_empleado', 
-        'id_estado'      
+        'id_turno',
+        'num_empleado',
+        'id_estado'
     ];
 
     // La función intacta de tus compañeros
@@ -24,9 +24,19 @@ class Grupo extends Model
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
     }
-    
+
     public function alumnosInduccion()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_induccion', 'id_grupo');
+    }
+
+    public function alumnosDefinitivos()
+    {
+        return $this->hasMany(Alumno::class, 'id_grupo_definitivo', 'id_grupo');
+    }
+
+    public function carrera()
+    {
+        return $this->belongsTo(Carrera::class, 'id_carrera', 'id_carrera');
     }
 }

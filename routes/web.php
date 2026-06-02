@@ -4,13 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Middleware\CheckRole; // Importa el Middleware
+use App\Http\Middleware\CheckRole; 
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\GrupoController;
 use App\Models\Grupo;
 use App\Http\Middleware\ValidarSesionGoogle;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
+use App\Http\Controllers\GrupoFinalController;
 
 // --- Rutas del referentes al inicio de sesion ---
 Route::get('/', function () {
@@ -131,4 +132,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/grupos_final/modo_lectura', function () {
         return view('grupos_final.modo_lectura');
     })->name('grupos_final.modo_lectura');
+
+    Route::middleware(['auth', 'rol:Administrador'])->group(function () {
+    // Vista de criterios
+    Route::get('/criterios-grupos', [GrupoFinalController::class, 'index'])->name('grupos.finales.index');
+    // Procesamiento del algoritmo
+    Route::post('/generar-grupos-finales', [GrupoFinalController::class, 'generar'])->name('grupos.finales.generar');
+    Route::get('/grupos-finales', [GrupoFinalController::class, 'gruposFinales'])
+    ->name('grupos.finales.lista');
+});
+
 });

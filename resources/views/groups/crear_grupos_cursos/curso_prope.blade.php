@@ -50,7 +50,7 @@
                 <div class="card border-0 shadow-sm rounded-3 mb-4">
                     <div class="card-header bg-transparent border-bottom-0 pt-4 px-4 pb-0">
                         <div class="d-flex align-items-center text-dark fw-bold">
-                            <i class="bi bi-file-earmark-excel-fill text-warning me-2 fs-3"></i>
+                            <i class="bi bi-file-earmark-excel-fill text-black me-2 fs-3"></i>
                             <span class="text-uppercase tracking-wide fs-5">Paso 1: Importar Lista de Estudiantes</span>
                             <span class="text-danger ms-1">*</span>
                         </div>
@@ -60,7 +60,7 @@
                             Suba el archivo Excel (.xlsx) general con la lista de estudiantes. El sistema los separará automáticamente.
                         </p>
 
-                        <label class="border border-3 border-warning border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-3 d-block w-100 cursor-pointer">
+                        <label class="border border-3 border-black border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-3 d-block w-100 cursor-pointer">
                             <input type="file" name="archivo_alumnos" id="archivo_alumnos" class="d-none" accept=".xlsx" required>
                             <div class="py-3">
                                 <i class="bi bi-cloud-arrow-up text-primary display-3 mb-3 d-block"></i>

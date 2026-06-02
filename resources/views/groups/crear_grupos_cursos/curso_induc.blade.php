@@ -129,7 +129,7 @@
                         <i class="bi bi-arrow-left me-2"></i> Atrás
                     </button>
                     <button type="submit" class="btn btn-warning btn-lg text-white fw-bold px-5 text-uppercase shadow-sm">
-                        CREAR GRUPOS E IMPORTAR
+                        CREAR GRUPOS
                     </button>
                 </div>
             </div>
