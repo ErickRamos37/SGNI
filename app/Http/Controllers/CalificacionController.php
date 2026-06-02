@@ -13,12 +13,24 @@ use App\Models\ResultadosPropedeutico;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Exports\GrupoCalificacionesExport;
+use Illuminate\Support\Facades\File;
 
 class CalificacionController extends Controller
 {
     public function showCaptura()
     {
         return view('calificaciones.captura');
+    }
+
+    public function descargarFormatoBase()
+    {
+        $rutaArchivo = public_path('formatos/formato_calificaciones.xlsx');
+        if (!File::exists($rutaArchivo)) {
+            return redirect()->back()->withErrors([
+                'archivo_excel' => 'Error del sistema: El archivo de formato base no se encuentra en la carpeta public/formatos/.'
+            ]);
+        }
+        return response()->download($rutaArchivo, 'formato_calificaciones.xlsx');
     }
 
     public function upload(UploadCalificacionesRequest $request): RedirectResponse
