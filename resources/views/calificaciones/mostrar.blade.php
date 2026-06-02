@@ -5,10 +5,10 @@
         <div class="row justify-content-center">
             <div class="col-12">
 
+                {{-- Encabezado y buscador --}}
                 <div class="row align-items-end g-3 mb-4">
                     <div class="col-12 col-md-6">
-                        <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones
-                        </h1>
+                        <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones</h1>
 
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="text-muted small fw-bold">Grupo:</span>
@@ -16,23 +16,23 @@
                                 class="form-select form-select-sm border-0 bg-transparent fw-bold text-primary p-3 w-auto shadow-none"
                                 onchange="location = this.value;" style="cursor: pointer;">
                                 <option value="{{ route('calificaciones.mostrar') }}" {{ !$grupo ? 'selected' : '' }}>
-                                    --Seleccione un Grupo--  </option>
+                                    --Seleccione un Grupo--
+                                </option>
                                 @foreach ($grupos as $g)
                                     <option value="{{ route('calificaciones.mostrar', $g->id_grupo ?? $g->id) }}"
                                         {{ $grupo && $grupo->id_grupo == ($g->id_grupo ?? $g->id) ? 'selected' : '' }}>
-
                                         {{ $g->nombre ?? ($g->nombre_grupo ?? 'Grupo ' . ($g->id_grupo ?? $g->id)) }}
-
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
+                        {{-- Botón Descargar Lista: Estilo delineado negro con efecto --}}
                         @if ($grupo)
                             <a href="#" id="btn-descargar-lista"
                                 data-url="{{ route('calificaciones.exportar', $grupo->id_grupo ?? $grupo->id) }}"
-                                class="btn btn-secondary btn-sm fw-bold text-white shadow-sm rounded-3">
-                                <i class="bi bi-download me-1"></i> DESCARGAR LISTA
+                                class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Descargar Lista
                             </a>
                         @endif
                     </div>
@@ -77,17 +77,12 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0" id="tabla-estudiantes">
-
-                                    <thead class="table-light border-bottom border-1 text-uppercase"
-                                        style="font-size: 0.8rem;">
+                                    <thead class="table-light border-bottom border-1 text-uppercase" style="font-size: 0.8rem;">
                                         <tr>
                                             <th class="body-color fw-bold py-3 ps-4" style="width: 15%;">Matrícula</th>
-                                            <th class="body-color fw-bold py-3" style="width: 45%;">Nombre del Alumno
-                                            </th>
-                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen
-                                                Diagnóstico</th>
-                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen
-                                                Propedéutico Final</th>
+                                            <th class="body-color fw-bold py-3" style="width: 45%;">Nombre del Alumno</th>
+                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen Diagnóstico</th>
+                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen Propedéutico Final</th>
                                         </tr>
                                     </thead>
 
@@ -97,17 +92,13 @@
                                                 $notaInicial = $alumno->resultadosPropedeutico->examen_inicial ?? null;
                                                 $notaFinal = $alumno->resultadosPropedeutico->examen_final ?? null;
                                             @endphp
-                                            <tr data-matricula="{{ $alumno->matricula }}"
-                                                class="border-bottom border-light student-row">
-
+                                            <tr data-matricula="{{ $alumno->matricula }}" class="border-bottom border-light student-row">
                                                 <td class="ps-4 fw-bold text-dark fs-6 tracking-wide">
                                                     {{ $alumno->matricula }}
                                                 </td>
-
                                                 <td class="fw-semibold body-color student-name">
                                                     {{ $alumno->ap_pat }} {{ $alumno->ap_mat }} {{ $alumno->nombre }}
                                                 </td>
-
                                                 <td>
                                                     <div class="col-9 col-md-7 mx-auto">
                                                         <input type="number"
@@ -116,7 +107,6 @@
                                                             value="{{ $notaInicial }}" placeholder="-">
                                                     </div>
                                                 </td>
-
                                                 <td>
                                                     <div class="col-9 col-md-7 mx-auto">
                                                         <input type="number"
@@ -125,7 +115,6 @@
                                                             value="{{ $notaFinal }}" placeholder="-">
                                                     </div>
                                                 </td>
-
                                             </tr>
                                         @empty
                                             <tr>
@@ -134,59 +123,52 @@
                                                     No hay alumnos registrados en este grupo.
                                                 </td>
                                             </tr>
-                                        @endempty
-                                </tbody>
-
-                            </table>
-                        </div>
-                    </div>
-
-                    <div
-                        class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
-                        <span class="text-muted small fw-bold" id="contador-estudiantes">
-                            {{ $alumnos->count() }} estudiantes mostrados
-                        </span>
-
-                        <button type="button" id="btn-guardar-batch"
-                            class="btn btn-secondary text-white fw-bold text-uppercase px-4 py-2 rounded-3 shadow-sm d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-save-fill"></i> Guardar
-                        </button>
-                    </div>
-
-                </div>
-                @if ($alumnos->hasPages())
-                    <div class="mt-3 text-center">
-
-                        <small class="text-muted fw-bold d-block mb-2 text-uppercase tracking-wider"
-                            style="font-size: 0.75rem;">
-                            Página {{ $alumnos->currentPage() }} de {{ $alumnos->lastPage() }}
-                        </small>
-
-                        <div class="d-flex justify-content-center">
-                            {{ $alumnos->links('pagination::simple-bootstrap-4') }}
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
+                            <span class="text-muted small fw-bold" id="contador-estudiantes">
+                                {{ $alumnos->count() }} estudiantes mostrados
+                            </span>
+
+                            {{-- Botón Guardar: Estilo delineado negro con efecto --}}
+                            <button type="button" id="btn-guardar-batch" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Guardar
+                            </button>
+                        </div>
+
+                    </div>
+
+                    @if ($alumnos->hasPages())
+                        <div class="mt-3 text-center">
+                            <small class="text-muted fw-bold d-block mb-2 text-uppercase tracking-wider" style="font-size: 0.75rem;">
+                                Página {{ $alumnos->currentPage() }} de {{ $alumnos->lastPage() }}
+                            </small>
+                            <div class="d-flex justify-content-center">
+                                {{ $alumnos->links('pagination::simple-bootstrap-4') }}
+                            </div>
+                        </div>
+                    @endif
+                @else
+                    <div class="card border-0 shadow-sm p-5 rounded-4 bg-white text-center my-4">
+                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-warning bg-light border border-warning border-2"
+                            style="width: 75px; height: 75px;">
+                            <i class="bi bi-folder-symlink display-6"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">No se ha seleccionado un grupo</h4>
+                        <p class="text-muted col-md-6 mx-auto mb-0">
+                            Por favor, elija un grupo propedéutico desde el menú desplegable superior para visualizar el
+                            listado de alumnos y capturar sus calificaciones.
+                        </p>
                     </div>
                 @endif
-        </div>
-    </div>
-@else
-    <div class="card border-0 shadow-sm p-5 rounded-4 bg-white text-center my-4">
-        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-warning bg-light border border-warning border-2"
-            style="width: 75px; height: 75px;">
-            <i class="bi bi-folder-symlink display-6"></i>
-        </div>
-        <h4 class="fw-bold text-dark mb-2">No se ha seleccionado un grupo</h4>
-        <p class="text-muted col-md-6 mx-auto mb-0">
-            Por favor, elija un grupo propedéutico desde el menú desplegable superior para visualizar el
-            listado de alumnos y capturar sus calificaciones.
-        </p>
-    </div>
-    @endif
 
-</div>
-</div>
-</div>
+            </div>
+        </div>
+    </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -199,18 +181,15 @@
                 const filas = document.querySelectorAll('#tabla-estudiantes tbody tr.student-row');
                 const datos = [];
                 filas.forEach(fila => {
-                    const inputInicial = fila.querySelector(
-                        'input[data-field="examen_inicial"]');
+                    const inputInicial = fila.querySelector('input[data-field="examen_inicial"]');
                     const inputFinal = fila.querySelector('input[data-field="examen_final"]');
                     const matricula = fila.getAttribute('data-matricula');
 
                     if (matricula && inputInicial && inputFinal) {
                         datos.push({
                             matricula: matricula.trim(),
-                            examen_inicial: inputInicial.value !== '' ? parseFloat(
-                                inputInicial.value) : null,
-                            examen_final: inputFinal.value !== '' ? parseFloat(
-                                inputFinal.value) : null
+                            examen_inicial: inputInicial.value !== '' ? parseFloat(inputInicial.value) : null,
+                            examen_final: inputFinal.value !== '' ? parseFloat(inputFinal.value) : null
                         });
                     }
                 });
@@ -221,10 +200,9 @@
                 }
 
                 btn.disabled = true;
-                btn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
 
-                fetch("{{ route('calificaciones.guardarTablaDirecto') }}", {
+                fetch("{{ route('calificaciones.updateBatch') }}", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -242,22 +220,19 @@
                     })
                     .then(data => {
                         if (data.status === 'success') {
-                            alert(
-                                '¡Listo! Las calificaciones se actualizaron con éxito en la base de datos.'
-                            );
-                            window.location
-                                .reload();
+                            alert('¡Listo! Las calificaciones se actualizaron con éxito en la base de datos.');
+                            window.location.reload();
                         } else {
                             alert('Error: ' + data.message);
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="bi bi-save-fill"></i> Guardar';
+                            btn.innerHTML = 'Guardar';
                         }
                     })
                     .catch(error => {
                         console.error('Error detallado:', error);
                         alert('Inconveniente de comunicación con el servidor al intentar guardar.');
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-save-fill"></i> Guardar';
+                        btn.innerHTML = 'Guardar';
                     });
             });
         }
@@ -283,8 +258,7 @@
                     }
                 });
 
-                document.getElementById('contador-estudiantes').textContent =
-                    `${visibles} estudiantes mostrados`;
+                document.getElementById('contador-estudiantes').textContent = `${visibles} estudiantes mostrados`;
             });
         }
 
@@ -301,6 +275,7 @@
             });
         });
 
+        // Evento secundario unificado para el envío por payload alternativo
         const btnGuardar = document.getElementById('btn-guardar-batch');
         if (btnGuardar) {
             btnGuardar.addEventListener('click', function() {
@@ -310,23 +285,19 @@
 
                 rows.forEach(row => {
                     const matricula = row.getAttribute('data-matricula');
-                    const inputInicial = row.querySelector(
-                        'input[data-field="examen_inicial"]');
+                    const inputInicial = row.querySelector('input[data-field="examen_inicial"]');
                     const inputFinal = row.querySelector('input[data-field="examen_final"]');
 
                     if (inputInicial.value !== '' || inputFinal.value !== '') {
                         calificacionesPayload[matricula] = {
-                            examen_inicial: inputInicial.value !== '' ? parseInt(
-                                inputInicial.value) : null,
-                            examen_final: inputFinal.value !== '' ? parseInt(inputFinal
-                                .value) : null
+                            examen_inicial: inputInicial.value !== '' ? parseInt(inputInicial.value) : null,
+                            examen_final: inputFinal.value !== '' ? parseInt(inputFinal.value) : null
                         };
                     }
                 });
 
                 btn.disabled = true;
-                btn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
 
                 fetch("{{ route('calificaciones.updateBatch') }}", {
                         method: "POST",
@@ -349,8 +320,7 @@
                         alertMessage.textContent = data.message;
 
                         if (data.status === 'success') {
-                            alertBox.className =
-                                "alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
+                            alertBox.className = "alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
                             alertIcon.className = "bi bi-check-circle-fill fs-4 me-3";
                             window.scrollTo({
                                 top: 0,
@@ -360,18 +330,17 @@
                                 window.location.reload();
                             }, 1200);
                         } else {
-                            alertBox.className =
-                                "alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
+                            alertBox.className = "alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
                             alertIcon.className = "bi bi-exclamation-triangle-fill fs-4 me-3";
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="bi bi-save-fill"></i> GUARDAR';
+                            btn.innerHTML = 'Guardar';
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         alert('Inconveniente de comunicación con el servidor.');
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-save-fill"></i> GUARDAR';
+                        btn.innerHTML = 'Guardar';
                     });
             });
         }
@@ -380,7 +349,6 @@
         if (btnDescargar) {
             btnDescargar.addEventListener('click', function(e) {
                 e.preventDefault();
-
                 const urlExportar = this.getAttribute('data-url');
                 if (urlExportar) {
                     window.location.href = urlExportar;
