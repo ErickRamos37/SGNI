@@ -31,22 +31,19 @@ Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 
 // --- Grupo de Rutas Protegidas (Solo para usuarios logueados) ---
 Route::middleware(['auth'])->group(function () {
-    
+
     // Rutas EXCLUSIVAS para Administradores
     Route::middleware(['rol:Administrador'])->group(function () {
         // Alta de los usuarios
         Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
-
         Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
+
         // Tabla de los usuarios
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
-
-        Route::get('/usuarios/lista', function () {
-            return view('usuarios.lista_usuarios');
-        })->name('usuarios.lista');
+        Route::get('/usuarios/lista', [UsuarioController::class, 'index'])->name('usuarios.lista');
     });
 
-    
+
     Route::get('/asistencias/importar', function () {
         return view('attendance.importar_asistencias');
     })->name('asistencias.importar');
@@ -62,7 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/grupos/importar', function () {
         return view('groups.importar_alumnos');
     })->name('grupos.importar');
-    
+
     Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
 
     Route::get('/psicologo', function () {
@@ -109,7 +106,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
     Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
-
+    Route::get('/calificaciones/descargar-formato-base', [CalificacionController::class, 'descargarFormatoBase'])->name('calificaciones.descargarFormatoBase');
 
     Route::get('/grupos/generados', function () {
         return view('groups.grupos_generados');
@@ -120,7 +117,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
 
 
-   
+
     Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
 
     Route::get('/grupos_final/criterios', function () {

@@ -133,6 +133,13 @@
                     </a>
                 </li>
 
+                <li class="nav-item mb-1">
+                    <a href="{{ route('usuarios.lista') }}"
+                        class="nav-link {{ request()->routeIs('usuarios.lista') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
+                        Alta de Personal
+                    </a>
+                </li>
+
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link dropdown-toggle {{ request()->routeIs('grupos.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }} d-flex justify-content-between align-items-center"

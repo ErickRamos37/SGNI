@@ -15,10 +15,9 @@ class Alumno extends Model
     protected $primaryKey = 'matricula';
     public $incrementing = false;
 
-    public $timestamps = false; 
+    public $timestamps = false;
     protected $keyType = 'string';
-    
-    
+
     protected $fillable = [
         'matricula',
         'nombre',
@@ -26,10 +25,10 @@ class Alumno extends Model
         'ap_mat',
         'id_grupo_propedeutico',
         'id_resultados_propedeutico',
-        'correo_alternativo',  
-        'telefono',            
-        'id_carrera',          
-        'id_grupo_induccion'   
+        'correo_alternativo',
+        'telefono',
+        'id_carrera',
+        'id_grupo_induccion'
     ];
 
 

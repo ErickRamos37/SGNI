@@ -1,108 +1,156 @@
 @extends('layouts.app')
 
 @section('contenido')
-    <div class="container py-2">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
+    <div class="container-fluid py-4">
 
-                <h2 class="text-center fw-bold text-dark mb-2 display-6">
-                    Cargar Excel con Calificaciones
-                </h2>
-                <p class="text-center body-color mb-4 fs-5">
-                    Importe el archivo de calificaciones del grupo.
+        {{-- 1. Header Principal --}}
+        <div class="mb-4">
+            <h1 class="fw-bold text-dark mb-1">Cargar Excel con Calificaciones</h1>
+            <p class="text-muted mb-2">Importe el archivo de calificaciones del grupo de manera automática</p>
+        </div>
+
+        {{-- Boton Descargar Formato: Ahora apunta a la nueva ruta del archivo estatico y limpio --}}
+        <div class="text-center mb-4">
+            <a href="{{ route('calificaciones.descargarFormatoBase') }}"
+                class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                Descargar Formato
+            </a>
+        </div>
+
+        {{-- 2. Tarjeta de Contenido Principal --}}
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-transparent border-bottom-0 pt-4 px-4 pb-0">
+                <div class="d-flex align-items-center text-primary fw-bold">
+                    <i class="bi bi-file-earmark-excel-fill text-primary me-2 fs-3"></i>
+                    <span class="text-uppercase tracking-wide fs-5">Importar Lista de Calificaciones</span>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <p class="small text-muted mb-4">
+                    Suba el archivo Excel (.xlsx) con los resultados de las evaluaciones del grupo seleccionado. El sistema procesará las calificaciones de forma inmediata.
                 </p>
 
-                <div class="text-center mb-4">
-                    <a href="{{ route('calificaciones.exportar', $grupo->id_grupo ?? ($grupo->id ?? 1)) }}"
-                        class="btn btn-warning text-white fw-bold btn-sm shadow-sm rounded-3">
-                        <i class="bi bi-download me-1"></i> DESCARGAR FORMATO
-                    </a>
-                </div>
+                {{-- Formulario Operativo --}}
+                <form action="{{ route('calificaciones.upload') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-                <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4 bg-white">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                    {{-- Área Dropzone Interactiva --}}
+                    <label class="border border-3 border-black border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-4 d-block w-100 position-relative cursor-pointer" id="dropzone-area">
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>¡Revisa el archivo!</strong>
-                            <ul class="mb-0 mt-1 small">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                        <input type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required
+                            class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;">
 
-                    <form action="{{ route('calificaciones.upload') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                        <div class="py-3">
+                            <i class="bi bi-cloud-arrow-up text-primary display-3 mb-3 d-block"></i>
 
-                        <div class="p-5 text-center position-relative mb-4 border border-2 border-dashed border-warning rounded-4 bg-light"
-                            id="dropzone-area">
+                            <h5 class="fw-bold text-dark mb-1" id="nombre_archivo">Arrastre el archivo aquí</h5>
+                            <p class="text-muted small mb-3" id="file-help-text">o haga clic para seleccionar</p>
 
-                            <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-white shadow-sm bg-warning"
-                                style="width: 65px; height: 65px;">
-                                <i class="bi bi-upload fs-3"></i>
+                            <div id="file-name-badge" class="d-none mb-3">
+                                <span class="badge bg-warning text-dark p-2 fs-6 rounded-3 shadow-sm fw-semibold">
+                                    <i class="bi bi-file-earmark-check-fill me-2"></i>
+                                    <span id="file-name-text"></span>
+                                </span>
                             </div>
 
-                            <h5 class="fw-bold text-dark mb-1">Haga clic aqui para seleccionar
-                                <div id="file-name-badge" class="d-none mb-3">
-                                    <span class="badge bg-warning text-dark p-2 fs-6 rounded-3 shadow-sm fw-semibold">
-                                        <i class="bi bi-file-earmark-check-fill me-2"></i>
-                                        <span id="file-name-text"></span>
-                                    </span>
-                                </div>
-
-                                <div
-                                    class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-white border rounded-3 shadow-sm text-muted small">
-                                    <i class="bi bi-file-earmark-spreadsheet-fill text-warning"></i>
-                                    <span>Formato: .xlsx o .xls (Excel)</span>
-                                </div>
-
-                                <input type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required
-                                    class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;">
+                            <div class="d-inline-flex align-items-center badge bg-white text-dark border px-3 py-2 rounded-2 small shadow-sm">
+                                <i class="bi bi-file-earmark-spreadsheet-fill text-dark me-1"></i>
+                                <span>Formato: .xlsx / .xls</span>
+                            </div>
                         </div>
+                    </label>
 
-                        <div class="alert alert-info border-0 mb-0 p-3 rounded-3 shadow-sm text-start" role="alert">
-                            <p class="mb-0 fs-6 text-dark">
-                                <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
-                                <span class="text-muted fw-semibold">Matrícula, Nombre, Examen Diagnóstico, Examen
-                                    Propedéutico Final</span>
-                            </p>
+                    {{-- Recuadro Informativo de Formato --}}
+                    <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-4" role="alert">
+                        <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
+                        <div class="small">
+                            <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
+                            <span class="text-muted fw-semibold">Matrícula, Nombre, Examen Diagnóstico, Examen Propedéutico Final</span>
                         </div>
+                    </div>
 
-                        <div class="text-end mt-4">
-                            <button type="submit" class="btn btn-warning btn-lg fw-bold px-5 py-3 shadow-sm rounded-3">
-                                <i class="bi bi-cloud-arrow-up-fill me-2"></i>
-                                Subir Calificaciones
-                            </button>
-                        </div>
+                    {{-- Botón de Acción Único Inferior Derecho --}}
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                            Subir Calificaciones
+                        </button>
+                    </div>
 
-                    </form>
-                </div>
-
+                </form>
             </div>
         </div>
+
     </div>
 
+    {{-- Importación de la librería de SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- LÓGICA DE ALERTAS EMERGENTES --}}
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: '¡Carga Exitosa!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#00723F',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        </script>
+    @endif
+
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let listadoErrores = '';
+
+                @foreach ($errors->all() as $error)
+                    let errorTexto = "{{ $error }}";
+
+                    if (!errorTexto.includes('Fila')) {
+                        errorTexto = "El contenido o la estructura interna del archivo es incorrecto. Verifique las columnas del formato.";
+                    }
+
+                    listadoErrores += '<div class="d-flex align-items-start mb-2 text-dark">' +
+                                        '<i class="bi bi-x-circle-fill text-danger me-2 mt-1"></i>' +
+                                        '<span>' + errorTexto + '</span>' +
+                                      '</div>';
+                @endforeach
+
+                Swal.fire({
+                    title: '¡Contenido del Archivo Incorrecto!',
+                    html: '<p class="text-muted small text-start mb-3">El sistema detectó inconsistencias al intentar leer el documento:</p>' +
+                           '<div class="bg-light p-3 rounded-3 border text-start lh-base style-scroll" style="max-height: 200px; overflow-y: auto;">' +
+                               listadoErrores +
+                           '</div>',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Entendido'
+                });
+            });
+        </script>
+    @endif
+
+    {{-- Script nativo de control de UI para el Dropzone --}}
     <script>
         document.getElementById('archivo_excel').addEventListener('change', function(e) {
             const fileName = e.target.files[0] ? e.target.files[0].name : '';
             const badge = document.getElementById('file-name-badge');
             const helpText = document.getElementById('file-help-text');
             const textSpan = document.getElementById('file-name-text');
+            const mainTitle = document.getElementById('nombre_archivo');
+
             if (fileName) {
                 textSpan.textContent = fileName;
                 badge.classList.remove('d-none');
                 helpText.classList.add('d-none');
+                mainTitle.innerText = "¡Archivo Seleccionado!";
             } else {
                 badge.classList.add('d-none');
                 helpText.classList.remove('d-none');
+                mainTitle.innerText = "Arrastre el archivo aquí";
             }
         });
     </script>
