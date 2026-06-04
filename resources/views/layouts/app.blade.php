@@ -39,7 +39,7 @@
         </div>
 
         {{--- Sidebar --}}
-        <div class="offcanvas-lg offcanvas-start bg-primary text-white flex-column flex-shrink-0 p-3 min-vh-100" tabindex="-1"
+        <div class="offcanvas-lg offcanvas-start bg-primary text-white d-flex flex-column flex-shrink-0 p-3 min-vh-100" tabindex="-1"
             id="sidebarMenu">
 
             <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
@@ -224,13 +224,13 @@
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('calificaciones.mostrar') ? 'text-primary bg-light' : 'text-dark' }}"
                                 href="{{ route('calificaciones.mostrar') }}">
-                                Mostrar Calificaciones
+                                Mostrar Calificaciones Capturadas
                             </a>
                         </li>
                     </ul>
                 </li>
 
-                {{-- ─── Vistas del Administrador ──────────────────── --}}
+                {{--- Vistas del Administrador ---}}
                 @if(Auth::user()->rol->nombre_rol === 'Administrador')
 
                 {{-- Personal --}}
@@ -277,7 +277,7 @@
 
             <hr>
 
-            <div class="dropdown">
+            <div class="dropup">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- Mostramos el nombre guardado en la sesión -->
                     <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>

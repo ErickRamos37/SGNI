@@ -88,7 +88,7 @@
                         <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-0" role="alert">
                             <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                             <div class="small">
-                                <strong>Formato esperado:</strong> El archivo debe contener la columna "programa_desc" con la carrera.
+                                <strong>Formato esperado:</strong> El archivo debe contener  "unidad_desc|programaestudios|programa_des|matricula|Nombre|apellido_paterno|apellido_materno".
                             </div>
                         </div>
 
@@ -189,9 +189,10 @@
                 if(inputArchivo.files.length === 0) {
                     Swal.fire({
                         title: 'Archivo requerido',
-                        text: '¡Ey! Por favor selecciona un archivo Excel con la lista de estudiantes antes de continuar al Paso 2.',
+                        text: 'Por favor selecciona un archivo Excel con la lista de estudiantes antes de continuar al Paso 2.',
                         icon: 'warning',
-                        confirmButtonColor: '#00723F', // Color amarillo de advertencia (warning)
+                        customClass: { confirmButton: 'btn btn-primary' },
+                        buttonsStyling: false,
                         confirmButtonText: '<i class="bi bi-hand-thumbs-up-fill me-1"></i> Entendido'
                     });
                     return;
@@ -300,7 +301,8 @@
                                    <i class="bi bi-exclamation-triangle-fill text-warning"></i> <b>Repetidos (ignorados):</b> ${repetidos}
                                </div>`,
                         icon: 'warning',
-                        confirmButtonColor: '#00723F',
+                        customClass: { confirmButton: 'btn btn-primary' },
+                        buttonsStyling: false,
                         confirmButtonText: 'Aceptar'
                     });
                 } else {
@@ -308,7 +310,8 @@
                         title: '¡Creación de Grupos!',
                         text: `Se crearon los grupos correctamente.`,
                         icon: 'success',
-                        confirmButtonColor: '#00723F', 
+                        customClass: { confirmButton: 'btn btn-primary' },
+                        buttonsStyling: false,
                         confirmButtonText: 'Aceptar'
                     });
                 }
@@ -326,7 +329,8 @@
                     title: '¡Acción Denegada!',
                     text: "{{ session('error_grupos_existentes') }}",
                     icon: 'error',
-                    confirmButtonColor: '#dc3545', // Color rojo para detener
+                    customClass: { confirmButton: 'btn btn-danger' },
+                    buttonsStyling: false,
                     confirmButtonText: 'Entendido'
                 });
             });

@@ -6,10 +6,14 @@ use App\Models\Alumno;
 use App\Models\ResultadosPropedeutico;
 use App\Models\Grupo;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterImport;
 
-class CalificacionesImport implements ToModel
+class CalificacionesImport implements ToModel, WithEvents
 {
     protected $contadorFilas = 1;
+
+    protected $filasConDatos = 0;
 
     public function model(array $row)
     {
@@ -35,6 +39,9 @@ class CalificacionesImport implements ToModel
             throw new \Exception("Fila {$this->contadorFilas}: El alumno '{$alumno->nombre}' (Matrícula: {$matricula}) existe, pero NO tiene ningún grupo propedéutico asignado.");
         }
 
+        // CORRECCIÓN 3: Si pasó los candados, sumamos 1 a las filas con datos reales procesados
+        $this->filasConDatos++;
+
         $examenInicial = $row[2];
         $examenFinal   = $row[3];
 
@@ -45,7 +52,6 @@ class CalificacionesImport implements ToModel
                     'examen_final'   => $examenFinal,
                 ]);
         } else {
-
             $idCursoDefecto = 1;
 
             $grupo = Grupo::find($alumno->id_grupo_propedeutico);
@@ -64,5 +70,17 @@ class CalificacionesImport implements ToModel
         }
 
         return null;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterImport::class => function(AfterImport $event) {
+                // Si terminó todo el Excel y nunca se procesó ningún dato numérico real:
+                if ($this->filasConDatos === 0) {
+                    throw new \Exception("Fila de datos inexistente: El archivo Excel está vacío o no contiene ningún registro de alumnos válido.");
+                }
+            },
+        ];
     }
 }

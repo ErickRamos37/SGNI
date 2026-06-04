@@ -9,9 +9,9 @@
             <p class="text-muted mb-2">Importe el archivo de calificaciones del grupo de manera automática</p>
         </div>
 
-        {{-- Botón Descargar Formato: Centrado arriba --}}
+        {{-- Boton Descargar Formato: Ahora apunta a la nueva ruta del archivo estatico y limpio --}}
         <div class="text-center mb-4">
-            <a href="{{ route('calificaciones.exportar', $grupo->id_grupo ?? ($grupo->id ?? 1)) }}"
+            <a href="{{ route('calificaciones.descargarFormatoBase') }}"
                 class="btn btn-outline-dark px-4 fw-semibold rounded-3">
                 Descargar Formato
             </a>
@@ -86,11 +86,7 @@
     {{-- Importación de la librería de SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {{-- ========================================================= --}}
-    {{--    LÓGICA DE DETECCIÓN Y DISPARO DE ALERTAS EMERGENTES     --}}
-    {{-- ========================================================= --}}
-
-    {{-- 1. Alerta de Éxito al procesar las notas --}}
+    {{-- LÓGICA DE ALERTAS EMERGENTES --}}
     @if (session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -98,20 +94,18 @@
                     title: '¡Carga Exitosa!',
                     text: "{{ session('success') }}",
                     icon: 'success',
-                    confirmButtonColor: '#00723F', // Verde UABC
+                    confirmButtonColor: '#00723F',
                     confirmButtonText: 'Aceptar'
                 });
             });
         </script>
     @endif
 
-    {{-- 2. Alerta de Error: Atrapa problemas e intercepta errores crudos --}}
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 let listadoErrores = '';
 
-                {{-- Recorremos las fallas. Usamos concatenación tradicional de JS para evitar conflictos con Blade --}}
                 @foreach ($errors->all() as $error)
                     let errorTexto = "{{ $error }}";
 
@@ -132,7 +126,7 @@
                                listadoErrores +
                            '</div>',
                     icon: 'error',
-                    confirmButtonColor: '#dc3545', // Rojo
+                    confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Entendido'
                 });
             });
