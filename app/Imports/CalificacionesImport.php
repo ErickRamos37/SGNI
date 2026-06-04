@@ -39,7 +39,7 @@ class CalificacionesImport implements ToModel, WithEvents
             throw new \Exception("Fila {$this->contadorFilas}: El alumno '{$alumno->nombre}' (Matrícula: {$matricula}) existe, pero NO tiene ningún grupo propedéutico asignado.");
         }
 
-        // 🌟 CORRECCIÓN 3: Si pasó los candados, sumamos 1 a las filas con datos reales procesados
+        // CORRECCIÓN 3: Si pasó los candados, sumamos 1 a las filas con datos reales procesados
         $this->filasConDatos++;
 
         $examenInicial = $row[2];

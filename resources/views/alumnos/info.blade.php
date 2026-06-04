@@ -2,30 +2,36 @@
 
 @section('contenido')
 <div class="container-fluid">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h2 class="text-primary fw-bold">Información Estudiantil</h2>
+
+    {{-- ─── Encabezado de página + Buscador ──────────────────────── --}}
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Información Estudiantil</h2>
             <p class="text-muted mb-0">Perfil completo del estudiante</p>
         </div>
-        <div class="col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
-            <form id="form-buscar-alumno" class="d-flex w-100" style="max-width: 400px;">
-                <div class="w-100 position-relative">
-                    <input type="number" id="matricula-input" class="form-control rounded-start" placeholder="Ingrese matrícula..." required>
-                    <div id="matricula-error" class="invalid-feedback position-absolute"></div>
+        <div class="w-25">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Buscar Alumno</label>
+            <form id="form-buscar-alumno">
+                <div class="input-group shadow-sm has-validation">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="number" id="matricula-input" class="form-control border-start-0 ps-0" placeholder="Ingrese matrícula..." required>
+                    <button type="submit" id="btn-buscar" class="btn btn-outline-dark fw-semibold px-4">
+                        <span id="btn-text">Buscar</span>
+                        <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                    </button>
+                    <div id="matricula-error" class="invalid-feedback"></div>
                 </div>
-                <button type="submit" id="btn-buscar" class="btn btn-primary text-white rounded-end px-4 fw-bold shadow-sm">
-                    <span id="btn-text">Buscar</span>
-                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                </button>
             </form>
         </div>
     </div>
 
+    {{-- ─── Contenido del perfil (oculto hasta buscar) ────────────── --}}
     <div id="contenedor-info-alumno" class="d-none">
-        
-        <div class="card bg-primary text-white border-0 shadow-sm rounded-4 mb-4">
+
+        {{-- Banner del alumno --}}
+        <div class="card bg-primary text-white border border-light-subtle shadow-sm rounded-3 mb-4">
             <div class="card-body d-flex align-items-center p-4">
-                <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 70px; height: 70px;">
+                <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm p-3">
                     <i class="bi bi-person fs-1"></i>
                 </div>
                 <div>
@@ -35,18 +41,21 @@
             </div>
         </div>
 
+        {{-- Tarjetas de información --}}
         <div class="row g-4">
+
+            {{-- Información de contacto --}}
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-transparent">
-                    <div class="card-header bg-primary text-white text-uppercase fw-bold py-3 border-0 rounded-top-4">
-                        Información de contacto
+                <div class="card border border-light-subtle shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
+                        <h5 class="fw-bold text-uppercase text-white mb-0">Información de contacto</h5>
                     </div>
-                    <div class="card-body bg-light rounded-bottom-4 p-4">
-                        
+                    <div class="card-body bg-light p-4">
+
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-person-fill text-primary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Nombres</small>
+                                <small class="text-secondary text-uppercase fw-bold">Nombres</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-nombres">-</span>
                         </div>
@@ -54,7 +63,7 @@
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-person-fill text-primary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Apellidos</small>
+                                <small class="text-secondary text-uppercase fw-bold">Apellidos</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-apellidos">-</span>
                         </div>
@@ -62,7 +71,7 @@
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-telephone-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Teléfono</small>
+                                <small class="text-secondary text-uppercase fw-bold">Teléfono</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-telefono">-</span>
                         </div>
@@ -70,7 +79,7 @@
                         <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-envelope-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Correo Institucional</small>
+                                <small class="text-secondary text-uppercase fw-bold">Correo Institucional</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-correo">-</span>
                         </div>
@@ -79,17 +88,18 @@
                 </div>
             </div>
 
+            {{-- Información de admisión --}}
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm rounded-4 h-100 bg-transparent">
-                    <div class="card-header bg-secondary text-white text-uppercase fw-bold py-3 border-0 rounded-top-4">
-                        Información de admisión
+                <div class="card border border-light-subtle shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
+                        <h5 class="fw-bold text-uppercase text-white mb-0">Información de admisión</h5>
                     </div>
-                    <div class="card-body bg-light rounded-bottom-4 p-4">
-                        
+                    <div class="card-body bg-light p-4">
+
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-award-fill text-primary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Puntaje de Ingreso</small>
+                                <small class="text-secondary text-uppercase fw-bold">Puntaje de Ingreso</small>
                             </div>
                             <div>
                                 <span class="fs-1 fw-bold text-primary" id="lbl-puntaje">-</span>
@@ -100,7 +110,7 @@
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-book-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Carrera</small>
+                                <small class="text-secondary text-uppercase fw-bold">Carrera</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-carrera">-</span>
                         </div>
@@ -108,7 +118,7 @@
                         <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-people-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold" style="font-size: 0.75rem;">Grupo de Inducción</small>
+                                <small class="text-secondary text-uppercase fw-bold">Grupo de Inducción</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-grupo">-</span>
                         </div>
@@ -116,6 +126,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
