@@ -14,7 +14,7 @@
     <p class="text-muted fs-5 mb-4">{{ $grupo->nombre_grupo }}</p>
 
     {{-- Botón de Descargar (Amarillo) --}}
-    <a href="{{ route('grupos.descargar_lista', $grupo->id_grupo) }}" class="btn btn-warning text-dark fw-bold rounded-pill px-4 py-2 shadow-sm text-decoration-none">
+    <a href="{{ route('grupos.descargar_lista', $grupo->id_grupo) }}" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
         <i class="bi bi-download me-2"></i> DESCARGAR LISTA
     </a>
 </div>
