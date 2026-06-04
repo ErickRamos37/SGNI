@@ -40,31 +40,6 @@
             <hr>
 
             <ul class="nav nav-pills flex-column mb-auto">
-<<<<<<< HEAD
-                <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-dark bg-secondary fw-bold shadow-sm">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white hover-opacity">
-                        Crear Grupo (Manual)
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
-                        Registro de Asistencia
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
-                        Cierre y Lista Final
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
-                        Alta de Profesores
-=======
                 @auth
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
@@ -147,7 +122,6 @@
                     <a class="dropdown-item fw-bold {{ request()->routeIs('grupos.generados') ? 'text-primary bg-light' : 'text-dark' }} py-2 rounded-2"
                         href="{{ route('curso_prope_creado') }}">
                         Grupos Generados
->>>>>>> testing
                     </a>
                 </li>
             </ul>

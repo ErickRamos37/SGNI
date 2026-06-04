@@ -14,9 +14,6 @@ use App\Http\Controllers\CierreController;
 
 // --- Rutas del referentes al inicio de sesion ---
 Route::get('/', function () {
-<<<<<<< HEAD
-    return view('welcome');
-=======
     return view('auth.login');
 })->name('login');
 
@@ -119,8 +116,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
 
-
-
     Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
 
     Route::get('/grupos_final/criterios', function () {
@@ -134,5 +129,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/grupos_final/modo_lectura', function () {
         return view('grupos_final.modo_lectura');
     })->name('grupos_final.modo_lectura');
->>>>>>> testing
 });

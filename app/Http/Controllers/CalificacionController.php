@@ -13,6 +13,7 @@ use App\Models\ResultadosPropedeutico;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Exports\GrupoCalificacionesExport;
+use Illuminate\Support\Facades\File;
 
 class CalificacionController extends Controller
 {
@@ -30,16 +31,26 @@ class CalificacionController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()->withErrors([
-                'archivo_excel' => 'Error al procesar la estructura interna del archivo: ' . $e->getMessage()
+                'archivo_excel' => 'El contenido del archivo es incorrecto.'
             ]);
         }
+    }
+
+    public function descargarFormatoBase()
+    {
+        $rutaArchivo = public_path('formatos/formato_calificaciones.xlsx');
+        if (!File::exists($rutaArchivo)) {
+            return redirect()->back()->withErrors([
+                'archivo_excel' => 'Error del sistema: El archivo de formato base no se encuentra en la carpeta public/formatos/.'
+            ]);
+        }
+        return response()->download($rutaArchivo, 'formato_calificaciones.xlsx');
     }
 
     public function exportarGrupo($id_grupo)
     {
         $grupo = Grupo::findOrFail($id_grupo);
-        // Reemplazamos espacios para que el nombre del archivo no de problemas
-        $nombreArchivo = 'Calificaciones_' . str_replace(' ', '_', $grupo->nombre) . '.xlsx';
+        $nombreArchivo = 'calificaciones_propedeutico' . str_replace(' ', '_', $grupo->nombre) . '.xlsx';
 
         return Excel::download(new GrupoCalificacionesExport($id_grupo), $nombreArchivo);
     }
@@ -118,6 +129,7 @@ class CalificacionController extends Controller
             ], 500);
         }
     }
+
     public function guardarTabla(Request $request)
     {
         $calificaciones = $request->input('calificaciones', []);

@@ -61,6 +61,10 @@
                     </label>
 
                     <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-4" role="alert">
+                        <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
+                        <div class="small">
+                            <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
+                            <span class="text-muted fw-semibold">Matrícula, Nombre, Examen Diagnóstico, Examen Propedéutico Final</span>
                         </div>
                     </div>
 

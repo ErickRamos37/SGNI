@@ -5,10 +5,10 @@
         <div class="row justify-content-center">
             <div class="col-12">
 
+                {{-- Encabezado y buscador --}}
                 <div class="row align-items-end g-3 mb-4">
                     <div class="col-12 col-md-6">
-                        <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones
-                        </h1>
+                        <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones</h1>
 
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="text-muted small fw-bold">Grupo:</span>
@@ -27,6 +27,7 @@
                             </select>
                         </div>
 
+                        {{-- Botón Descargar Lista: Estilo delineado negro con efecto --}}
                         @if ($grupo)
                             <a href="#" id="btn-descargar-lista"
                                 data-url="{{ route('calificaciones.exportar', $grupo->id_grupo ?? $grupo->id) }}"
@@ -76,15 +77,12 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0" id="tabla-estudiantes">
-                                    <thead class="table-light border-bottom border-1 text-uppercase"
-                                        style="font-size: 0.8rem;">
+                                    <thead class="table-light border-bottom border-1 text-uppercase" style="font-size: 0.8rem;">
                                         <tr>
                                             <th class="body-color fw-bold py-3 ps-4" style="width: 15%;">Matrícula</th>
                                             <th class="body-color fw-bold py-3" style="width: 45%;">Nombre del Alumno</th>
-                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen
-                                                Diagnóstico</th>
-                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen
-                                                Propedéutico Final</th>
+                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen Diagnóstico</th>
+                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen Propedéutico Final</th>
                                         </tr>
                                     </thead>
 
@@ -94,20 +92,19 @@
                                                 $notaInicial = $alumno->resultadosPropedeutico->examen_inicial ?? null;
                                                 $notaFinal = $alumno->resultadosPropedeutico->examen_final ?? null;
                                             @endphp
-                                            <tr data-matricula="{{ $alumno->matricula }}"
-                                                class="border-bottom border-light student-row">
+                                            <tr data-matricula="{{ $alumno->matricula }}" class="border-bottom border-light student-row">
                                                 <td class="ps-4 fw-bold text-dark fs-6 tracking-wide">
                                                     {{ $alumno->matricula }}
                                                 </td>
                                                 <td class="fw-semibold body-color student-name">
-                                                    {{ $alumno->nombre }} {{ $alumno->ap_pat }} {{ $alumno->ap_mat }}
+                                                    {{ $alumno->ap_pat }} {{ $alumno->ap_mat }} {{ $alumno->nombre }}
                                                 </td>
                                                 <td>
                                                     <div class="col-9 col-md-7 mx-auto">
                                                         <input type="number"
                                                             class="form-control text-center fw-bold rounded-3 shadow-sm input-score {{ !is_null($notaInicial) && $notaInicial < 70 ? 'text-danger border-danger' : 'text-dark border-light bg-light' }}"
                                                             data-field="examen_inicial" min="0" max="100"
-                                                            step="0.01" value="{{ $notaInicial }}" placeholder="-">
+                                                            value="{{ $notaInicial }}" placeholder="-">
                                                     </div>
                                                 </td>
                                                 <td>
@@ -115,7 +112,7 @@
                                                         <input type="number"
                                                             class="form-control text-center fw-bold rounded-3 shadow-sm input-score {{ !is_null($notaFinal) && $notaFinal < 70 ? 'text-danger border-danger' : 'text-dark border-light bg-light' }}"
                                                             data-field="examen_final" min="0" max="100"
-                                                            step="0.01" value="{{ $notaFinal }}" placeholder="-">
+                                                            value="{{ $notaFinal }}" placeholder="-">
                                                     </div>
                                                 </td>
                                             </tr>
@@ -132,20 +129,22 @@
                             </div>
                         </div>
 
-                        <div
-                            class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
                             <span class="text-muted small fw-bold" id="contador-estudiantes">
                                 {{ $alumnos->count() }} estudiantes mostrados
                             </span>
 
-                            <button type="button" id="btn-guardar-batch"
-                                class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                            {{-- Botón Guardar: Estilo delineado negro con efecto --}}
+                            <button type="button" id="btn-guardar-batch" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Guardar
+                            </button>
+                        </div>
+
                     </div>
 
                     @if ($alumnos->hasPages())
                         <div class="mt-3 text-center">
-                            <small class="text-muted fw-bold d-block mb-2 text-uppercase tracking-wider"
-                                style="font-size: 0.75rem;">
+                            <small class="text-muted fw-bold d-block mb-2 text-uppercase tracking-wider" style="font-size: 0.75rem;">
                                 Página {{ $alumnos->currentPage() }} de {{ $alumnos->lastPage() }}
                             </small>
                             <div class="d-flex justify-content-center">
@@ -155,7 +154,7 @@
                     @endif
                 @else
                     <div class="card border-0 shadow-sm p-5 rounded-4 bg-white text-center my-4">
-                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-primary bg-light border border-primary border-2"
+                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-warning bg-light border border-warning border-2"
                             style="width: 75px; height: 75px;">
                             <i class="bi bi-folder-symlink display-6"></i>
                         </div>
