@@ -1,58 +1,63 @@
 @extends('layouts.app')
 
 @section('contenido')
-<div class="container-fluid py-2">
-    
-    <div class="mb-4">
-        <h1 class="fw-bold text-dark mb-1">Pase de Lista</h1>
-        <p class="text-dark fw-semibold" style="opacity: 0.7;">Grupo: Ingeniería - Grupo A</p>
-        
-        <a href="{{ route('asistencias.importar') }}" class="btn btn-primary text-white fw-bold px-4 py-2 mt-2 shadow-sm rounded-3 border-0">
-            <i class="bi bi-file-earmark-excel me-2 text-secondary fs-5"></i> IMPORTAR LISTA EXCEL
-        </a>
+<div class="container-fluid">
+
+    {{-- ─── Encabezado de página + Botón de acción ───────────────── --}}
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Pase de Lista</h2>
+            <p class="text-muted mb-0">Grupo: Ingeniería - Grupo A</p>
+        </div>
+        <div>
+            <a href="{{ route('asistencias.importar') }}" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                <i class="bi bi-file-earmark-excel me-2 fs-5"></i> IMPORTAR LISTA EXCEL
+            </a>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        
-        <div class="card-header bg-primary text-white py-3 border-0">
-            <h5 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Lista de Asistencia Semanal</h5>
+    {{-- ─── Tarjeta contenedora ───────────────────────────────────── --}}
+    <div class="card border border-light-subtle shadow-sm rounded-3">
+
+        <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
+            <h5 class="fw-bold text-uppercase text-white mb-0">Lista de Asistencia Semanal</h5>
         </div>
 
-        {{-- 
+        {{--
             EVALUAMOS SI EXISTEN ALUMNOS.
-            Como ahorita tu controlador no manda la variable $alumnos, 
+            Como ahorita tu controlador no manda la variable $alumnos,
             entrará directo al @else (Estado Vacío).
         --}}
         @if(isset($alumnos) && count($alumnos) > 0)
-            
+
             {{-- SI HAY ALUMNOS: Muestra la tabla --}}
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead class="bg-light text-dark small fw-bold text-uppercase" style="opacity: 0.8;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
                             <tr>
-                                <th class="ps-4 py-3 border-bottom-0">Matrícula</th>
-                                <th class="py-3 border-bottom-0">Nombre Completo</th>
-                                <th class="text-center py-3 border-bottom-0">Lunes</th>
-                                <th class="text-center py-3 border-bottom-0">Martes</th>
-                                <th class="text-center py-3 border-bottom-0">Miércoles</th>
-                                <th class="text-center py-3 border-bottom-0">Jueves</th>
-                                <th class="text-center py-3 border-bottom-0">Viernes</th>
+                                <th class="px-4 py-3">Matrícula</th>
+                                <th class="py-3">Nombre Completo</th>
+                                <th class="py-3 text-center">Lunes</th>
+                                <th class="py-3 text-center">Martes</th>
+                                <th class="py-3 text-center">Miércoles</th>
+                                <th class="py-3 text-center">Jueves</th>
+                                <th class="py-3 text-center">Viernes</th>
                             </tr>
                         </thead>
-                        
-                        <tbody class="border-top-0">
+
+                        <tbody class="small">
                             @foreach($alumnos as $alumno)
-                            
+
                             {{-- MAGIA: Buscamos si este alumno tiene asistencias en el Excel recién subido --}}
                             @php
                                 $datosExcel = collect($asistenciasExcel)->firstWhere('matricula_alumno', $alumno->matricula_alumno);
                             @endphp
 
                             <tr class="fila-alumno" data-matricula="{{ $alumno->matricula_alumno }}">
-                                <td class="ps-4 text-dark fw-bold py-3">{{ $alumno->matricula_alumno }}</td>
-                                <td class="fw-bold text-dark">{{ $alumno->nombres_alumno }} {{ $alumno->apellidos_alumno }}</td>
-                                
+                                <td class="px-4 fw-bold text-dark">{{ $alumno->matricula_alumno }}</td>
+                                <td class="text-dark">{{ $alumno->nombres_alumno }} {{ $alumno->apellidos_alumno }}</td>
+
                                 {{-- Si los datos del Excel dicen que vino, le ponemos el atributo 'checked' --}}
                                 <td class="text-center"><input class="form-check-input fs-4 shadow-sm chk-lunes" type="checkbox" {{ ($datosExcel && $datosExcel->lunes) ? 'checked' : '' }}></td>
                                 <td class="text-center"><input class="form-check-input fs-4 shadow-sm chk-martes" type="checkbox" {{ ($datosExcel && $datosExcel->martes) ? 'checked' : '' }}></td>
@@ -66,29 +71,29 @@
                 </div>
             </div>
 
-            <div class="card-footer bg-white border-top py-4 px-4 d-flex justify-content-between align-items-center">
-                <span class="text-dark fw-bold small" style="opacity: 0.7;">{{ count($alumnos) }} estudiantes registrados</span>
-                
-                <button id="btnGuardarAsistencias" class="btn btn-secondary text-dark fw-bold px-5 py-2 rounded-3 shadow-sm border-0">
+            <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-between align-items-center">
+                <span class="text-muted fw-bold small">{{ count($alumnos) }} estudiantes registrados</span>
+
+                <button id="btnGuardarAsistencias" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                     GUARDAR
                 </button>
             </div>
 
         @else
-            
+
             {{-- NO HAY ALUMNOS (ESTADO VACÍO): Mensaje de espera para el profesor --}}
             <div class="card-body p-5 text-center">
                 <div class="py-5">
                     {{-- Cambié el ícono por uno de "grupo de personas" para que tenga más sentido --}}
-                    <i class="bi bi-people text-muted opacity-25 mb-3" style="font-size: 5rem;"></i>
-                    
+                    <i class="bi bi-people display-4 d-block mb-3 text-muted opacity-25"></i>
+
                     <h3 class="fw-bold text-dark mb-2">Aún no hay alumnos asignados</h3>
-                    <p class="text-muted fs-5 mx-auto mb-4" style="max-width: 550px;">
+                    <p class="text-muted fs-5 w-75 mx-auto mb-4">
                         El pase de lista se habilitará automáticamente en cuanto el área de administración genere los grupos de Propedéutico o Inducción y te asigne tu lista oficial.
                     </p>
-                    
+
                     {{-- Botón visualmente desactivado para indicar que está en espera --}}
-                    <button class="btn btn-secondary text-dark fw-bold px-4 py-2 rounded-3 shadow-sm opacity-75" disabled>
+                    <button class="btn btn-outline-dark px-5 fw-semibold rounded-3 opacity-75" disabled>
                         <i class="bi bi-hourglass-split me-2"></i> Esperando asignación de grupo...
                     </button>
                 </div>
@@ -96,7 +101,8 @@
 
         @endif
 
-    </div>
+    </div>{{-- /card --}}
+
 </div>
 
 {{-- Tu script de guardado se queda exactamente igual, listo para cuando la tabla exista --}}

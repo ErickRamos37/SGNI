@@ -1,50 +1,46 @@
 @extends('layouts.app')
 
 @section('contenido')
-<div class="container-fluid py-2">
-    
-    {{-- Encabezado y Buscador (Intactos del diseño original) --}}
-    <div class="row align-items-center mb-4">
-        <div class="col-md-6">
-            <h1 class="fw-bold text-dark mb-1">Lista de Asistencia Grupal</h1>
-            <p class="text-dark fw-semibold mb-3" style="opacity: 0.7;">Grupo: Sin asignar</p>
-            
+<div class="container-fluid">
+
+    {{-- ─── Encabezado de página + Buscador ──────────────────────── --}}
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Lista de Asistencia Grupal</h2>
+            <p class="text-muted mb-0">Grupo: Sin asignar</p>
+
             {{-- Botón deshabilitado porque no hay nada que descargar --}}
-            <button class="btn btn-secondary text-dark fw-bold px-4 py-2 shadow-sm rounded-3 border-0" disabled>
+            <button class="btn btn-outline-dark px-5 fw-semibold rounded-3 mt-2">
                 <i class="bi bi-download me-2"></i> DESCARGAR LISTA
             </button>
         </div>
-        
-        <div class="col-md-6 d-flex justify-content-md-end mt-4 mt-md-0">
-            <div style="width: 100%; max-width: 350px;">
-                <label class="form-label small fw-bold text-dark text-uppercase mb-1" style="opacity: 0.7; font-size: 0.75rem;">Buscar Estudiante</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden">
-                    <span class="input-group-text bg-white border-end-0 text-dark" style="opacity: 0.5;">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" class="form-control border-start-0 ps-0" placeholder="Matrícula o nombre..." disabled>
-                </div>
+        <div class="w-25">
+            <label class="small fw-bold text-muted text-uppercase mb-1">Buscar Estudiante</label>
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Matrícula o nombre..." disabled>
             </div>
         </div>
     </div>
 
-    {{-- Tarjeta Principal --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        
+    {{-- ─── Tarjeta contenedora ───────────────────────────────────── --}}
+    <div class="card border border-light-subtle shadow-sm rounded-3">
+
         {{-- Header Verde UABC --}}
-        <div class="card-header bg-primary text-white py-3 border-0">
-            <h5 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Registro de Asistencia Semanal</h5>
+        <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
+            <h5 class="fw-bold text-uppercase text-white mb-0">Registro de Asistencia Semanal</h5>
         </div>
 
         {{-- ESTADO VACÍO (Empty State) --}}
         <div class="card-body p-5 text-center">
             <div class="py-5">
-                <i class="bi bi-people text-muted opacity-50 mb-3" style="font-size: 4rem;"></i>
+                <i class="bi bi-people display-6 d-block mb-2 text-light-subtle"></i>
                 <h3 class="fw-bold text-dark">No hay alumnos registrados</h3>
                 <p class="text-muted fs-5 mb-0">Aún no se han generado los grupos o asignado estudiantes a esta sección.</p>
             </div>
         </div>
 
-    </div>
+    </div>{{-- /card --}}
+
 </div>
 @endsection

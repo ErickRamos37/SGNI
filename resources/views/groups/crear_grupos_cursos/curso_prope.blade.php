@@ -1,31 +1,35 @@
 @extends('layouts.app')
 
 @section('contenido')
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- Lógica de control de pestañas --}}
     @php
         $tabActive = request('tab', 'crear');
     @endphp
 
-    {{-- 1. Header Principal --}}
-    <div class="mb-4">
-        <h1 class="fw-bold text-dark mb-1">Crear Grupos</h1>
-        <p class="text-muted mb-0">Seleccione el programa y configure los grupos</p>
-        <a href="{{ route('crear_grupo') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mb-2">
-            <i class="bi bi-arrow-left me-1"></i> Volver a selección de programa
-        </a>
+    {{-- ─── Encabezado de página ─────────────────────────────────── --}}
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Crear Grupos</h2>
+            <p class="text-muted mb-0">Seleccione el programa y configure los grupos</p>
+            <a href="{{ route('crear_grupo') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
+                <i class="bi bi-arrow-left me-1"></i> Volver a selección de programa
+            </a>
+        </div>
     </div>
 
-    {{-- 2. Banner: Programa Seleccionado --}}
-    <div class="bg-primary text-white p-4 mb-4 rounded-3 shadow-sm">
-        <small class="text-white-50 text-uppercase fw-bold d-block mb-1 tracking-wide">
-            Programa Seleccionado
-        </small>
-        <h3 class="fw-bold mb-0">Curso Propedéutico</h3>
+    {{-- ─── Banner: Programa Seleccionado ────────────────────────── --}}
+    <div class="card bg-primary text-white border border-light-subtle shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4">
+            <small class="text-white-50 text-uppercase fw-bold d-block mb-1">
+                Programa Seleccionado
+            </small>
+            <h3 class="fw-bold mb-0">Curso Propedéutico</h3>
+        </div>
     </div>
 
-    {{-- 3. Barra de Navegación por Pestañas --}}
+    {{-- ─── Barra de Navegación por Pestañas ─────────────────────── --}}
     <div class="bg-light border rounded-3 p-1 d-inline-flex align-items-center mb-4">
         <a href="?tab=crear" class="btn {{ $tabActive === 'crear' ? 'btn-primary shadow-sm' : 'btn-light text-dark border-0 bg-transparent' }} fw-semibold rounded-3 px-4 py-2 me-1">
             Crear Grupos
@@ -47,20 +51,19 @@
 
             {{-- ==================== PASO 1: SUBIR EXCEL ==================== --}}
             <div id="paso1">
-                <div class="card border-0 shadow-sm rounded-3 mb-4">
-                    <div class="card-header bg-transparent border-bottom-0 pt-4 px-4 pb-0">
-                        <div class="d-flex align-items-center text-dark fw-bold">
-                            <i class="bi bi-file-earmark-excel-fill text-warning me-2 fs-3"></i>
-                            <span class="text-uppercase tracking-wide fs-5">Paso 1: Importar Lista de Estudiantes</span>
+                <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
+                            <i class="bi bi-file-earmark-excel-fill text-primary me-2 fs-3"></i>
+                            Paso 1: Importar Lista de Estudiantes
                             <span class="text-danger ms-1">*</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-4">
+                        </h5>
+
                         <p class="small text-muted mb-4">
                             Suba el archivo Excel (.xlsx) general con la lista de estudiantes. El sistema los separará automáticamente.
                         </p>
 
-                        <label class="border border-3 border-warning border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-3 d-block w-100 cursor-pointer">
+                        <label class="border border-3 border-dark border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-3 d-block w-100 cursor-pointer">
                             <input type="file" name="archivo_alumnos" id="archivo_alumnos" class="d-none" accept=".xlsx" required>
                             <div class="py-3">
                                 <i class="bi bi-cloud-arrow-up text-primary display-3 mb-3 d-block"></i>
@@ -88,79 +91,81 @@
                                 <strong>Formato esperado:</strong> El archivo debe contener la columna "programa_desc" con la carrera.
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <button type="button" id="btnSiguiente" class="btn btn-primary btn-lg fw-bold px-5 text-uppercase shadow-sm">
-                        Siguiente <i class="bi bi-arrow-right ms-2"></i>
-                    </button>
+                        <hr class="my-4 border-light-subtle">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" id="btnCancelar" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Cancelar
+                            </button>
+                            <button type="button" id="btnSiguiente" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {{-- ==================== PASO 2: CONFIGURAR GRUPOS ==================== --}}
             <div id="paso2" class="d-none">
-                <div class="card border-0 shadow-sm rounded-3 mb-4">
-                    <div class="card-header bg-transparent border-bottom-0 pt-4 px-4 pb-0">
-                        <div class="d-flex align-items-center text-dark fw-bold">
+                <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
                             <i class="bi bi-sliders text-warning me-2 fs-3"></i>
-                            <span class="text-uppercase tracking-wide fs-5">Paso 2: Configurar Cantidad de Grupos</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-4">
-                        
+                            Paso 2: Configurar Cantidad de Grupos
+                        </h5>
+
                         {{-- INGENIERÍA --}}
                         <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-gear-fill text-secondary fs-4 me-2"></i>
-                            <span class="fw-bold text-dark text-uppercase tracking-wide fs-6">Grupos para Ingeniería</span>
+                            <span class="fw-bold text-dark text-uppercase fs-6">Grupos para Ingeniería</span>
                         </div>
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana_inge" class="text-uppercase fw-semibold text-muted d-block mb-2 small">Mañana</label>
-                                    <input type="number" name="grupos_manana_inge" id="grupos_manana_inge" class="form-control text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
+                                    <label for="grupos_manana_inge" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
+                                    <input type="number" name="grupos_manana_inge" id="grupos_manana_inge" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde_inge" class="text-uppercase fw-semibold text-muted d-block mb-2 small">Tarde</label>
-                                    <input type="number" name="grupos_tarde_inge" id="grupos_tarde_inge" class="form-control text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
+                                    <label for="grupos_tarde_inge" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
+                                    <input type="number" name="grupos_tarde_inge" id="grupos_tarde_inge" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
                                 </div>
                             </div>
                         </div>
 
-                        <hr class="text-muted opacity-25">
+                        <hr class="my-4 border-light-subtle">
 
                         {{-- ARQUITECTURA --}}
-                        <div class="d-flex align-items-center mb-3 mt-4">
+                        <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-palette-fill text-secondary fs-4 me-2"></i>
-                            <span class="fw-bold text-dark text-uppercase tracking-wide fs-6">Grupos para Arquitectura y Diseño</span>
+                            <span class="fw-bold text-dark text-uppercase fs-6">Grupos para Arquitectura y Diseño</span>
                         </div>
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana_arqui" class="text-uppercase fw-semibold text-muted d-block mb-2 small">Mañana</label>
-                                    <input type="number" name="grupos_manana_arqui" id="grupos_manana_arqui" class="form-control text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
+                                    <label for="grupos_manana_arqui" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
+                                    <input type="number" name="grupos_manana_arqui" id="grupos_manana_arqui" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde_arqui" class="text-uppercase fw-semibold text-muted d-block mb-2 small">Tarde</label>
-                                    <input type="number" name="grupos_tarde_arqui" id="grupos_tarde_arqui" class="form-control text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
+                                    <label for="grupos_tarde_arqui" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
+                                    <input type="number" name="grupos_tarde_arqui" id="grupos_tarde_arqui" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
                                 </div>
                             </div>
                         </div>
 
+                        <hr class="my-4 border-light-subtle">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" id="btnAtras" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Volver
+                            </button>
+                            <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Crear
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" id="btnAtras" class="btn btn-light btn-lg text-dark fw-bold px-4 border shadow-sm">
-                        <i class="bi bi-arrow-left me-2"></i> Atrás
-                    </button>
-                    <button type="submit" class="btn btn-warning btn-lg text-white fw-bold px-5 text-uppercase shadow-sm">
-                        CREAR GRUPOS E IMPORTAR
-                    </button>
                 </div>
             </div>
         </form>
@@ -211,9 +216,10 @@
         {{-- ========================================================= --}}
         <form action="{{ route('grupos.guardar_profesores') }}" method="POST">
             @csrf
-            <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
-                <div class="card-header bg-primary py-3 px-4 border-0">
-                    <h5 class="text-white fw-bold text-uppercase mb-0 tracking-wide fs-6">
+            <div class="card border border-light-subtle shadow-sm rounded-3">
+
+                <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
+                    <h5 class="fw-bold text-uppercase text-white mb-0">
                         Asignar Profesores a Grupos
                     </h5>
                 </div>
@@ -221,25 +227,25 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-uppercase">
+                            <thead class="table-light text-muted small text-uppercase">
                                 <tr>
-                                    <th class="px-4 py-3 text-muted fw-bold small">Grupo</th>
-                                    <th class="px-4 py-3 text-muted fw-bold small">Profesor Asignado</th>
-                                    <th class="px-4 py-3 text-muted fw-bold small">Acción</th>
+                                    <th class="px-4 py-3">Grupo</th>
+                                    <th class="py-3">Profesor Asignado</th>
+                                    <th class="py-3">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody class="border-top-0">
+                            <tbody class="small">
                                 @foreach($grupos as $grupo)
                                 <tr>
-                                    <td class="px-4 py-3 fw-bold text-dark">
+                                    <td class="px-4 fw-bold text-dark">
                                         {{ $grupo->nombre_grupo }}
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td>
                                         @if($grupo->num_empleado && $grupo->num_empleado != auth()->user()->num_empleado)
                                             @php
                                                 $profeAsignado = $profesores->firstWhere('num_empleado', $grupo->num_empleado);
                                             @endphp
-                                            <span style="color: #00723F; font-weight: 600;">
+                                            <span class="text-primary fw-semibold">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $profeAsignado ? $profeAsignado->nombre . ' ' . $profeAsignado->ap_pat : 'Profesor Asignado' }}
                                             </span>
@@ -247,8 +253,8 @@
                                             <span class="text-danger fw-semibold">Sin asignar</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3">
-                                        <select name="profesores[{{ $grupo->id_grupo }}]" class="form-select w-100">
+                                    <td>
+                                        <select name="profesores[{{ $grupo->id_grupo }}]" class="form-select shadow-sm">
                                             <option value="" selected disabled>Seleccionar profesor</option>
                                             @foreach($profesores as $profe)
                                                 <option value="{{ $profe->num_empleado }}" {{ $grupo->num_empleado == $profe->num_empleado ? 'selected' : '' }}>
@@ -264,17 +270,16 @@
                     </div>
                 </div>
 
-                <div class="card-footer bg-light border-top-0 p-4 d-flex justify-content-between align-items-center">
-                    <span class="small text-muted fw-semibold">
-                    </span>
-                    <button type="submit" class="btn btn-warning text-white fw-bold px-5 text-uppercase shadow-sm">
-                        GUARDAR ASIGNACIONES
+                <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                        Guardar
                     </button>
                 </div>
-            </div>
+
+            </div>{{-- /card --}}
         </form>
 
-    @endif 
+    @endif
 
     {{-- ========================================================= --}}
     {{-- ALERTA EMERGENTE (SWEETALERT2) PARA RESULTADOS DE IMPORTACIÓN --}}
