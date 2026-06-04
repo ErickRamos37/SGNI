@@ -3,11 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UploadCalificacionesRequest;
-<<<<<<< HEAD
 use App\Http\Requests\UploadCalificacionesBatchRequest;
-=======
-use App\Http\Requests\UpdateCalificacionesBatchRequest;
->>>>>>> testing
 use App\Imports\CalificacionesImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\JsonResponse;
@@ -17,10 +13,6 @@ use App\Models\ResultadosPropedeutico;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Exports\GrupoCalificacionesExport;
-<<<<<<< HEAD
-=======
-use Illuminate\Support\Facades\File;
->>>>>>> testing
 
 class CalificacionController extends Controller
 {
@@ -29,20 +21,6 @@ class CalificacionController extends Controller
         return view('calificaciones.captura');
     }
 
-<<<<<<< HEAD
-=======
-    public function descargarFormatoBase()
-    {
-        $rutaArchivo = public_path('formatos/formato_calificaciones.xlsx');
-        if (!File::exists($rutaArchivo)) {
-            return redirect()->back()->withErrors([
-                'archivo_excel' => 'Error del sistema: El archivo de formato base no se encuentra en la carpeta public/formatos/.'
-            ]);
-        }
-        return response()->download($rutaArchivo, 'formato_calificaciones.xlsx');
-    }
-
->>>>>>> testing
     public function upload(UploadCalificacionesRequest $request): RedirectResponse
     {
         try {
@@ -84,21 +62,13 @@ class CalificacionController extends Controller
             }
             $alumnos = Alumno::where('id_grupo_propedeutico', $id_grupo)
                 ->with('resultadosPropedeutico')
-<<<<<<< HEAD
                 ->paginate(10);
-=======
-                ->paginate(15);
->>>>>>> testing
         }
 
         return view('calificaciones.mostrar', compact('grupos', 'grupo', 'alumnos'));
     }
 
-<<<<<<< HEAD
     public function updateBatch(UploadCalificacionesBatchRequest $request): JsonResponse
-=======
-    public function updateBatch(UpdateCalificacionesBatchRequest $request): JsonResponse
->>>>>>> testing
     {
         $data = $request->validated();
 

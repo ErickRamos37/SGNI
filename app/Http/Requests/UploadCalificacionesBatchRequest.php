@@ -1,17 +1,9 @@
 <?php
-<<<<<<< HEAD
-
-=======
->>>>>>> testing
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-<<<<<<< HEAD
 class UploadCalificacionesBatchRequest extends FormRequest
-=======
-class UpdateCalificacionesBatchRequest extends FormRequest
->>>>>>> testing
 {
     public function authorize(): bool
     {

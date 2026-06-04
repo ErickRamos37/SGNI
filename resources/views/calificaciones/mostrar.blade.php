@@ -5,17 +5,10 @@
         <div class="row justify-content-center">
             <div class="col-12">
 
-<<<<<<< HEAD
                 <div class="row align-items-end g-3 mb-4">
                     <div class="col-12 col-md-6">
                         <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones
                         </h1>
-=======
-                {{-- Encabezado y buscador --}}
-                <div class="row align-items-end g-3 mb-4">
-                    <div class="col-12 col-md-6">
-                        <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones</h1>
->>>>>>> testing
 
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="text-muted small fw-bold">Grupo:</span>
@@ -34,10 +27,6 @@
                             </select>
                         </div>
 
-<<<<<<< HEAD
-=======
-                        {{-- Botón Descargar Lista: Estilo delineado negro con efecto --}}
->>>>>>> testing
                         @if ($grupo)
                             <a href="#" id="btn-descargar-lista"
                                 data-url="{{ route('calificaciones.exportar', $grupo->id_grupo ?? $grupo->id) }}"
@@ -87,7 +76,6 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0" id="tabla-estudiantes">
-<<<<<<< HEAD
                                     <thead class="table-light border-bottom border-1 text-uppercase"
                                         style="font-size: 0.8rem;">
                                         <tr>
@@ -97,14 +85,6 @@
                                                 Diagnóstico</th>
                                             <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen
                                                 Propedéutico Final</th>
-=======
-                                    <thead class="table-light border-bottom border-1 text-uppercase" style="font-size: 0.8rem;">
-                                        <tr>
-                                            <th class="body-color fw-bold py-3 ps-4" style="width: 15%;">Matrícula</th>
-                                            <th class="body-color fw-bold py-3" style="width: 45%;">Nombre del Alumno</th>
-                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen Diagnóstico</th>
-                                            <th class="body-color fw-bold py-3 text-center" style="width: 20%;">Examen Propedéutico Final</th>
->>>>>>> testing
                                         </tr>
                                     </thead>
 
@@ -114,32 +94,20 @@
                                                 $notaInicial = $alumno->resultadosPropedeutico->examen_inicial ?? null;
                                                 $notaFinal = $alumno->resultadosPropedeutico->examen_final ?? null;
                                             @endphp
-<<<<<<< HEAD
                                             <tr data-matricula="{{ $alumno->matricula }}"
                                                 class="border-bottom border-light student-row">
-=======
-                                            <tr data-matricula="{{ $alumno->matricula }}" class="border-bottom border-light student-row">
->>>>>>> testing
                                                 <td class="ps-4 fw-bold text-dark fs-6 tracking-wide">
                                                     {{ $alumno->matricula }}
                                                 </td>
                                                 <td class="fw-semibold body-color student-name">
-<<<<<<< HEAD
                                                     {{ $alumno->nombre }} {{ $alumno->ap_pat }} {{ $alumno->ap_mat }}
-=======
-                                                    {{ $alumno->ap_pat }} {{ $alumno->ap_mat }} {{ $alumno->nombre }}
->>>>>>> testing
                                                 </td>
                                                 <td>
                                                     <div class="col-9 col-md-7 mx-auto">
                                                         <input type="number"
                                                             class="form-control text-center fw-bold rounded-3 shadow-sm input-score {{ !is_null($notaInicial) && $notaInicial < 70 ? 'text-danger border-danger' : 'text-dark border-light bg-light' }}"
                                                             data-field="examen_inicial" min="0" max="100"
-<<<<<<< HEAD
                                                             step="0.01" value="{{ $notaInicial }}" placeholder="-">
-=======
-                                                            value="{{ $notaInicial }}" placeholder="-">
->>>>>>> testing
                                                     </div>
                                                 </td>
                                                 <td>
@@ -147,11 +115,7 @@
                                                         <input type="number"
                                                             class="form-control text-center fw-bold rounded-3 shadow-sm input-score {{ !is_null($notaFinal) && $notaFinal < 70 ? 'text-danger border-danger' : 'text-dark border-light bg-light' }}"
                                                             data-field="examen_final" min="0" max="100"
-<<<<<<< HEAD
                                                             step="0.01" value="{{ $notaFinal }}" placeholder="-">
-=======
-                                                            value="{{ $notaFinal }}" placeholder="-">
->>>>>>> testing
                                                     </div>
                                                 </td>
                                             </tr>
@@ -168,37 +132,20 @@
                             </div>
                         </div>
 
-<<<<<<< HEAD
                         <div
                             class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
-=======
-                        <div class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
->>>>>>> testing
                             <span class="text-muted small fw-bold" id="contador-estudiantes">
                                 {{ $alumnos->count() }} estudiantes mostrados
                             </span>
 
-<<<<<<< HEAD
                             <button type="button" id="btn-guardar-batch"
                                 class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-=======
-                            {{-- Botón Guardar: Estilo delineado negro con efecto --}}
-                            <button type="button" id="btn-guardar-batch" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
->>>>>>> testing
-                                Guardar
-                            </button>
-                        </div>
-
                     </div>
 
                     @if ($alumnos->hasPages())
                         <div class="mt-3 text-center">
-<<<<<<< HEAD
                             <small class="text-muted fw-bold d-block mb-2 text-uppercase tracking-wider"
                                 style="font-size: 0.75rem;">
-=======
-                            <small class="text-muted fw-bold d-block mb-2 text-uppercase tracking-wider" style="font-size: 0.75rem;">
->>>>>>> testing
                                 Página {{ $alumnos->currentPage() }} de {{ $alumnos->lastPage() }}
                             </small>
                             <div class="d-flex justify-content-center">
@@ -208,11 +155,7 @@
                     @endif
                 @else
                     <div class="card border-0 shadow-sm p-5 rounded-4 bg-white text-center my-4">
-<<<<<<< HEAD
                         <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-primary bg-light border border-primary border-2"
-=======
-                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-warning bg-light border border-warning border-2"
->>>>>>> testing
                             style="width: 75px; height: 75px;">
                             <i class="bi bi-folder-symlink display-6"></i>
                         </div>
@@ -228,7 +171,6 @@
         </div>
     </div>
 
-<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @if (session('success'))
@@ -452,195 +394,4 @@
             }
         });
     </script>
-=======
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-        const btnGuardarBatch = document.getElementById('btn-guardar-batch');
-
-        if (btnGuardarBatch) {
-            btnGuardarBatch.addEventListener('click', function() {
-                const btn = this;
-                const filas = document.querySelectorAll('#tabla-estudiantes tbody tr.student-row');
-                const datos = [];
-                filas.forEach(fila => {
-                    const inputInicial = fila.querySelector('input[data-field="examen_inicial"]');
-                    const inputFinal = fila.querySelector('input[data-field="examen_final"]');
-                    const matricula = fila.getAttribute('data-matricula');
-
-                    if (matricula && inputInicial && inputFinal) {
-                        datos.push({
-                            matricula: matricula.trim(),
-                            examen_inicial: inputInicial.value !== '' ? parseFloat(inputInicial.value) : null,
-                            examen_final: inputFinal.value !== '' ? parseFloat(inputFinal.value) : null
-                        });
-                    }
-                });
-
-                if (datos.length === 0) {
-                    alert('No hay alumnos válidos en la tabla para guardar.');
-                    return;
-                }
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
-
-                fetch("{{ route('calificaciones.updateBatch') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            calificaciones: datos
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Respuesta incorrecta del servidor');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert('¡Listo! Las calificaciones se actualizaron con éxito en la base de datos.');
-                            window.location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                            btn.disabled = false;
-                            btn.innerHTML = 'Guardar';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error detallado:', error);
-                        alert('Inconveniente de comunicación con el servidor al intentar guardar.');
-                        btn.disabled = false;
-                        btn.innerHTML = 'Guardar';
-                    });
-            });
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search-alumno');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                const rows = document.querySelectorAll('.student-row');
-                let visibles = 0;
-
-                rows.forEach(row => {
-                    const matricula = row.getAttribute('data-matricula').toLowerCase();
-                    const nombre = row.querySelector('.student-name').textContent.toLowerCase();
-
-                    if (matricula.includes(query) || nombre.includes(query)) {
-                        row.classList.remove('d-none');
-                        visibles++;
-                    } else {
-                        row.classList.add('d-none');
-                    }
-                });
-
-                document.getElementById('contador-estudiantes').textContent = `${visibles} estudiantes mostrados`;
-            });
-        }
-
-        document.querySelectorAll('.input-score').forEach(input => {
-            input.addEventListener('input', function() {
-                const val = parseInt(this.value);
-                if (!isNaN(val) && val < 70) {
-                    this.classList.remove('text-dark', 'border-light', 'bg-light');
-                    this.classList.add('text-danger', 'border-danger');
-                } else {
-                    this.classList.remove('text-danger', 'border-danger');
-                    this.classList.add('text-dark', 'border-light', 'bg-light');
-                }
-            });
-        });
-
-        // Evento secundario unificado para el envío por payload alternativo
-        const btnGuardar = document.getElementById('btn-guardar-batch');
-        if (btnGuardar) {
-            btnGuardar.addEventListener('click', function() {
-                const btn = this;
-                const rows = document.querySelectorAll('tbody tr[data-matricula]');
-                const calificacionesPayload = {};
-
-                rows.forEach(row => {
-                    const matricula = row.getAttribute('data-matricula');
-                    const inputInicial = row.querySelector('input[data-field="examen_inicial"]');
-                    const inputFinal = row.querySelector('input[data-field="examen_final"]');
-
-                    if (inputInicial.value !== '' || inputFinal.value !== '') {
-                        calificacionesPayload[matricula] = {
-                            examen_inicial: inputInicial.value !== '' ? parseInt(inputInicial.value) : null,
-                            examen_final: inputFinal.value !== '' ? parseInt(inputFinal.value) : null
-                        };
-                    }
-                });
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
-
-                fetch("{{ route('calificaciones.updateBatch') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            calificaciones: calificacionesPayload
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const alertContainer = document.getElementById('alert-container-ajax');
-                        const alertBox = document.getElementById('alert-box-ajax');
-                        const alertIcon = document.getElementById('alert-icon-ajax');
-                        const alertMessage = document.getElementById('alert-message-ajax');
-
-                        alertContainer.classList.remove('d-none');
-                        alertMessage.textContent = data.message;
-
-                        if (data.status === 'success') {
-                            alertBox.className = "alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
-                            alertIcon.className = "bi bi-check-circle-fill fs-4 me-3";
-                            window.scrollTo({
-                                top: 0,
-                                behavior: 'smooth'
-                            });
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1200);
-                        } else {
-                            alertBox.className = "alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
-                            alertIcon.className = "bi bi-exclamation-triangle-fill fs-4 me-3";
-                            btn.disabled = false;
-                            btn.innerHTML = 'Guardar';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Inconveniente de comunicación con el servidor.');
-                        btn.disabled = false;
-                        btn.innerHTML = 'Guardar';
-                    });
-            });
-        }
-
-        const btnDescargar = document.getElementById('btn-descargar-lista');
-        if (btnDescargar) {
-            btnDescargar.addEventListener('click', function(e) {
-                e.preventDefault();
-                const urlExportar = this.getAttribute('data-url');
-                if (urlExportar) {
-                    window.location.href = urlExportar;
-                } else {
-                    alert('No se pudo obtener la ruta de descarga.');
-                }
-            });
-        }
-    });
-</script>
->>>>>>> testing
 @endsection

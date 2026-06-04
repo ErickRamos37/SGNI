@@ -55,32 +55,15 @@
                             </div>
 
                             <div class="d-inline-flex align-items-center badge bg-white text-dark border px-3 py-2 rounded-2 small shadow-sm">
-<<<<<<< HEAD
                                 <i class="bi bi-filetype-xlsx text-dark me-1 fs-6"></i> Formato: .xlsx (Excel)
-=======
-                                <i class="bi bi-file-earmark-spreadsheet-fill text-dark me-1"></i>
-                                <span>Formato: .xlsx / .xls</span>
->>>>>>> testing
                             </div>
                         </div>
                     </label>
 
-<<<<<<< HEAD
-=======
-                    {{-- Recuadro Informativo de Formato --}}
->>>>>>> testing
                     <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-4" role="alert">
-                        <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
-                        <div class="small">
-                            <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
-                            <span class="text-muted fw-semibold">Matrícula, Nombre, Examen Diagnóstico, Examen Propedéutico Final</span>
                         </div>
                     </div>
 
-<<<<<<< HEAD
-=======
-                    {{-- Botón de Acción Único Inferior Derecho --}}
->>>>>>> testing
                     <div class="text-end mt-4">
                         <button type="submit" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
                             Subir Calificaciones
@@ -96,11 +79,7 @@
     {{-- Importación de la librería de SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<<<<<<< HEAD
 {{-- LÓGICA DE ALERTAS EMERGENTES --}}
-=======
-    {{-- LÓGICA DE ALERTAS EMERGENTES --}}
->>>>>>> testing
     @if (session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -115,7 +94,6 @@
         </script>
     @endif
 
-<<<<<<< HEAD
 @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -124,32 +102,6 @@
                 Swal.fire({
                     title: '¡Inconsistencia Detectada!',
                     html: '<p class="text-muted small text-center mb-0">' + errorTexto + '</p>',
-=======
-    @if ($errors->any())
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                let listadoErrores = '';
-
-                @foreach ($errors->all() as $error)
-                    let errorTexto = "{{ $error }}";
-
-                    if (!errorTexto.includes('Fila')) {
-                        errorTexto = "El contenido o la estructura interna del archivo es incorrecto. Verifique las columnas del formato.";
-                    }
-
-                    listadoErrores += '<div class="d-flex align-items-start mb-2 text-dark">' +
-                                        '<i class="bi bi-x-circle-fill text-danger me-2 mt-1"></i>' +
-                                        '<span>' + errorTexto + '</span>' +
-                                      '</div>';
-                @endforeach
-
-                Swal.fire({
-                    title: '¡Contenido del Archivo Incorrecto!',
-                    html: '<p class="text-muted small text-start mb-3">El sistema detectó inconsistencias al intentar leer el documento:</p>' +
-                           '<div class="bg-light p-3 rounded-3 border text-start lh-base style-scroll" style="max-height: 200px; overflow-y: auto;">' +
-                               listadoErrores +
-                           '</div>',
->>>>>>> testing
                     icon: 'error',
                     confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Entendido'
