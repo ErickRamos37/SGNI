@@ -1,32 +1,29 @@
 @extends('layouts.app')
 
 @section('contenido')
-    <div class="container-fluid py-4">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
 
-        {{-- 1. Header Principal --}}
-        <div class="mb-4">
-            <h1 class="fw-bold text-dark mb-1">Cargar Excel con Calificaciones</h1>
-            <p class="text-muted mb-2">Importe el archivo de calificaciones del grupo de manera automática</p>
-        </div>
-
-        {{-- Boton Descargar Formato: Ahora apunta a la nueva ruta del archivo estatico y limpio --}}
-        <div class="text-center mb-4">
-            <a href="{{ route('calificaciones.descargarFormatoBase') }}"
-                class="btn btn-outline-dark px-4 fw-semibold rounded-3">
-                Descargar Formato
-            </a>
-        </div>
-
-        {{-- 2. Tarjeta de Contenido Principal --}}
-        <div class="card border-0 shadow-sm rounded-3 mb-4">
-            <div class="card-header bg-transparent border-bottom-0 pt-4 px-4 pb-0">
-                <div class="d-flex align-items-center text-primary fw-bold">
-                    <i class="bi bi-file-earmark-excel-fill text-primary me-2 fs-3"></i>
-                    <span class="text-uppercase tracking-wide fs-5">Importar Lista de Calificaciones</span>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark">Cargar Excel con Calificaciones</h2>
+                    <p class="text-muted mb-0">Importe el archivo de calificaciones del grupo de manera automática</p>
                 </div>
+                <a href="{{ route('calificaciones.descargarFormatoBase') }}" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Descargar formato
+                </a>
             </div>
 
-            <div class="card-body p-4">
+            <div class="mb-4">
+                <div class="card border border-light-subtle shadow-sm rounded-3 bg-white h-100">
+                    <div class="card-body p-4 p-md-5">
+
+                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
+                            <i class="bi bi-file-earmark-excel-fill me-2 fs-4"></i>
+                            <span>Importar Lista de Calificaciones</span>
+                        </h5>
+
                 <p class="small text-muted mb-4">
                     Suba el archivo Excel (.xlsx) con los resultados de las evaluaciones del grupo seleccionado. El sistema procesará las calificaciones de forma inmediata.
                 </p>
@@ -71,17 +68,24 @@
                     </div>
 
                     {{-- Botón de Acción Único Inferior Derecho --}}
-                    <div class="text-end mt-4">
-                        <button type="submit" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
-                            Subir Calificaciones
+                    <hr class="my-4 border-light-subtle">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                            Guardar
                         </button>
                     </div>
 
                 </form>
             </div>
         </div>
+        </div>
 
+        </div>
     </div>
+</div>
 
     {{-- Importación de la librería de SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

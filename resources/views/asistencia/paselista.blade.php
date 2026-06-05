@@ -11,7 +11,7 @@
         </div>
         <div>
             <a href="{{ route('asistencias.importar') }}" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                <i class="bi bi-file-earmark-excel me-2 fs-5"></i> IMPORTAR LISTA EXCEL
+                Subir Lista Excel
             </a>
         </div>
     </div>
@@ -75,7 +75,7 @@
                 <span class="text-muted fw-bold small">{{ count($alumnos) }} estudiantes registrados</span>
 
                 <button id="btnGuardarAsistencias" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                    GUARDAR
+                    Guardar
                 </button>
             </div>
 

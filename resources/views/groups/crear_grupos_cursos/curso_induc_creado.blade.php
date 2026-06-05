@@ -11,17 +11,20 @@
         </div>
     </div>
 
-    {{-- TABS CON COLORES OFICIALES (Aquí Inducción está activo) --}}
+    {{-- TABS CON ESTILO OUTLINE DARK (EFECTO HOVER) --}}
     <div class="mb-4">
         <div class="d-inline-flex rounded-pill border bg-white shadow-sm p-1 gap-1">
+            
             <a href="{{ route('curso_prope_creado') }}"
-                class="btn btn-sm rounded-pill px-4 py-2 fw-semibold btn-light text-muted text-decoration-none">
+                class="btn btn-sm rounded-pill px-4 py-2 fw-semibold btn-outline-dark border-0 text-decoration-none">
                 Propedéutico
             </a>
+            
             <a href="{{ route('curso_induc_creado') }}"
-                class="btn btn-sm rounded-pill px-4 py-2 fw-semibold btn-secondary text-dark text-decoration-none">
+                class="btn btn-sm rounded-pill px-4 py-2 fw-semibold btn-outline-dark text-decoration-none active">
                 Inducción
             </a>
+            
         </div>
     </div>
 

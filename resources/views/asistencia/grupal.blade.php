@@ -10,8 +10,8 @@
             <p class="text-muted mb-0">Grupo: Sin asignar</p>
 
             {{-- Botón deshabilitado porque no hay nada que descargar --}}
-            <button class="btn btn-outline-dark px-5 fw-semibold rounded-3 mt-2">
-                <i class="bi bi-download me-2"></i> DESCARGAR LISTA
+            <button class="btn btn-outline-dark px-5 fw-semibold rounded-3 mt-3">
+                Descargar Lista
             </button>
         </div>
         <div class="w-25">

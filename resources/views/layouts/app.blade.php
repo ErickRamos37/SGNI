@@ -20,7 +20,7 @@
             transform: rotate(-180deg);
         }
     </style>
-    
+
 </head>
 
 <body>
@@ -174,7 +174,7 @@
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('asistencia.paselista', 'asistencia.grupal')
+                               {{ request()->routeIs('asistencia.paselista', 'asistencia.grupal', 'asistencias.importar')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
                         data-bs-toggle="dropdown"
@@ -277,7 +277,7 @@
 
             <hr>
 
-            <div class="dropup">
+            <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- Mostramos el nombre guardado en la sesión -->
                     <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>
