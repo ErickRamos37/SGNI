@@ -170,6 +170,7 @@
                     </ul>
                 </li>
 
+                
                 {{-- Capturar Asistencia --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
