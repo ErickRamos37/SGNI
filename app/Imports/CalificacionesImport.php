@@ -38,8 +38,6 @@ class CalificacionesImport implements ToModel, WithEvents
         if ($alumno->id_grupo_propedeutico === null || empty($alumno->id_grupo_propedeutico)) {
             throw new \Exception("Fila {$this->contadorFilas}: El alumno '{$alumno->nombre}' (Matrícula: {$matricula}) existe, pero NO tiene ningún grupo propedéutico asignado.");
         }
-
-        // CORRECCIÓN 3: Si pasó los candados, sumamos 1 a las filas con datos reales procesados
         $this->filasConDatos++;
 
         $examenInicial = $row[2];
@@ -76,7 +74,6 @@ class CalificacionesImport implements ToModel, WithEvents
     {
         return [
             AfterImport::class => function(AfterImport $event) {
-                // Si terminó todo el Excel y nunca se procesó ningún dato numérico real:
                 if ($this->filasConDatos === 0) {
                     throw new \Exception("Fila de datos inexistente: El archivo Excel está vacío o no contiene ningún registro de alumnos válido.");
                 }
