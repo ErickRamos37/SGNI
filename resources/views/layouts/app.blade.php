@@ -238,7 +238,7 @@
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('usuarios.alta_usuarios', 'usuarios.lista')
+                               {{ request()->routeIs('usuarios.alta_usuarios', 'usuarios.index')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
                         data-bs-toggle="dropdown"
@@ -256,8 +256,8 @@
                         </li>
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
-                                      {{ request()->routeIs('usuarios.lista') ? 'text-primary bg-light' : 'text-dark' }}"
-                                href="{{ route('usuarios.lista') }}">
+                                      {{ request()->routeIs('usuarios.index') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('usuarios.index') }}">
                                 Lista del Personal
                             </a>
                         </li>
