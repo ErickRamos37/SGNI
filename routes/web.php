@@ -65,9 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
 
-    Route::get('/crear_grupo', function () {
-        return view('groups.crear_grupos_cursos.crear_grupo');
-    })->name('crear_grupo');
+
 
     Route::get('/curso_prope', [GrupoController::class, 'showCursoPrope'])->name('curso_prope');
     Route::post('/grupos/guardar-profesores', [GrupoController::class, 'guardarProfesores'])->name('grupos.guardar_profesores');

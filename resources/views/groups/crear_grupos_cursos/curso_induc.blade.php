@@ -12,9 +12,6 @@
         <div>
             <h2 class="fw-bold text-dark mb-1">Crear Grupos</h2>
             <p class="text-muted mb-0">Seleccione el programa y configure los grupos</p>
-            <a href="{{ route('crear_grupo') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
-                Atras
-            </a>
         </div>
     </div>
 
@@ -50,13 +47,52 @@
             @csrf
             <input type="hidden" name="tipo_grupo" value="Inducción">
 
-            {{-- ==================== PASO 1: SUBIR EXCEL ==================== --}}
+            {{-- ==================== PASO 1: CONFIGURAR GRUPOS ==================== --}}
             <div id="paso1">
                 <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
                     <div class="card-body p-4 p-md-5">
                         <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
+                            Paso 1: Configurar Cantidad de Grupos
+                            <span class="text-danger ms-1">*</span>
+                        </h5>
+                        
+                        {{-- GRUPOS GENERALES (INDUC NO SEPARA CARRERAS) --}}
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-people-fill text-secondary fs-4 me-2"></i>
+                            <span class="fw-bold text-dark text-uppercase fs-6">Grupos Generales (Tronco Común)</span>
+                        </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
+                                    <label for="grupos_manana" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
+                                    <input type="number" name="grupos_manana" id="grupos_manana" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
+                                    <label for="grupos_tarde" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
+                                    <input type="number" name="grupos_tarde" id="grupos_tarde" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 border-light-subtle">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" id="btnSiguiente" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ==================== PASO 2: SUBIR EXCEL ==================== --}}
+            <div id="paso2" class="d-none">
+                <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
                             <i class="bi bi-file-earmark-excel-fill text-primary me-2 fs-3"></i>
-                            Paso 1: Importar Lista de Estudiantes
+                            Paso 2: Importar Lista de Estudiantes
                             <span class="text-danger ms-1">*</span>
                         </h5>
 
@@ -94,50 +130,8 @@
 
                         <hr class="my-4 border-light-subtle">
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Cancelar
-                            </button>
-                            <button type="button" id="btnSiguiente" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Siguiente
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- ==================== PASO 2: CONFIGURAR GRUPOS ==================== --}}
-            <div id="paso2" class="d-none">
-                <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
-                    <div class="card-body p-4 p-md-5">
-                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
-                            <i class="bi bi-sliders text-warning me-2 fs-3"></i>
-                            Paso 2: Configurar Cantidad de Grupos
-                        </h5>
-                        
-                        {{-- GRUPOS GENERALES (INDUC NO SEPARA CARRERAS) --}}
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-people-fill text-secondary fs-4 me-2"></i>
-                            <span class="fw-bold text-dark text-uppercase fs-6">Grupos Generales (Tronco Común)</span>
-                        </div>
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
-                                    <input type="number" name="grupos_manana" id="grupos_manana" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
-                                    <input type="number" name="grupos_tarde" id="grupos_tarde" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-4 border-light-subtle">
-                        <div class="d-flex justify-content-end gap-2">
                             <button type="button" id="btnCancelar" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Atras
+                                Cancelar
                             </button>
                             <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                 Crear
@@ -158,18 +152,28 @@
             });
 
             document.getElementById('btnSiguiente').addEventListener('click', function() {
-                const inputArchivo = document.getElementById('archivo_alumnos');
-                if(inputArchivo.files.length === 0) {
+                const inputManana = document.getElementById('grupos_manana');
+                const inputTarde = document.getElementById('grupos_tarde');
+                
+                let manana = parseInt(inputManana.value) || 0;
+                let tarde = parseInt(inputTarde.value) || 0;
+                
+                if(manana === 0 && tarde === 0) {
                     Swal.fire({
-                        title: 'Archivo requerido',
-                        text: 'Por favor selecciona un archivo Excel con la lista de estudiantes antes de continuar al Paso 2.',
+                        title: 'Faltan datos',
+                        text: 'Por favor, solicita al menos un grupo (ya sea en la mañana o en la tarde) para continuar.',
                         icon: 'warning',
                         customClass: { confirmButton: 'btn btn-primary' },
                         buttonsStyling: false,
-                        confirmButtonText: '<i class="bi bi-hand-thumbs-up-fill me-1"></i> Entendido'
+                        confirmButtonText: ' Entendido'
                     });
                     return;
                 }
+
+                // Autocompletar los vacíos con 0 para evitar errores al guardar
+                if(inputManana.value === '') inputManana.value = '0';
+                if(inputTarde.value === '') inputTarde.value = '0';
+
                 document.getElementById('paso1').classList.add('d-none');
                 document.getElementById('paso2').classList.remove('d-none');
             });
@@ -177,6 +181,21 @@
             document.getElementById('btnCancelar').addEventListener('click', function() {
                 document.getElementById('paso2').classList.add('d-none');
                 document.getElementById('paso1').classList.remove('d-none');
+            });
+
+            document.getElementById('formCrearGrupos').addEventListener('submit', function(e) {
+                const inputArchivo = document.getElementById('archivo_alumnos');
+                if(inputArchivo.files.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Archivo requerido',
+                        text: 'Por favor selecciona un archivo Excel con la lista de estudiantes antes de crear los grupos.',
+                        icon: 'warning',
+                        customClass: { confirmButton: 'btn btn-primary' },
+                        buttonsStyling: false,
+                        confirmButtonText: '<i class="bi bi-hand-thumbs-up-fill me-1"></i> Entendido'
+                    });
+                }
             });
         </script>
 
@@ -278,7 +297,7 @@
                     title: '¡Acción Denegada!',
                     text: "{{ session('error_grupos_existentes') }}",
                     icon: 'error',
-                    customClass: { confirmButton: 'btn btn-danger' },
+                    customClass: { confirmButton: 'btn btn-primary' },
                     buttonsStyling: false,
                     confirmButtonText: 'Entendido'
                 });
