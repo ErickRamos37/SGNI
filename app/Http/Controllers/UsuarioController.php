@@ -72,6 +72,6 @@ class UsuarioController extends Controller
         }
 
         // 2. Si no es AJAX, simplemente cargamos la vista vacía
-        return view('usuarios.lista_usuarios');
+        return view('usuarios.index');
     }
 }

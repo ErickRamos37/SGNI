@@ -38,11 +38,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
         Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
 
-        // Tabla de los usuarios
-        // Alta de los usuarios
-        Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
-        Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
-
         // Tabla de los usuarios (Llama DataTables)
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
     });
