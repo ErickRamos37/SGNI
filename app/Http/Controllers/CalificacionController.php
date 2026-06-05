@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UploadCalificacionesRequest;
-use App\Http\Requests\UpdateCalificacionesBatchRequest;
+use App\Http\Requests\UploadCalificacionesBatchRequest;
 use App\Imports\CalificacionesImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\JsonResponse;
@@ -50,9 +50,7 @@ class CalificacionController extends Controller
     public function exportarGrupo($id_grupo)
     {
         $grupo = Grupo::findOrFail($id_grupo);
-        // Reemplazamos espacios para que el nombre del archivo no de problemas
         $nombreArchivo = 'Calificaciones_' . str_replace(' ', '_', $grupo->nombre) . '.xlsx';
-
         return Excel::download(new GrupoCalificacionesExport($id_grupo), $nombreArchivo);
     }
 
@@ -74,13 +72,13 @@ class CalificacionController extends Controller
             }
             $alumnos = Alumno::where('id_grupo_propedeutico', $id_grupo)
                 ->with('resultadosPropedeutico')
-                ->paginate(15);
+                ->paginate(10);
         }
 
         return view('calificaciones.mostrar', compact('grupos', 'grupo', 'alumnos'));
     }
 
-    public function updateBatch(UpdateCalificacionesBatchRequest $request): JsonResponse
+    public function updateBatch(UploadCalificacionesBatchRequest $request): JsonResponse
     {
         $data = $request->validated();
 

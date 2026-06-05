@@ -10,6 +10,30 @@ $body-bg: #f4f6f9;
 // Color del texto por defecto:
 $body-color: #333333;
 
+// Sobrescribir variables de Bootstrap para Paginación y Formularios
+// Colores base y activo
+$pagination-color: #212529;
+$pagination-active-bg: #212529;
+$pagination-active-border-color: #212529;
+
+// Efecto Hover
+$pagination-hover-color: #ffffff;
+$pagination-hover-bg: #2c3136; // Fondo gris tenue típico de Bootstrap
+$pagination-hover-border-color: #000000;
+
+// Efecto Focus (Elimina la estela azul al hacer clic)
+$pagination-focus-color: #000000;
+$pagination-focus-bg: #ffffff;
+$pagination-focus-box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+
+// Efecto Focus para el Buscador y Select (Elimina estela azul)
+$input-focus-border-color: #212529;
+$input-focus-box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+
+// Efecto para los Selects / Casillas de número
+$form-select-focus-border-color: #212529;
+$form-select-focus-box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+
 // Importacion del framework de diseño Bootstrap
 @import "bootstrap/scss/bootstrap";
 
@@ -18,3 +42,6 @@ $body-color: #333333;
 
 // AGREGAR ESTA LÍNEA AL FINAL:
 @import "bootstrap-icons/font/bootstrap-icons.css";
+
+// Estilos de DataTables para Bootstrap 5
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.css';
