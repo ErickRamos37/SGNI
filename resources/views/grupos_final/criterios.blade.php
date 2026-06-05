@@ -1,24 +1,20 @@
 @extends('layouts.app')
 
 @section('contenido')
-    <div class="container-fluid py-4">
-
-        <div class="mb-4">
-            <h1 class="fw-bolder text-dark mb-1 display-6">Criterios y Creación de Grupos Finales</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark">Criterios y Creación de Grupos Finales</h2>
             <p class="text-muted">Configure los criterios para la asignación de grupos finales del primer semestre</p>
-        </div>
 
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-10 col-xl-9">
+            <div class="mb-4">
+                <div class="card border border-light-subtle shadow-sm rounded-3 bg-white h-100">
+                    <div class="card-body p-4 p-md-5">
 
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
-
-                    <div class="d-flex align-items-center gap-2 mb-4">
-                        <i class="bi bi-file-earmark-text-fill text-secondary fs-4"></i>
-                        <h5 class="mb-0 fw-bold text-uppercase text-secondary tracking-wider fs-6">
-                            Criterios de Asignación
+                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
+                            <i class="bi bi-file-earmark-text-fill me-2 fs-4"></i>
+                            <span>Criterios de Asignación</span>
                         </h5>
-                    </div>
 
                     <div class="d-flex flex-column gap-3 mb-4">
 
@@ -29,18 +25,18 @@
 
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <label class="small fw-bold text-muted text-uppercase d-block mb-1">
+                                    <label class="form-label text-dark fw-semibold">
                                         Nombre del Criterio
                                     </label>
-                                    <input type="text" class="form-control border-light shadow-none bg-white fw-semibold"
+                                    <input type="text" class="form-control shadow-sm bg-white fw-semibold"
                                         value="Promedios Altos de Alumnos" readonly>
                                 </div>
                                 <div class="col-12 col-md-4">
-                                    <label class="small fw-bold text-muted text-uppercase d-block mb-1">
+                                    <label class="form-label text-dark fw-semibold">
                                         Valor Mínimo
                                     </label>
                                     <input type="number"
-                                        class="form-control border-light shadow-none bg-white text-center fw-bold"
+                                        class="form-control shadow-sm bg-white text-center fw-bold"
                                         value="85" readonly>
                                 </div>
                             </div>
@@ -53,18 +49,18 @@
 
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <label class="small fw-bold text-muted text-uppercase d-block mb-1">
+                                    <label class="form-label text-dark fw-semibold">
                                         Nombre del Criterio
                                     </label>
-                                    <input type="text" class="form-control border-light shadow-none bg-white fw-semibold"
+                                    <input type="text" class="form-control shadow-sm bg-white fw-semibold"
                                         value="Promedios Bajos" readonly>
                                 </div>
                                 <div class="col-12 col-md-4">
-                                    <label class="small fw-bold text-muted text-uppercase d-block mb-1">
+                                    <label class="form-label text-dark fw-semibold">
                                         Valor Mínimo
                                     </label>
                                     <input type="number"
-                                        class="form-control border-light shadow-none bg-white text-center fw-bold"
+                                        class="form-control shadow-sm bg-white text-center fw-bold"
                                         value="70" readonly>
                                 </div>
                             </div>
@@ -72,20 +68,22 @@
 
                     </div>
 
-                    <hr class="text-muted my-4 opacity-25">
+                    <hr class="my-4 border-light-subtle">
 
-                    <div class="mb-4">
-                        <label class="small fw-bold text-muted text-uppercase d-block mb-1">
-                            Agregar Nuevo Criterio
-                        </label>
-                        <div class="input-group">
-                            <input type="text"
-                                class="form-control border bg-light small ps-3 shadow-none rounded-start-3"
-                                placeholder="Nombre del criterio (ej: Asistencia Mínima)">
-                            <button class="btn btn-secondary text-white fw-bold px-4 rounded-end-3 shadow-sm"
-                                type="button">
-                                <i class="bi bi-plus-lg me-1"></i> Agregar
-                            </button>
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <label class="form-label text-dark fw-semibold">
+                                Agregar Nuevo Criterio
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <input type="text"
+                                    class="form-control"
+                                    placeholder="Nombre del criterio (ej: Asistencia Mínima)">
+                                <button class="btn btn-outline-dark px-5 fw-semibold rounded-3"
+                                    type="button">
+                                    Crear
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -117,16 +115,21 @@
                         </p>
                     </div>
 
-                    <div class="text-end">
-                        <button type="button"
-                            class="btn btn-secondary text-white fw-bold px-4 py-2 text-uppercase shadow-sm rounded-3">
-                            Crear Grupos Finales
+                    <hr class="my-4 border-light-subtle">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                            Crear
                         </button>
                     </div>
 
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
+</div>
 @endsection

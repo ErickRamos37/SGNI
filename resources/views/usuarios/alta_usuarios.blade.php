@@ -67,11 +67,11 @@
                             <hr class="my-4 border-light-subtle">
 
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('usuarios.lista_usuarios') }}" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                                <a href="{{ route('usuarios.lista_usuarios') }}" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                     Cancelar
                                 </a>
-                                <button type="submit" id="btnGuardar" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
-                                    Registrar usuario
+                                <button type="submit" id="btnGuardar" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                    Guardar
                                 </button>
                             </div>
                         </form>

@@ -15,7 +15,7 @@
         {{-- Botón de Descargar Formato --}}
         <div class="text-center mb-5">
             <button class="btn btn-secondary text-dark fw-bold rounded-pill px-4 py-2 shadow-sm">
-                <i class="bi bi-download me-2"></i> DESCARGAR FORMATO DE LISTA
+                Descargar Formato
             </button>
         </div>
 
@@ -52,7 +52,7 @@
             {{-- Botón Final de Subir --}}
             <div class="text-end">
                 <button class="btn btn-secondary text-dark fw-bold rounded-pill px-5 py-2 shadow-sm">
-                    <i class="bi bi-cloud-arrow-up me-2"></i> Subir Asistencias
+                    Subir Asistencias
                 </button>
             </div>
 
