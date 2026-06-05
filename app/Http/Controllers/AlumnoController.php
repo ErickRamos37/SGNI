@@ -41,16 +41,18 @@ class AlumnoController extends Controller
     public function store(StoreAlumnoRequest $request)
     {
         $datos = $request->validated();
-        $datos['correo_institucional'] = $datos['matricula'] . '@uabc.edu.mx';
-        $datos['puntaje_ingreso'] = 0;
-        $datos['id_resultados_propedeutico'] = 1;
 
-        $alumno = Alumno::create($datos);
+    $datos['correo_institucional'] = $datos['matricula'] . '@uabc.edu.mx';
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Alumno registrado correctamente',
-            'alumno' => $alumno
-        ], 201);
+    $datos['puntaje_ingreso'] = 0;
+    $datos['id_resultados_propedeutico'] = null;  
+
+    $alumno = Alumno::create($datos);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Alumno registrado correctamente',
+        'alumno'  => $alumno
+    ], 201);
     }
 }
