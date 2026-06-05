@@ -154,19 +154,18 @@ document.addEventListener('DOMContentLoaded', function () {
                             feedback.innerText = error.data.errors[field][0];
                         }
                     }
-                } else {
-                    alert('Ocurrió un error inesperado en el servidor.');
                 }
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error de conexión. Revisa tu internet.');
-            } finally {
-                // Desbloquear botón
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = 'Guardar';
+            } else {
+                alert('Ocurrió un error en el servidor. Revise la consola.');
+                console.error(error);
             }
+        })
+        .finally(() => {
+            btnGuardar.disabled = false;
+            btnText.classList.remove('d-none');
+            btnSpinner.classList.add('d-none');
         });
     });
+});
 </script>
 @endsection
