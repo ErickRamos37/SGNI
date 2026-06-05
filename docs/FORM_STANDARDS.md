@@ -31,3 +31,51 @@ Todo formulario debe ser procesado de forma asíncrona y cumplir con este flujo 
 3. **Bloqueo Anti-Doble Clic:** Al disparar el `submit`, el botón de guardar debe pasar a `disabled = true` y reemplazar su texto por un `<span class="spinner-border spinner-border-sm"></span> Guardando...`.
 4. **Reseteo de Errores Previo:** Antes de enviar el `fetch`, se deben remover todas las clases `.is-invalid` y limpiar los textos de error.
 5. **Manejo del Error 422:** Si Laravel responde con un 422 (Unprocessable Entity), el script iterará sobre el JSON de errores, agregará la clase `.is-invalid` al input correspondiente y pintará el mensaje rojo en su `.invalid-feedback`.
+
+## 5. Botones de Acción (Generales)
+
+Para mantener la coherencia visual, todos los botones de acción de los formularios (Guardar, Cancelar, Siguiente, etc.) deben utilizar el estilo **Outline Dark**, a excepción de los botones de búsqueda y las pestañas de navegación (Tabs).
+
+**Clases obligatorias:**
+`btn btn-outline-dark px-5 fw-semibold rounded-3`
+
+**Ejemplo:**
+```html
+<div class="d-flex justify-content-end gap-2">
+    <button type="button" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+        Cancelar
+    </button>
+    <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+        Siguiente
+    </button>
+</div>
+```
+
+## 6. Zona de Carga de Archivos (Drag & Drop)
+
+Para las vistas que requieran la importación de archivos (como listas de Excel), se utilizará un contenedor unificado de "Arrastrar y Soltar" con bordes punteados para indicar claramente el área de interacción.
+
+**Clases del contenedor principal (Label):**
+`border border-3 border-dark border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-3 d-block w-100 cursor-pointer`
+
+**Estructura HTML de Referencia:**
+```html
+<label class="border border-3 border-dark border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-3 d-block w-100 cursor-pointer">
+    <input type="file" name="archivo" id="archivo" class="d-none" accept=".xlsx" required>
+    <div class="py-3">
+        <i class="bi bi-cloud-arrow-up text-primary display-3 mb-3 d-block"></i>
+        <h5 class="fw-bold text-dark mb-1" id="nombre_archivo">Arrastre el archivo aquí</h5>
+        <p class="text-muted small mb-3">o haga clic para seleccionar</p>
+        <div class="d-inline-flex align-items-center badge bg-white text-dark border px-3 py-2 rounded-2 small shadow-sm">
+            <i class="bi bi-filetype-xlsx text-dark me-1 fs-6"></i> Formato: .xlsx (Excel)
+        </div>
+    </div>
+</label>
+
+<div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-0" role="alert">
+    <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
+    <div class="small">
+        <strong>Formato esperado:</strong> Especifique aquí las columnas requeridas.
+    </div>
+</div>
+```
