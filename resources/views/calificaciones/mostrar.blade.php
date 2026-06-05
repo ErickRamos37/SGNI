@@ -9,12 +9,15 @@
                 <div class="row align-items-end g-3 mb-4">
                     <div class="col-12 col-md-6">
                         <h1 class="fw-extrabold text-dark mb-1 display-6" style="font-weight: 800;">Captura de Calificaciones</h1>
+                        <a href="{{ route('calificaciones.captura') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mb-3">
+                            Atras
+                        </a>
 
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="text-muted small fw-bold">Grupo:</span>
                             <select id="select-grupo"
-                                class="form-select form-select-sm border-0 bg-transparent fw-bold text-primary p-3 w-auto shadow-none"
-                                onchange="location = this.value;" style="cursor: pointer;">
+                                class="form-select form-select-sm border-0 bg-transparent fw-bold text-primary py-3 ps-2 pe-5 w-auto shadow-none"
+                                onchange="location = this.value;" style="cursor: pointer; min-width: 220px;">
                                 <option value="{{ route('calificaciones.mostrar') }}" {{ !$grupo ? 'selected' : '' }}>
                                     --Seleccione un Grupo--
                                 </option>
@@ -119,7 +122,7 @@
                                         @empty
                                             <tr>
                                                 <td colspan="4" class="text-center py-5 text-muted">
-                                                    <i class="bi bi-people display-4 d-block mb-3 text-secondary"></i>
+                                                    <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
                                                     No hay alumnos registrados en este grupo.
                                                 </td>
                                             </tr>
@@ -154,9 +157,9 @@
                     @endif
                 @else
                     <div class="card border-0 shadow-sm p-5 rounded-4 bg-white text-center my-4">
-                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle text-warning bg-light border border-warning border-2"
+                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle bg-light border border-2"
                             style="width: 75px; height: 75px;">
-                            <i class="bi bi-folder-symlink display-6"></i>
+                            <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
                         </div>
                         <h4 class="fw-bold text-dark mb-2">No se ha seleccionado un grupo</h4>
                         <p class="text-muted col-md-6 mx-auto mb-0">
@@ -170,193 +173,207 @@
         </div>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        const btnGuardarBatch = document.getElementById('btn-guardar-batch');
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: '¡Carga Exitosa!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#00723F',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        </script>
+    @endif
 
-        if (btnGuardarBatch) {
-            btnGuardarBatch.addEventListener('click', function() {
-                const btn = this;
-                const filas = document.querySelectorAll('#tabla-estudiantes tbody tr.student-row');
-                const datos = [];
-                filas.forEach(fila => {
-                    const inputInicial = fila.querySelector('input[data-field="examen_inicial"]');
-                    const inputFinal = fila.querySelector('input[data-field="examen_final"]');
-                    const matricula = fila.getAttribute('data-matricula');
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: '¡Formato o Datos Incorrectos!',
+                    html: '<p class="text-muted small text-center mb-0">El contenido o la estructura interna es incorrecto. Por favor, verifique los campos.</p>',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Entendido'
+                });
+            });
+        </script>
+    @endif
 
-                    if (matricula && inputInicial && inputFinal) {
-                        datos.push({
-                            matricula: matricula.trim(),
-                            examen_inicial: inputInicial.value !== '' ? parseFloat(inputInicial.value) : null,
-                            examen_final: inputFinal.value !== '' ? parseFloat(inputFinal.value) : null
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // 1. CONTROL DE BÚSQUEDA EN TIEMPO REAL
+            const searchInput = document.getElementById('search-alumno');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    const rows = document.querySelectorAll('.student-row');
+                    let visibles = 0;
+
+                    rows.forEach(row => {
+                        const matricula = row.getAttribute('data-matricula').toLowerCase();
+                        const nombre = row.querySelector('.student-name').textContent.toLowerCase();
+
+                        if (matricula.includes(query) || nombre.includes(query)) {
+                            row.classList.remove('d-none');
+                            visibles++;
+                        } else {
+                            row.classList.add('d-none');
+                        }
+                    });
+
+                    document.getElementById('contador-estudiantes').textContent =
+                        `${visibles} estudiantes mostrados`;
+                });
+            }
+
+            document.querySelectorAll('.input-score').forEach(input => {
+                input.addEventListener('input', function() {
+                    let valString = this.value;
+
+                    if (valString.includes('.')) {
+                        const partes = valString.split('.');
+                        if (partes[1].length > 2) {
+                            valString = partes[0] + '.' + partes[1].slice(0, 2);
+                            this.value = valString;
+                        }
+                    }
+
+                    const valFloat = parseFloat(valString);
+
+                    if (!isNaN(valFloat) && valFloat > 100) {
+                        this.value = "100";
+                    }
+
+                    if (!isNaN(valFloat) && valFloat < 0) {
+                        this.value = "0";
+                    }
+
+                    if (valString.length > 1 && valString.startsWith('0') && !valString.startsWith('0.')) {
+                        this.value = valFloat;
+                        valString = this.value;
+                    }
+
+                    if (!isNaN(valFloat) && valFloat < 60) {
+                        this.classList.remove('text-dark', 'border-light', 'bg-light');
+                        this.classList.add('text-danger', 'border-danger');
+                    } else {
+                        this.classList.remove('text-danger', 'border-danger');
+                        this.classList.add('text-dark', 'border-light', 'bg-light');
+                    }
+                });
+            });
+
+            const btnGuardarBatch = document.getElementById('btn-guardar-batch');
+            if (btnGuardarBatch) {
+                btnGuardarBatch.addEventListener('click', function() {
+                    const btn = this;
+                    const filas = document.querySelectorAll('#tabla-estudiantes tbody tr.student-row');
+                    const calificacionesPayload = {};
+                    let tieneDatos = false;
+
+                    filas.forEach(fila => {
+                        const inputInicial = fila.querySelector('input[data-field="examen_inicial"]');
+                        const inputFinal = fila.querySelector('input[data-field="examen_final"]');
+                        const matricula = fila.getAttribute('data-matricula');
+
+                        if (matricula && inputInicial && inputFinal) {
+                            const notaIni = inputInicial.value !== '' ? parseFloat(inputInicial.value) : null;
+                            const notaFin = inputFinal.value !== '' ? parseFloat(inputFinal.value) : null;
+
+                            if ((notaIni !== null && (notaIni < 0 || notaIni > 100)) ||
+                                (notaFin !== null && (notaFin < 0 || notaFin > 100))) {
+                                calificacionInvalida = true;
+                            }
+
+                            calificacionesPayload[matricula.trim()] = {
+                                examen_inicial: notaIni,
+                                examen_final: notaFin
+                            };
+                            tieneDatos = true;
+                        }
+                    });
+
+                    if (!tieneDatos) {
+                        Swal.fire({
+                            title: '¡Tabla Vacía!',
+                            text: 'No hay registros válidos para actualizar.',
+                            icon: 'warning',
+                            confirmButtonColor: '#dc3545',
+                            confirmButtonText: 'Aceptar'
+                        });
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
+
+                    fetch("{{ route('calificaciones.updateBatch') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                calificaciones: calificacionesPayload
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error en el servidor');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: '¡Carga Exitosa!',
+                                    text: 'Las calificaciones se actualizaron con éxito en la base de datos.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#00723F',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: '¡Error al Guardar!',
+                                text: 'Ocurrió un inconveniente al actualizar las notas en el servidor.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545',
+                                confirmButtonText: 'Entendido'
+                            });
+                            btn.disabled = false;
+                            btn.innerHTML = 'Guardar';
+                        });
+                });
+            }
+
+            const btnDescargar = document.getElementById('btn-descargar-lista');
+            if (btnDescargar) {
+                btnDescargar.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const urlExportar = this.getAttribute('data-url');
+                    if (urlExportar) {
+                        window.location.href = urlExportar;
+                    } else {
+                        Swal.fire({
+                            title: '¡Error de Ruta!',
+                            text: 'No se pudo obtener la ruta de descarga.',
+                            icon: 'error',
+                            confirmButtonColor: '#dc3545',
+                            confirmButtonText: 'Entendido'
                         });
                     }
                 });
-
-                if (datos.length === 0) {
-                    alert('No hay alumnos válidos en la tabla para guardar.');
-                    return;
-                }
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
-
-                fetch("{{ route('calificaciones.updateBatch') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            calificaciones: datos
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Respuesta incorrecta del servidor');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert('¡Listo! Las calificaciones se actualizaron con éxito en la base de datos.');
-                            window.location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                            btn.disabled = false;
-                            btn.innerHTML = 'Guardar';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error detallado:', error);
-                        alert('Inconveniente de comunicación con el servidor al intentar guardar.');
-                        btn.disabled = false;
-                        btn.innerHTML = 'Guardar';
-                    });
-            });
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search-alumno');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                const rows = document.querySelectorAll('.student-row');
-                let visibles = 0;
-
-                rows.forEach(row => {
-                    const matricula = row.getAttribute('data-matricula').toLowerCase();
-                    const nombre = row.querySelector('.student-name').textContent.toLowerCase();
-
-                    if (matricula.includes(query) || nombre.includes(query)) {
-                        row.classList.remove('d-none');
-                        visibles++;
-                    } else {
-                        row.classList.add('d-none');
-                    }
-                });
-
-                document.getElementById('contador-estudiantes').textContent = `${visibles} estudiantes mostrados`;
-            });
-        }
-
-        document.querySelectorAll('.input-score').forEach(input => {
-            input.addEventListener('input', function() {
-                const val = parseInt(this.value);
-                if (!isNaN(val) && val < 70) {
-                    this.classList.remove('text-dark', 'border-light', 'bg-light');
-                    this.classList.add('text-danger', 'border-danger');
-                } else {
-                    this.classList.remove('text-danger', 'border-danger');
-                    this.classList.add('text-dark', 'border-light', 'bg-light');
-                }
-            });
+            }
         });
-
-        // Evento secundario unificado para el envío por payload alternativo
-        const btnGuardar = document.getElementById('btn-guardar-batch');
-        if (btnGuardar) {
-            btnGuardar.addEventListener('click', function() {
-                const btn = this;
-                const rows = document.querySelectorAll('tbody tr[data-matricula]');
-                const calificacionesPayload = {};
-
-                rows.forEach(row => {
-                    const matricula = row.getAttribute('data-matricula');
-                    const inputInicial = row.querySelector('input[data-field="examen_inicial"]');
-                    const inputFinal = row.querySelector('input[data-field="examen_final"]');
-
-                    if (inputInicial.value !== '' || inputFinal.value !== '') {
-                        calificacionesPayload[matricula] = {
-                            examen_inicial: inputInicial.value !== '' ? parseInt(inputInicial.value) : null,
-                            examen_final: inputFinal.value !== '' ? parseInt(inputFinal.value) : null
-                        };
-                    }
-                });
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...';
-
-                fetch("{{ route('calificaciones.updateBatch') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            calificaciones: calificacionesPayload
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const alertContainer = document.getElementById('alert-container-ajax');
-                        const alertBox = document.getElementById('alert-box-ajax');
-                        const alertIcon = document.getElementById('alert-icon-ajax');
-                        const alertMessage = document.getElementById('alert-message-ajax');
-
-                        alertContainer.classList.remove('d-none');
-                        alertMessage.textContent = data.message;
-
-                        if (data.status === 'success') {
-                            alertBox.className = "alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
-                            alertIcon.className = "bi bi-check-circle-fill fs-4 me-3";
-                            window.scrollTo({
-                                top: 0,
-                                behavior: 'smooth'
-                            });
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1200);
-                        } else {
-                            alertBox.className = "alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm rounded-3";
-                            alertIcon.className = "bi bi-exclamation-triangle-fill fs-4 me-3";
-                            btn.disabled = false;
-                            btn.innerHTML = 'Guardar';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Inconveniente de comunicación con el servidor.');
-                        btn.disabled = false;
-                        btn.innerHTML = 'Guardar';
-                    });
-            });
-        }
-
-        const btnDescargar = document.getElementById('btn-descargar-lista');
-        if (btnDescargar) {
-            btnDescargar.addEventListener('click', function(e) {
-                e.preventDefault();
-                const urlExportar = this.getAttribute('data-url');
-                if (urlExportar) {
-                    window.location.href = urlExportar;
-                } else {
-                    alert('No se pudo obtener la ruta de descarga.');
-                }
-            });
-        }
-    });
-</script>
+    </script>
 @endsection

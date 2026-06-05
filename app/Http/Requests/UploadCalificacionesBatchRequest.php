@@ -3,7 +3,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCalificacionesBatchRequest extends FormRequest
+class UploadCalificacionesBatchRequest extends FormRequest
 {
     public function authorize(): bool
     {

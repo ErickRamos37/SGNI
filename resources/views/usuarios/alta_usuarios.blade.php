@@ -52,6 +52,9 @@
                                     <input type="email" name="correo_institucional" id="correo_institucional" class="form-control shadow-sm" placeholder="ejemplo@uabc.edu.mx" required>
                                     <div class="invalid-feedback" id="error-correo_institucional"></div>
                                 </div>
+                            </div>
+
+                            <div class="row g-4 mb-4">
                                 <div class="col-md-6">
                                     <label for="id_rol" class="form-label text-dark fw-semibold">Rol en el sistema <span class="text-danger">*</span></label>
                                     <select name="id_rol" id="id_rol" class="form-select shadow-sm" required>
@@ -67,11 +70,11 @@
                             <hr class="my-4 border-light-subtle">
 
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('usuarios.lista_usuarios') }}" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                                <a href="{{ route('usuarios.index') }}" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                     Cancelar
                                 </a>
-                                <button type="submit" id="btnGuardar" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
-                                    Registrar usuario
+                                <button type="submit" id="btnGuardar" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                    Guardar
                                 </button>
                             </div>
                         </form>
@@ -88,6 +91,32 @@
         const form = document.getElementById('formAltaUsuario');
         const btnGuardar = document.getElementById('btnGuardar');
         const mensajeExito = document.getElementById('mensajeExito');
+
+        // Delegación de eventos para limpiar errores al escribir
+        form.addEventListener('input', function(e) {
+            // Si el elemento modificado tiene la clase de error...
+            if (e.target.classList.contains('is-invalid')) {
+                // Se quitamos el borde rojo
+                e.target.classList.remove('is-invalid');
+
+                // Se busca su div de error correspondiente y lo vaciamos
+                const errorDiv = document.getElementById(`error-${e.target.id}`);
+                if (errorDiv) {
+                    errorDiv.innerHTML = '';
+                }
+            }
+        });
+
+        // Este evento asegura que los <select> también se limpien al cambiar de opción
+        form.addEventListener('change', function(e) {
+            if (e.target.tagName === 'SELECT' && e.target.classList.contains('is-invalid')) {
+                e.target.classList.remove('is-invalid');
+                const errorDiv = document.getElementById(`error-${e.target.id}`);
+                if (errorDiv) {
+                    errorDiv.innerHTML = '';
+                }
+            }
+        });
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault(); // Evita que la página parpadee o recargue

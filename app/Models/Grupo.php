@@ -29,4 +29,10 @@ class Grupo extends Model
     {
         return $this->hasMany(Alumno::class, 'id_grupo_induccion', 'id_grupo');
     }
+
+    public function alumnosPropedeutico()
+    {
+        return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
+    }
+
 }

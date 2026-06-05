@@ -11,6 +11,7 @@ use App\Models\Grupo;
 use App\Http\Middleware\ValidarSesionGoogle;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
+use App\Http\Controllers\SeguimientoController;
 
 // --- Rutas del referentes al inicio de sesion ---
 Route::get('/', function () {
@@ -38,9 +39,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
         Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
 
-        // Tabla de los usuarios
-        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.lista_usuarios');
-        Route::get('/usuarios/lista', [UsuarioController::class, 'index'])->name('usuarios.lista');
+        // Tabla de los usuarios (Llama DataTables)
+        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
     });
 
 
@@ -62,9 +62,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
 
-    Route::get('/psicologo', function () {
-        return view('panel_psicologia.psicologo');
-    })->name('psicologo');
+    Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
 
     Route::get('/crear_grupo', function () {
         return view('groups.crear_grupos_cursos.crear_grupo');

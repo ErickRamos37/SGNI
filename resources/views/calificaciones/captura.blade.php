@@ -3,14 +3,15 @@
 @section('contenido')
     <div class="container-fluid py-4">
 
-        {{-- 1. Header Principal --}}
-        <div class="mb-4">
-            <h1 class="fw-bold text-dark mb-1">Cargar Excel con Calificaciones</h1>
-            <p class="text-muted mb-2">Importe el archivo de calificaciones del grupo de manera automática</p>
-        </div>
-
-        {{-- Boton Descargar Formato: Ahora apunta a la nueva ruta del archivo estatico y limpio --}}
-        <div class="text-center mb-4">
+        {{-- 1. Header Principal con botón de acción y enlace de "Atrás" integrado --}}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold text-dark mb-1">Cargar Excel con Calificaciones</h1>
+                <p class="text-muted mb-0">Importe el archivo de calificaciones del grupo de manera automática</p>
+                <a href="{{ route('crear_grupo') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
+                    Atras
+                </a>
+            </div>
             <a href="{{ route('calificaciones.descargarFormatoBase') }}"
                 class="btn btn-outline-dark px-4 fw-semibold rounded-3">
                 Descargar Formato
@@ -55,13 +56,11 @@
                             </div>
 
                             <div class="d-inline-flex align-items-center badge bg-white text-dark border px-3 py-2 rounded-2 small shadow-sm">
-                                <i class="bi bi-file-earmark-spreadsheet-fill text-dark me-1"></i>
-                                <span>Formato: .xlsx / .xls</span>
+                                <i class="bi bi-filetype-xlsx text-dark me-1 fs-6"></i> Formato: .xlsx (Excel)
                             </div>
                         </div>
                     </label>
 
-                    {{-- Recuadro Informativo de Formato --}}
                     <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-4" role="alert">
                         <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                         <div class="small">
@@ -70,8 +69,13 @@
                         </div>
                     </div>
 
-                    {{-- Botón de Acción Único Inferior Derecho --}}
-                    <div class="text-end mt-4">
+                    {{-- Botones de Acción Dobles Inferior Derecho --}}
+                    <hr class="my-4 border-light-subtle">
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" id="btn-cancelar"
+                            class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                            Cancelar
+                        </button>
                         <button type="submit" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
                             Subir Calificaciones
                         </button>
@@ -104,27 +108,11 @@
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                let listadoErrores = '';
-
-                @foreach ($errors->all() as $error)
-                    let errorTexto = "{{ $error }}";
-
-                    if (!errorTexto.includes('Fila')) {
-                        errorTexto = "El contenido o la estructura interna del archivo es incorrecto. Verifique las columnas del formato.";
-                    }
-
-                    listadoErrores += '<div class="d-flex align-items-start mb-2 text-dark">' +
-                                        '<i class="bi bi-x-circle-fill text-danger me-2 mt-1"></i>' +
-                                        '<span>' + errorTexto + '</span>' +
-                                      '</div>';
-                @endforeach
+                let errorTexto = "{{ $errors->first() }}";
 
                 Swal.fire({
-                    title: '¡Contenido del Archivo Incorrecto!',
-                    html: '<p class="text-muted small text-start mb-3">El sistema detectó inconsistencias al intentar leer el documento:</p>' +
-                           '<div class="bg-light p-3 rounded-3 border text-start lh-base style-scroll" style="max-height: 200px; overflow-y: auto;">' +
-                               listadoErrores +
-                           '</div>',
+                    title: '¡Inconsistencia Detectada!',
+                    html: '<p class="text-muted small text-center mb-0">' + errorTexto + '</p>',
                     icon: 'error',
                     confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Entendido'
@@ -133,25 +121,39 @@
         </script>
     @endif
 
-    {{-- Script nativo de control de UI para el Dropzone --}}
     <script>
-        document.getElementById('archivo_excel').addEventListener('change', function(e) {
-            const fileName = e.target.files[0] ? e.target.files[0].name : '';
-            const badge = document.getElementById('file-name-badge');
-            const helpText = document.getElementById('file-help-text');
-            const textSpan = document.getElementById('file-name-text');
-            const mainTitle = document.getElementById('nombre_archivo');
+        document.addEventListener('DOMContentLoaded', function() {
+            const archivoInput = document.getElementById('archivo_excel');
 
-            if (fileName) {
-                textSpan.textContent = fileName;
-                badge.classList.remove('d-none');
-                helpText.classList.add('d-none');
-                mainTitle.innerText = "¡Archivo Seleccionado!";
-            } else {
-                badge.classList.add('d-none');
-                helpText.classList.remove('d-none');
-                mainTitle.innerText = "Arrastre el archivo aquí";
-            }
+            // Script nativo de control de UI para el Dropzone
+            archivoInput.addEventListener('change', function(e) {
+                const fileName = e.target.files[0] ? e.target.files[0].name : '';
+                const badge = document.getElementById('file-name-badge');
+                const helpText = document.getElementById('file-help-text');
+                const textSpan = document.getElementById('file-name-text');
+                const mainTitle = document.getElementById('nombre_archivo');
+
+                if (fileName) {
+                    textSpan.textContent = fileName;
+                    badge.classList.remove('d-none');
+                    helpText.classList.add('d-none');
+                    mainTitle.innerText = "¡Archivo Seleccionado!";
+                } else {
+                    badge.classList.add('d-none');
+                    helpText.classList.remove('d-none');
+                    mainTitle.innerText = "Arrastre el archivo aquí";
+                }
+            });
+
+            // Lógica inteligente para el botón de Cancelar
+            document.getElementById('btn-cancelar').addEventListener('click', function() {
+                if (archivoInput.value !== '') {
+                    archivoInput.value = '';
+                    archivoInput.dispatchEvent(new Event('change'));
+                } else {
+                    window.history.back();
+                }
+            });
         });
     </script>
 @endsection
