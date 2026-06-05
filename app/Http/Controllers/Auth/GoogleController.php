@@ -40,7 +40,7 @@ class GoogleController extends Controller
         switch ($nombreRol) {
             case 'administrador':
             case 'admin':
-                return redirect()->route('usuarios.lista_usuarios');
+                return redirect()->route('usuarios.index');
 
             case 'profesor':
             case 'docente':
