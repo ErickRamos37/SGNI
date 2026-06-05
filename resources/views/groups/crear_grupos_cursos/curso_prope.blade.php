@@ -14,7 +14,7 @@
             <h2 class="fw-bold text-dark mb-1">Crear Grupos</h2>
             <p class="text-muted mb-0">Seleccione el programa y configure los grupos</p>
             <a href="{{ route('crear_grupo') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
-                <i class="bi bi-arrow-left me-1"></i> Volver a selección de programa
+                Atras
             </a>
         </div>
     </div>
@@ -30,13 +30,15 @@
     </div>
 
     {{-- ─── Barra de Navegación por Pestañas ─────────────────────── --}}
-    <div class="bg-light border rounded-3 p-1 d-inline-flex align-items-center mb-4">
-        <a href="?tab=crear" class="btn {{ $tabActive === 'crear' ? 'btn-primary shadow-sm' : 'btn-light text-dark border-0 bg-transparent' }} fw-semibold rounded-3 px-4 py-2 me-1">
-            Crear Grupos
-        </a>
-        <a href="?tab=asignar" class="btn {{ $tabActive === 'asignar' ? 'btn-primary shadow-sm' : 'btn-light text-dark border-0 bg-transparent' }} fw-semibold rounded-3 px-4 py-2">
-            Asignar Profesores a Grupos
-        </a>
+    <div class="mb-4">
+        <div class="d-inline-flex rounded-pill border bg-white shadow-sm p-1 gap-1">
+            <a href="?tab=crear" class="btn btn-sm rounded-pill px-4 py-2 fw-semibold text-decoration-none {{ $tabActive === 'crear' ? 'btn-outline-dark active' : 'btn-outline-dark border-0' }}">
+                Crear Grupos
+            </a>
+            <a href="?tab=asignar" class="btn btn-sm rounded-pill px-4 py-2 fw-semibold text-decoration-none {{ $tabActive === 'asignar' ? 'btn-outline-dark active' : 'btn-outline-dark border-0' }}">
+                Asignar Profesores a Grupos
+            </a>
+        </div>
     </div>
 
     {{-- ========================================================= --}}
@@ -94,7 +96,7 @@
 
                         <hr class="my-4 border-light-subtle">
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="button" id="btnCancelar" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                            <button type="button" id="btnCancelar" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                 Cancelar
                             </button>
                             <button type="button" id="btnSiguiente" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
@@ -159,7 +161,7 @@
                         <hr class="my-4 border-light-subtle">
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" id="btnAtras" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Volver
+                                Atras
                             </button>
                             <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                 Crear
@@ -237,11 +239,11 @@
                             </thead>
                             <tbody class="small">
                                 @foreach($grupos as $grupo)
-                                <tr>
-                                    <td class="px-4 fw-bold text-dark">
+                                <tr class="registro-row" data-search="{{ strtolower($grupo->nombre_grupo) }}">
+                                    <td class="px-4 py-3 fw-bold text-dark">
                                         {{ $grupo->nombre_grupo }}
                                     </td>
-                                    <td>
+                                    <td class="py-3 text-dark">
                                         @if($grupo->num_empleado && $grupo->num_empleado != auth()->user()->num_empleado)
                                             @php
                                                 $profeAsignado = $profesores->firstWhere('num_empleado', $grupo->num_empleado);
@@ -254,7 +256,7 @@
                                             <span class="text-danger fw-semibold">Sin asignar</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td class="py-3">
                                         <select name="profesores[{{ $grupo->id_grupo }}]" class="form-select shadow-sm">
                                             <option value="" selected disabled>Seleccionar profesor</option>
                                             @foreach($profesores as $profe)
@@ -271,7 +273,10 @@
                     </div>
                 </div>
 
-                <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-end">
+                <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-end gap-2">
+                    <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                        Cancelar
+                    </button>
                     <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                         Guardar
                     </button>
