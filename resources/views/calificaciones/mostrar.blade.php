@@ -42,6 +42,7 @@
                         @endif
                     </div>
                 </div>
+
                 {{-- Contenedor para mostrar mensajes de alerta via AJAX --}}
                 <div id="alert-container-ajax" class="d-none mb-3">
                     <div class="alert alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert"
@@ -80,8 +81,7 @@
                             </div>
                         </div>
 
-                        <div
-                            class="card-footer bg-white d-flex justify-content-end align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
+                        <div class="card-footer bg-white d-flex justify-content-end align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
                             <button type="button" id="btn-guardar-batch"
                                 class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                 Guardar Cambios
@@ -127,216 +127,217 @@
 
     <script type="module">
         $(document).ready(function() {
-                    @if ($grupo)
-                        // 1. Inicializacion y configuracion de DataTables de lado del servidor
-                        let tablaEstudiantes = $('#tabla-estudiantes').DataTable({
-                            processing: true,
-                            serverSide: true,
-                            pageLength: 15, // Paginacion por defecto
-                            lengthChange: true, // Muestra el selector de cantidad de filas
-                            lengthMenu: [
-                                [10, 15, 20, 25, 30, 35, 40, 45, 50],
-                                [10, 15, 20, 25, 30, 35, 40, 45, 50]
-                            ],
-                            ajax: {
-                                url: "{{ route('calificaciones.data', $grupo->id_grupo ?? $grupo->id) }}", // Ruta JSON de datos
-                                type: 'GET'
-                            },
-                            language: {
-                                // Diccionario de traduccion estatica local para evitar consultas externas
-                                processing: "Procesando...",
-                                search: "Buscar Matrícula:",
-                                lengthMenu: "Mostrar _MENU_ registros",
-                                info: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                                infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-                                infoFiltered: "(filtrado de un total de _MAX_ registros)",
-                                infoPostFix: "",
-                                loadingRecords: "Cargando...",
-                                zeroRecords: "No se encontraron resultados",
-                                emptyTable: "Ningún dato disponible en esta tabla",
-                                paginate: {
-                                    first: "Primero",
-                                    previous: "Anterior",
-                                    next: "Siguiente",
-                                    last: "Último"
-                                },
-                                aria: {
-                                    sortAscending: ": Activar para ordenar la columna de manera ascendente",
-                                    sortDescending: ": Activar para ordenar la columna de manera descendente"
-                                }
-                            },
-                            columns: [{
-                                    data: 'matricula',
-                                    name: 'matricula',
-                                    className: 'fw-bold text-dark ps-2'
-                                },
-                                {
-                                    data: 'nombre_completo',
-                                    name: 'nombre',
-                                    searchable: false,
-                                    orderable: false
-                                },
-                                {
-                                    data: 'input_inicial',
-                                    name: 'input_inicial',
-                                    orderable: false,
-                                    searchable: false,
-                                    className: 'text-center'
-                                },
-                                {
-                                    data: 'input_final',
-                                    name: 'input_final',
-                                    orderable: false,
-                                    searchable: false,
-                                    className: 'text-center'
-                                }
-                            ]
+            @if ($grupo)
+                // 1. Inicializacion y configuracion de DataTables de lado del servidor
+                let tablaEstudiantes = $('#tabla-estudiantes').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: 15, // Paginacion por defecto
+                    lengthChange: true, // Muestra el selector de cantidad de filas
+                    lengthMenu: [
+                        [10, 15, 20, 25, 30, 35, 40, 45, 50],
+                        [10, 15, 20, 25, 30, 35, 40, 45, 50]
+                    ],
+                    ajax: {
+                        url: "{{ route('calificaciones.data', $grupo->id_grupo ?? $grupo->id) }}", // Ruta JSON de datos
+                        type: 'GET'
+                    },
+                    language: {
+                        // Diccionario de traduccion estatica local para evitar consultas externas
+                        processing: "Procesando...",
+                        search: "Buscar Matrícula:",
+                        lengthMenu: "Mostrar _MENU_ registros",
+                        info: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        infoFiltered: "(filtrado de un total de _MAX_ registros)",
+                        infoPostFix: "",
+                        loadingRecords: "Cargando...",
+                        zeroRecords: "No se encontraron resultados",
+                        emptyTable: "Ningún dato disponible en esta tabla",
+                        paginate: {
+                            first: "Primero",
+                            previous: "Anterior",
+                            next: "Siguiente",
+                            last: "Último"
+                        },
+                        aria: {
+                            sortAscending: ": Activar para ordenar la columna de manera ascendente",
+                            sortDescending: ": Activar para ordenar la columna de manera descendente"
+                        }
+                    },
+                    columns: [{
+                            data: 'matricula',
+                            name: 'matricula',
+                            className: 'fw-bold text-dark ps-2'
+                        },
+                        {
+                            data: 'nombre_completo',
+                            name: 'nombre',
+                            searchable: false,
+                            orderable: false
+                        },
+                        {
+                            data: 'input_inicial',
+                            name: 'input_inicial',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'input_final',
+                            name: 'input_final',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        }
+                    ]
+                });
+
+                // 2. Delegacion de eventos para validar calificaciones de filas dinamicas en tiempo real
+                $('#tabla-estudiantes').on('input', '.input-score', function() {
+                    let valString = $(this).val();
+
+                    // Limita la entrada a un maximo de dos numeros decimales
+                    if (valString.includes('.')) {
+                        const partes = valString.split('.');
+                        if (partes[1].length > 2) {
+                            valString = partes[0] + '.' + partes[1].slice(0, 2);
+                            $(this).val(valString);
+                        }
+                    }
+
+                    const valFloat = parseFloat(valString);
+
+                    // Restringe valores numericos fijos entre 0 y 100
+                    if (!isNaN(valFloat) && valFloat > 100) {
+                        $(this).val("100");
+                    }
+                    if (!isNaN(valFloat) && valFloat < 0) {
+                        $(this).val("0");
+                    }
+
+                    // Remueve ceros a la izquierda innecesarios (ej. cambia 05 por 5)
+                    if (valString.length > 1 && valString.startsWith('0') && !valString.startsWith('0.')) {
+                        $(this).val(valFloat);
+                        valString = $(this).val();
+                    }
+
+                    // Cambio dinamico del color del borde del input si la calificacion es reprobatoria
+                    if (!isNaN(valFloat) && valFloat < 60) {
+                        $(this).removeClass('text-dark border-light bg-light').addClass(
+                            'text-danger border-danger');
+                    } else {
+                        $(this).removeClass('text-danger border-danger').addClass(
+                            'text-dark border-light bg-light');
+                    }
+                });
+
+                // 3. Recoleccion y envio en lote de las calificaciones de la pagina actual visible
+                $('#btn-guardar-batch').on('click', function() {
+                    const btn = $(this);
+                    const filas = $('#tabla-estudiantes tbody tr.student-row');
+                    const calificacionesPayload = {};
+                    let tieneDatos = false;
+                    let calificacionInvalida = false;
+
+                    filas.each(function() {
+                        const fila = $(this);
+                        const inputInicial = fila.find('input[data-field="examen_inicial"]');
+                        const inputFinal = fila.find('input[data-field="examen_final"]');
+                        const matricula = fila.attr('data-matricula');
+
+                        if (matricula && inputInicial.length && inputFinal.length) {
+                            const valIni = inputInicial.val();
+                            const valFin = inputFinal.val();
+                            const notaIni = valIni !== '' ? parseFloat(valIni) : null;
+                            const notaFin = valFin !== '' ? parseFloat(valFin) : null;
+
+                            if ((notaIni !== null && (notaIni < 0 || notaIni > 100)) ||
+                                (notaFin !== null && (notaFin < 0 || notaFin > 100))) {
+                                calificacionInvalida = true;
+                            }
+
+                            calificacionesPayload[matricula.trim()] = {
+                                examen_inicial: notaIni,
+                                examen_final: notaFin
+                            };
+                            tieneDatos = true;
+                        }
+                    });
+
+                    if (!tieneDatos) {
+                        Swal.fire({
+                            title: '¡Tabla Vacia!',
+                            text: 'No hay registros válidos para actualizar.',
+                            icon: 'warning',
+                            confirmButtonColor: '#dc3545',
+                            confirmButtonText: 'Aceptar'
                         });
+                        return;
+                    }
 
-                        // 2. Delegacion de eventos para validar calificaciones de filas dinamicas en tiempo real
-                        $('#tabla-estudiantes').on('input', '.input-score', function() {
-                            let valString = $(this).val();
+                    // Inactiva el boton durante el guardado para prevenir multiples clics del usuario
+                    btn.prop('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...'
+                    );
 
-                            // Limita la entrada a un maximo de dos numeros decimales
-                            if (valString.includes('.')) {
-                                const partes = valString.split('.');
-                                if (partes[1].length > 2) {
-                                    valString = partes[0] + '.' + partes[1].slice(0, 2);
-                                    $(this).val(valString);
-                                }
-                            }
-
-                            const valFloat = parseFloat(valString);
-
-                            // Restringe valores numericos fijos entre 0 y 100
-                            if (!isNaN(valFloat) && valFloat > 100) {
-                                $(this).val("100");
-                            }
-                            if (!isNaN(valFloat) && valFloat < 0) {
-                                $(this).val("0");
-                            }
-
-                            // Remueve ceros a la izquierda innecesarios (ej. cambia 05 por 5)
-                            if (valString.length > 1 && valString.startsWith('0') && !valString.startsWith('0.')) {
-                                $(this).val(valFloat);
-                                valString = $(this).val();
-                            }
-
-                            // Cambio dinamico del color del borde del input si la calificacion es reprobatoria
-                            if (!isNaN(valFloat) && valFloat < 60) {
-                                $(this).removeClass('text-dark border-light bg-light').addClass(
-                                    'text-danger border-danger');
-                            } else {
-                                $(this).removeClass('text-danger border-danger').addClass(
-                                    'text-dark border-light bg-light');
-                            }
-                        });
-
-                        // 3. Recoleccion y envio en lote de las calificaciones de la pagina actual visible
-                        $('#btn-guardar-batch').on('click', function() {
-                            const btn = $(this);
-                            const filas = $('#tabla-estudiantes tbody tr.student-row');
-                            const calificacionesPayload = {};
-                            let tieneDatos = false;
-                            let calificacionInvalida = false;
-
-                            filas.each(function() {
-                                const fila = $(this);
-                                const inputInicial = fila.find('input[data-field="examen_inicial"]');
-                                const inputFinal = fila.find('input[data-field="examen_final"]');
-                                const matricula = fila.attr('data-matricula');
-
-                                if (matricula && inputInicial.length && inputFinal.length) {
-                                    const valIni = inputInicial.val();
-                                    const valFin = inputFinal.val();
-                                    const notaIni = valIni !== '' ? parseFloat(valIni) : null;
-                                    const notaFin = valFin !== '' ? parseFloat(valFin) : null;
-
-                                    if ((notaIni !== null && (notaIni < 0 || notaIni > 100)) ||
-                                        (notaFin !== null && (notaFin < 0 || notaFin > 100))) {
-                                        calificacionInvalida = true;
-                                    }
-
-                                    calificacionesPayload[matricula.trim()] = {
-                                        examen_inicial: notaIni,
-                                        examen_final: notaFin
-                                    };
-                                    tieneDatos = true;
-                                }
-                            });
-
-                            if (!tieneDatos) {
+                    // API Fetch para enviar los datos JSON de manera asincrona al controlador
+                    fetch("{{ route('calificaciones.updateBatch') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                calificaciones: calificacionesPayload
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error en el servidor');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.status === 'success') {
                                 Swal.fire({
-                                    title: '¡Tabla Vacia!',
-                                    text: 'No hay registros válidos para actualizar.',
-                                    icon: 'warning',
-                                    confirmButtonColor: '#dc3545',
+                                    title: '¡Carga Exitosa!',
+                                    text: 'Las calificaciones se actualizaron con éxito en la base de datos.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#00723F',
                                     confirmButtonText: 'Aceptar'
-                                });
-                                return;
-                            }
-
-                            // Inactiva el boton durante el guardado para prevenir multiples clics del usuario
-                            btn.prop('disabled', true).html(
-                                '<span class="spinner-border spinner-border-sm" role="status"></span> GUARDANDO...'
-                            );
-
-                            // API Fetch para enviar los datos JSON de manera asincrona al controlador
-                            fetch("{{ route('calificaciones.updateBatch') }}", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                    },
-                                    body: JSON.stringify({
-                                        calificaciones: calificacionesPayload
-                                    })
-                                })
-                                .then(response => {
-                                    if (!response.ok) throw new Error('Error en el servidor');
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    if (data.status === 'success') {
-                                        Swal.fire({
-                                            title: '¡Carga Exitosa!',
-                                            text: 'Las calificaciones se actualizaron con éxito en la base de datos.',
-                                            icon: 'success',
-                                            confirmButtonColor: '#00723F',
-                                            confirmButtonText: 'Aceptar'
-                                        }).then(() => {
-                                            // Restablece el boton a su estado original listo para volver a usarse
-                                            btn.prop('disabled', false).html('Guardar Cambios');
-                                        });
-                                    } else {
-                                        throw new Error(data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    // En caso de error, registra el log y rehabilita el boton para permitir reintentos
-                                    console.error('Error:', error);
-                                    Swal.fire({
-                                        title: '¡Error al Guardar!',
-                                        text: 'Ocurrio un inconveniente al actualizar las calificaciones en el servidor.',
-                                        icon: 'error',
-                                        confirmButtonColor: '#dc3545',
-                                        confirmButtonText: 'Entendido'
-                                    });
+                                }).then(() => {
+                                    // Restablece el boton a su estado original listo para volver a usarse
                                     btn.prop('disabled', false).html('Guardar Cambios');
                                 });
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            // En caso de error, registra el log y rehabilita el boton para permitir reintentos
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: '¡Error al Guardar!',
+                                text: 'Ocurrio un inconveniente al actualizar las calificaciones en el servidor.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545',
+                                confirmButtonText: 'Entendido'
+                            });
+                            btn.prop('disabled', false).html('Guardar Cambios');
                         });
-                    @endif
+                });
+            @endif
 
-                    // 4. Manejo del click en el boton externo para la descarga del archivo Excel
-                    // Se mantiene la verificacion de existencia para evitar errores fatales en la pagina
-                    const btnDescargar = document.getElementById('btn-descargar-lista');
-                    if (btnDescargar) {
-                        btnDescargar.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            // Como el boton existe, la ruta generada por Laravel siempre estara presente
-                            const urlExportar = this.getAttribute('data-url');
-                            window.location.href = urlExportar;
-                        });
-                    }
+            // 4. Manejo del click en el boton externo para la descarga del archivo Excel
+            // Se mantiene la verificacion de existencia para evitar errores fatales en la pagina
+            const btnDescargar = document.getElementById('btn-descargar-lista');
+            if (btnDescargar) {
+                btnDescargar.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Como el boton existe, la ruta generada por Laravel siempre estara presente
+                    const urlExportar = this.getAttribute('data-url');
+                    window.location.href = urlExportar;
+                });
+            }
+        });
     </script>
 @endsection
