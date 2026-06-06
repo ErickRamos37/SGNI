@@ -14,14 +14,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Exports\GrupoCalificacionesExport;
 use Illuminate\Support\Facades\File;
+use Yajra\DataTables\Facades\DataTables;
 
 class CalificacionController extends Controller
 {
+    // Muestra la vista principal de captura de calificaciones
     public function showCaptura()
     {
         return view('calificaciones.captura');
     }
 
+    // Descarga el archivo Excel de plantilla desde la carpeta publica
     public function descargarFormatoBase()
     {
         $rutaArchivo = public_path('formatos/formato_calificaciones.xlsx');
@@ -33,6 +36,7 @@ class CalificacionController extends Controller
         return response()->download($rutaArchivo, 'formato_calificaciones.xlsx');
     }
 
+    // Procesa e importa las calificaciones masivas desde un archivo Excel cargado
     public function upload(UploadCalificacionesRequest $request): RedirectResponse
     {
         try {
@@ -47,37 +51,90 @@ class CalificacionController extends Controller
         }
     }
 
+    // Exporta las calificaciones actuales de un grupo a un archivo Excel numerado
     public function exportarGrupo($id_grupo)
     {
         $grupo = Grupo::findOrFail($id_grupo);
-        $nombreArchivo = 'Calificaciones_' . str_replace(' ', '_', $grupo->nombre) . '.xlsx';
+        $nombreGrupo = $grupo->nombre_grupo ?? $grupo->nombre;
+        $nombreArchivo = 'calificaciones' . str_replace(' ', '_', $nombreGrupo) . '.xlsx';
+
         return Excel::download(new GrupoCalificacionesExport($id_grupo), $nombreArchivo);
     }
 
+    // Inicializa la vista de calificaciones y filtra los grupos semanticamente por su nombre
     public function indexByGrupo($id_grupo = null)
     {
-        $grupos = Grupo::where('id_curso', 2)->get();
-
+        // Se buscan grupos cuyo nombre contenga "propedeutico" ignorando IDs fijos
+        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%propedeutico%')->get();
         $grupo = null;
-        $alumnos = collect();
+        $alumnos = collect(); // Coleccion vacia; la carga de alumnos ahora se delega a DataTables por AJAX
 
         if ($id_grupo) {
-            $grupo = Grupo::where('id_curso', 2)->find($id_grupo);
+            $grupo = Grupo::where('nombre_grupo', 'LIKE', '%propedeutico%')->find($id_grupo);
+
             if (!$grupo) {
                 $grupo = (object) [
                     'id_grupo' => $id_grupo,
-                    'nombre' => 'Grupo ' . $id_grupo . ' (Temporal)',
+                    'nombre_grupo' => 'Grupo ' . $id_grupo . ' (Temporal)',
                     'id_curso' => 2
                 ];
             }
-            $alumnos = Alumno::where('id_grupo_propedeutico', $id_grupo)
-                ->with('resultadosPropedeutico')
-                ->paginate(10);
         }
 
         return view('calificaciones.mostrar', compact('grupos', 'grupo', 'alumnos'));
     }
 
+    // Procesa y retorna los datos de los alumnos en formato JSON estructurado para Server-Side DataTables
+    public function getAlumnosData(Request $request, $id_grupo)
+    {
+        if ($request->ajax()) {
+            $alumnos = Alumno::where('id_grupo_propedeutico', $id_grupo)
+                ->with('resultadosPropedeutico')
+                ->select('alumno.*'); // Se usa el nombre de la tabla en singular
+
+            return DataTables::eloquent($alumnos)
+                // Retorna el nombre completo concatenado
+                ->addColumn('nombre_completo', function ($alumno) {
+                    return trim("{$alumno->nombre} {$alumno->ap_pat} {$alumno->ap_mat}");
+                })
+                // Construye el input HTML dinamico para el examen inicial
+                ->addColumn('input_inicial', function ($alumno) {
+                    $nota = $alumno->resultadosPropedeutico->examen_inicial ?? null;
+                    $colorClass = (!is_null($nota) && $nota < 70) ? 'text-danger border-danger' : 'text-dark border-light bg-light';
+
+                    return '<div class="col-9 col-md-7 mx-auto">
+                                <input type="number"
+                                    class="form-control text-center fw-bold rounded-3 shadow-sm input-score ' . $colorClass . '"
+                                    data-field="examen_inicial" min="0" max="100"
+                                    value="' . $nota . '" placeholder="-">
+                            </div>';
+                })
+                // Construye el input HTML dinamico para el examen final
+                ->addColumn('input_final', function ($alumno) {
+                    $nota = $alumno->resultadosPropedeutico->examen_final ?? null;
+                    $colorClass = (!is_null($nota) && $nota < 70) ? 'text-danger border-danger' : 'text-dark border-light bg-light';
+
+                    return '<div class="col-9 col-md-7 mx-auto">
+                                <input type="number"
+                                    class="form-control text-center fw-bold rounded-3 shadow-sm input-score ' . $colorClass . '"
+                                    data-field="examen_final" min="0" max="100"
+                                    value="' . $nota . '" placeholder="-">
+                            </div>';
+                })
+                // Agrega metadatos necesarios a las filas <tr> generadas por DataTables
+                ->setRowAttr([
+                    'data-matricula' => function($alumno) {
+                        return $alumno->matricula;
+                    },
+                    'class' => 'border-bottom border-light student-row'
+                ])
+                // Indica que las columnas de los inputs contienen codigo HTML valido
+                ->rawColumns(['input_inicial', 'input_final'])
+                ->make(true);
+        }
+    }
+
+    // Guarda o actualiza en lote las calificaciones enviadas desde la pagina visible de DataTables
     public function updateBatch(UploadCalificacionesBatchRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -87,6 +144,7 @@ class CalificacionController extends Controller
                 $alumno = Alumno::where('matricula', $matricula)->first();
 
                 if ($alumno) {
+                    // Si ya tiene registro de calificaciones, actualiza los valores
                     if ($alumno->id_resultados_propedeutico) {
                         ResultadosPropedeutico::where('id_resultados_propedeutico', $alumno->id_resultados_propedeutico)
                             ->update([
@@ -94,6 +152,7 @@ class CalificacionController extends Controller
                                 'examen_final' => $scores['examen_final']
                             ]);
                     } else {
+                        // Si es un registro nuevo, busca el curso y genera las notas base
                         $idCursoDefecto = 1;
 
                         if ($alumno->id_grupo_propedeutico) {
@@ -128,6 +187,8 @@ class CalificacionController extends Controller
             ], 500);
         }
     }
+
+    // Metodo alternativo de guardado manual para procesamiento por Request estandar
     public function guardarTabla(Request $request)
     {
         $calificaciones = $request->input('calificaciones', []);
