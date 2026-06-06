@@ -19,6 +19,21 @@
         .nav-link[aria-expanded="true"] .toggle-icon {
             transform: rotate(-180deg);
         }
+
+        @media (min-width: 992px) {
+            #sidebarMenu {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 1030;
+            }
+
+            main {
+                margin-left: 280px;
+            }
+        }
     </style>
 
 </head>
