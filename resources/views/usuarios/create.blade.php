@@ -4,19 +4,16 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h2 class="fw-bold text-dark">Alta de Personal - Registro</h2>
-            <p class="text-muted">Registre nuevo personal docente o administrativo</p>
+            <h2 class="fw-bold text-dark">Alta de Personal</h2>
+            <p class="text-muted">Registrar los datos del nuevo personal</p>
 
             <div class="mb-4">
                 <div class="card border border-light-subtle shadow-sm rounded-3 bg-white h-100">
                     <div class="card-body p-4 p-md-5">
                         <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
                             <i class="bi bi-person-plus me-2 fs-4"></i>
-                            <span>Registrar usuario</span>
+                            <span>Registrar personal</span>
                         </h5>
-
-                        <div id="mensajeExito" class="alert alert-success d-none mb-4 rounded-3 shadow-sm"></div>
-
                         <form id="formAltaUsuario" action="{{ route('usuarios.store') }}" method="POST">
                             @csrf
 
@@ -56,7 +53,7 @@
 
                             <div class="row g-4 mb-4">
                                 <div class="col-md-6">
-                                    <label for="id_rol" class="form-label text-dark fw-semibold">Rol en el sistema <span class="text-danger">*</span></label>
+                                    <label for="id_rol" class="form-label text-dark fw-semibold">Cargo <span class="text-danger">*</span></label>
                                     <select name="id_rol" id="id_rol" class="form-select shadow-sm" required>
                                         <option value="" selected disabled>-- Seleccione un rol --</option>
                                         @foreach($roles as $rol)
@@ -86,11 +83,11 @@
 </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('formAltaUsuario');
         const btnGuardar = document.getElementById('btnGuardar');
-        const mensajeExito = document.getElementById('mensajeExito');
 
         // Delegación de eventos para limpiar errores al escribir
         form.addEventListener('input', function(e) {
@@ -128,7 +125,6 @@
             // 2. Limpia cualquier error rojo que haya quedado de un intento anterior
             document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
             document.querySelectorAll('.invalid-feedback').forEach(el => el.innerHTML = '');
-            mensajeExito.classList.add('d-none');
 
             try {
                 // Recolecta todo lo que el usuario escribió
@@ -150,8 +146,14 @@
                 // 4. Se analiza la respuesta
                 if (response.ok) {
                     // El Form Request aprobó y se guardó en BD
-                    mensajeExito.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${data.message}`;
-                    mensajeExito.classList.remove('d-none');
+                    Swal.fire({
+                        title: '¡Acción Exitosa!',
+                        text: data.message, // Usa el mensaje que retorna el controlador
+                        icon: 'success',
+                        customClass: { confirmButton: 'btn btn-primary' },
+                        buttonsStyling: false,
+                        confirmButtonText: 'Aceptar'
+                    });
 
                     form.reset(); // Vacia el formulario
 
