@@ -9,11 +9,6 @@
                 <div class="row align-items-end g-3 mb-4">
                     <div class="col-12 col-md-8">
                         <h1 class="fw-bold text-dark mb-1">Captura de Calificaciones</h1>
-                        <a href="#" onclick="window.history.back(); return false;"
-                            class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
-                            Atras
-                        </a>
-
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="text-muted small fw-bold">Grupo:</span>
                             {{-- Menu desplegable que redirige a la ruta del grupo seleccionado --}}
@@ -81,26 +76,42 @@
                             </div>
                         </div>
 
-                        <div class="card-footer bg-white d-flex justify-content-end align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
-                            <button type="button" id="btn-guardar-batch"
-                                class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Guardar Cambios
+                        {{-- Pie de tarjeta unificado con los botones alineados a los extremos --}}
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
+                            <button type="button" onclick="window.history.back();"
+                                class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
+                                <span>Regresar</span>
                             </button>
+                            <div class="d-flex gap-2">
+                                <button type="button" id="btn-guardar-batch"
+                                    class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                    Guardar Cambios
+                                </button>
+                            </div>
                         </div>
-
                     </div>
                 @else
-                    {{-- Vista de estado vacio cuando no hay ningun grupo seleccionado --}}
-                    <div class="card border-0 shadow-sm p-5 rounded-4 bg-white text-center my-4">
-                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle bg-light border border-2"
-                            style="width: 75px; height: 75px;">
-                            <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
+                    {{-- Vista de estado vacio reestructurada con card-body y card-footer unificados --}}
+                    <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4 bg-white">
+                        <div class="card-body text-center p-5">
+                            <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle bg-light border border-2"
+                                style="width: 75px; height: 75px;">
+                                <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-2">No se ha seleccionado un grupo</h4>
+                            <p class="text-muted col-md-6 mx-auto mb-0 small">
+                                Por favor, elija un grupo propedéutico desde el menú desplegable superior para visualizar el
+                                listado de alumnos y capturar sus calificaciones.
+                            </p>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">No se ha seleccionado un grupo</h4>
-                        <p class="text-muted col-md-6 mx-auto mb-0">
-                            Por favor, elija un grupo propedéutico desde el menú desplegable superior para visualizar el
-                            listado de alumnos y capturar sus calificaciones.
-                        </p>
+
+                        {{-- Pie de tarjeta unificado para el estado vacio alineado a la izquierda --}}
+                        <div class="card-footer bg-white d-flex justify-content-start align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
+                            <button type="button" onclick="window.history.back();"
+                                class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
+                                <span>Regresar</span>
+                            </button>
+                        </div>
                     </div>
                 @endif
 
@@ -232,7 +243,7 @@
                     }
                 });
 
-                // 3. Recoleccion y envio en lote de las calificaciones de la pagina actual visible
+                // Recoleccion y envio en lote de las calificaciones de la pagina actual visible
                 $('#btn-guardar-batch').on('click', function() {
                     const btn = $(this);
                     const filas = $('#tabla-estudiantes tbody tr.student-row');
@@ -327,7 +338,7 @@
                 });
             @endif
 
-            // 4. Manejo del click en el boton externo para la descarga del archivo Excel
+            // Manejo del click en el boton externo para la descarga del archivo Excel
             // Se mantiene la verificacion de existencia para evitar errores fatales en la pagina
             const btnDescargar = document.getElementById('btn-descargar-lista');
             if (btnDescargar) {

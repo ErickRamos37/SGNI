@@ -4,12 +4,12 @@
     <div class="container-fluid py-1">
 
         {{-- 1. Header Principal --}}
-        <div class="mb-0">
-            <h1 class="fw-bold text-dark mb-1">Cargar Excel con Calificaciones</h1>
-            <p class="text-muted mb-0">Importe el archivo de calificaciones del grupo de manera automática</p>
-            <a href="#" onclick="window.history.back(); return false;" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
-                Atras
-            </a>
+        <div
+            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-2">
+            <div>
+                <h1 class="fw-bold text-dark mb-1">Cargar Excel con Calificaciones</h1>
+                <p class="text-muted mb-0">Importe el archivo de calificaciones del grupo de manera automática</p>
+            </div>
         </div>
 
         {{-- 2. Tarjeta de Contenido Principal --}}
@@ -31,7 +31,8 @@
 
             <div class="card-body p-4">
                 <p class="small text-muted mb-4">
-                    Suba el archivo Excel (.xlsx) con los resultados de las evaluaciones del grupo seleccionado. El sistema procesará las calificaciones de forma inmediata.
+                    Suba el archivo Excel (.xlsx) con los resultados de las evaluaciones del grupo seleccionado. El sistema
+                    procesará las calificaciones de forma inmediata.
                 </p>
 
                 {{-- Formulario con soporte para transferencia de archivos binarios (enctype) --}}
@@ -39,7 +40,9 @@
                     @csrf
 
                     {{-- Area dropzone interactiva vinculada al input de archivo --}}
-                    <label class="border border-3 border-black border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-4 d-block w-100 position-relative cursor-pointer" id="dropzone-area">
+                    <label
+                        class="border border-3 border-black border-dashed rounded-3 bg-light bg-opacity-25 p-5 text-center mb-4 d-block w-100 position-relative cursor-pointer"
+                        id="dropzone-area">
 
                         <input type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required
                             class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;">
@@ -50,33 +53,41 @@
                             <h5 class="fw-bold text-dark mb-1" id="nombre_archivo">Arrastre el archivo aquí</h5>
                             <p class="text-muted small mb-3" id="file-help-text">o haga clic para seleccionar</p>
 
-                            <div class="d-inline-flex align-items-center badge bg-white text-dark border px-3 py-2 rounded-2 small shadow-sm">
+                            <div
+                                class="d-inline-flex align-items-center badge bg-white text-dark border px-3 py-2 rounded-2 small shadow-sm">
                                 <i class="bi bi-filetype-xlsx text-dark me-1 fs-6"></i> Formato: .xlsx (Excel)
                             </div>
                         </div>
                     </label>
 
                     {{-- Alerta informativa con la estructura obligatoria del archivo --}}
-                    <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-4" role="alert">
+                    <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-4"
+                        role="alert">
                         <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                         <div class="small">
                             <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
-                            <span class="text-muted fw-semibold">Matrícula, Nombre, Examen Diagnóstico, Examen Propedéutico Final</span>
+                            <span class="text-muted fw-semibold">Matricula, Examen Propedeutico Inicial y Examen
+                                Propedéutico Final</span>
                         </div>
                     </div>
 
                     {{-- Botones de accion del formulario --}}
                     <hr class="my-4 border-light-subtle">
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" id="btn-cancelar"
-                            class="btn btn-outline-dark px-4 fw-semibold rounded-3">
-                            Cancelar
+                    {{-- Cambiamos justify-content-end por justify-content-between para mandar los bloques a los extremos --}}
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <button type="button" onclick="window.history.back();"
+                            class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
+                            <span>Regresar</span>
                         </button>
-                        <button type="submit" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
-                            Subir Calificaciones
-                        </button>
-                    </div>
-
+                        <div class="d-flex gap-2">
+                            <button type="button" id="btn-cancelar"
+                                class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-outline-dark px-4 fw-semibold rounded-3">
+                                Subir Calificaciones
+                            </button>
+                        </div>
                 </form>
             </div>
         </div>

@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use App\Exports\GrupoCalificacionesExport;
 use Illuminate\Support\Facades\File;
 use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CalificacionController extends Controller
 {
@@ -27,13 +29,13 @@ class CalificacionController extends Controller
     // Descarga el archivo Excel de plantilla desde la carpeta publica
     public function descargarFormatoBase()
     {
-        $rutaArchivo = public_path('formatos/formato_calificaciones.xlsx');
+        $rutaArchivo = public_path('formatos/FormatoCalificaciones.xlsx');
         if (!File::exists($rutaArchivo)) {
             return redirect()->back()->withErrors([
                 'archivo_excel' => 'Error del sistema: El archivo de formato base no se encuentra en la carpeta public/formatos/.'
             ]);
         }
-        return response()->download($rutaArchivo, 'formato_calificaciones.xlsx');
+        return response()->download($rutaArchivo, 'FormatoCalificaciones.xlsx');
     }
 
     // Procesa e importa las calificaciones masivas desde un archivo Excel cargado
@@ -56,9 +58,57 @@ class CalificacionController extends Controller
     {
         $grupo = Grupo::findOrFail($id_grupo);
         $nombreGrupo = $grupo->nombre_grupo ?? $grupo->nombre;
-        $nombreArchivo = 'calificaciones' . str_replace(' ', '_', $nombreGrupo) . '.xlsx';
+        $nombreArchivo = 'calificaciones_' . str_replace(' ', '_', $nombreGrupo) . '.xlsx';
 
-        return Excel::download(new GrupoCalificacionesExport($id_grupo), $nombreArchivo);
+        // Verificamos la existencia de la plantilla oficial en la carpeta public
+        $rutaTemplate = public_path('formatos/FormatoCalificaciones.xlsx');
+        if (!file_exists($rutaTemplate)) {
+            return redirect()->back()->withErrors([
+                'archivo_excel' => 'Error del sistema: El archivo base FormatoCalificaciones.xlsx no se encuentra en public/formatos/.'
+            ]);
+        }
+
+        // Creamos una respuesta de descarga fluida nativa de Laravel
+        $response = new StreamedResponse(function () use ($rutaTemplate, $id_grupo) {
+            // Cargamos la plantilla directamente con el lector original de PhpSpreadsheet
+            $spreadsheet = IOFactory::load($rutaTemplate);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Consultamos los alumnos pertenecientes al grupo
+            $alumnos = Alumno::where('id_grupo_propedeutico', $id_grupo)
+                ->with('resultadosPropedeutico')
+                ->get();
+
+            // Con base en la imagen, los renglones de los alumnos inician en la fila 8
+            $filaActual = 8;
+
+            foreach ($alumnos as $alumno) {
+                // Insertamos los datos en las columnas independientes calculadas de la imagen
+                $sheet->setCellValue('B' . $filaActual, $alumno->nombre);
+                $sheet->setCellValue('C' . $filaActual, $alumno->ap_pat);
+                $sheet->setCellValue('D' . $filaActual, $alumno->ap_mat);
+                $sheet->setCellValue('E' . $filaActual, $alumno->matricula);
+
+                // Si el alumno cuenta con calificaciones, las inyectamos en las columnas H e I
+                if ($alumno->resultadosPropedeutico) {
+                    $sheet->setCellValue('H' . $filaActual, $alumno->resultadosPropedeutico->examen_inicial);
+                    $sheet->setCellValue('I' . $filaActual, $alumno->resultadosPropedeutico->examen_final);
+                }
+
+                $filaActual++;
+            }
+
+            // Escribimos el archivo directamente en la salida del navegador
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+        });
+
+        // Configuramos las cabeceras HTTP necesarias para forzar la descarga del Excel
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $nombreArchivo . '"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 
     // Inicializa la vista de calificaciones y filtra los grupos semanticamente por su nombre
@@ -123,7 +173,7 @@ class CalificacionController extends Controller
                 })
                 // Agrega metadatos necesarios a las filas <tr> generadas por DataTables
                 ->setRowAttr([
-                    'data-matricula' => function($alumno) {
+                    'data-matricula' => function ($alumno) {
                         return $alumno->matricula;
                     },
                     'class' => 'border-bottom border-light student-row'
