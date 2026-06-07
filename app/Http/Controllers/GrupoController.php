@@ -22,7 +22,7 @@ class GrupoController extends Controller
         // =======================================================
         // 1. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos)
         // =======================================================
-        $prefijo = ($request->tipo_grupo === 'Propedéutico') ? 'Prope' : 'Induc';
+        $prefijo = ($request->tipo_grupo === 'propedeutico') ? 'Prope' : 'Induc';
         $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%' . $prefijo . '%')->exists();
 
         if ($gruposExistentes) {
@@ -141,7 +141,7 @@ class GrupoController extends Controller
         $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
 
         // Buscar el curso por nombre
-        $nombreCursoBuscado = ($tipoGrupo === 'Propedéutico') ? 'prepedeutico' : 'induccion';
+        $nombreCursoBuscado = ($tipoGrupo === 'propedeutico') ? 'prope' : 'induccion';
         $cursoObj = Curso::where('nombre_curso', 'LIKE', '%' . $nombreCursoBuscado . '%')->first();
         $idCurso = $cursoObj ? $cursoObj->id_curso : null;
 
@@ -153,14 +153,14 @@ class GrupoController extends Controller
 
         for ($i = 0; $i < $totalGrupos; $i++) {
             $idTurno = ($i < $gruposManana) ? ($turnoMatutino ? $turnoMatutino->id_turno : 1) : ($turnoVespertino ? $turnoVespertino->id_turno : 2); 
-            $prefijo = ($tipoGrupo === 'Propedéutico') ? 'Prope' : 'Induc';
+            $prefijo = ($tipoGrupo === 'propedeutico') ? 'Prope' : 'Induc';
 
             $gruposCreados[] = Grupo::create([
                 'nombre_grupo' => $prefijo . ' ' . $etiqueta . ' - Gpo ' . $letras[$i],
                 'id_turno'     => $idTurno,
-                'id_curso'     => $idCurso, 
-                'num_empleado' => auth()->user()->num_empleado, 
-                'id_estado'    => 1, 
+                'id_curso'     => $idCurso,
+                'id_usuario'   => auth()->user()->id_usuario,
+                'id_estado'    => 1,
             ]);
         }
 
@@ -176,7 +176,7 @@ class GrupoController extends Controller
         // Algoritmo Round-Robin: Repartir como baraja para balancear los grupos
         foreach ($alumnos as $data) {
             $grupo = $gruposCreados[$indiceGrupo];
-            $columnaGrupo = ($tipoGrupo === 'Propedéutico') ? 'id_grupo_propedeutico' : 'id_grupo_induccion';
+            $columnaGrupo = ($tipoGrupo === 'propedeutico') ? 'id_grupo_propedeutico' : 'id_grupo_induccion';
             
             // Insertamos o actualizamos
             $datosUpdate = [
@@ -280,7 +280,7 @@ class GrupoController extends Controller
             $grupo->load('alumnos');
         }
         
-        $docente = \App\Models\Usuario::where('num_empleado', $grupo->num_empleado)->first();
+        $docente = \App\Models\Usuario::where('num_empleado', $grupo->id_usuario)->first();
         $nombreDocente = $docente ? mb_strtoupper($docente->nombre . ' ' . $docente->ap_pat . ' ' . $docente->ap_mat) : 'SIN ASIGNAR';
         
         $grupo->load('turno');
@@ -385,8 +385,8 @@ class GrupoController extends Controller
                 // Solo actualizamos si el administrador realmente seleccionó un docente (no está vacío)
                 if (!empty($num_empleado)) {
                     $grupo = Grupo::findOrFail($id_grupo);
-                    $grupo->num_empleado = $num_empleado; // Asignamos el docente al grupo
-                    $grupo->save(); // Guardamos el cambio en la base de datos
+                    $grupo->id_usuario = $num_empleado;
+                    $grupo->save();
                 }
             }
 

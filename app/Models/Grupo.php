@@ -14,9 +14,9 @@ class Grupo extends Model
     protected $fillable = [
         'nombre_grupo',
         'id_curso',
-        'id_turno',      
-        'num_empleado', 
-        'id_estado'      
+        'id_turno',
+        'id_usuario',
+        'id_estado'
     ];
 
     public function alumnos(): HasMany
@@ -46,7 +46,7 @@ class Grupo extends Model
 
     public function docente()
     {
-        return $this->belongsTo(Usuario::class, 'num_empleado', 'num_empleado');
+        return $this->belongsTo(Usuario::class, 'id_usuario', 'num_empleado');
     }
 
 }

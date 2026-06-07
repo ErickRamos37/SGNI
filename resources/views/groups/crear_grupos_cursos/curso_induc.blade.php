@@ -45,7 +45,7 @@
         {{-- VISTA: CREAR GRUPOS (CON ASISTENTE PASO A PASO) --}}
         <form action="{{ route('grupos_induc.store') }}" method="POST" enctype="multipart/form-data" id="formCrearGrupos">
             @csrf
-            <input type="hidden" name="tipo_grupo" value="Inducción">
+            <input type="hidden" name="tipo_grupo" value="induccion">
 
             {{-- ==================== PASO 1: CONFIGURAR GRUPOS ==================== --}}
             <div id="paso1">
@@ -206,7 +206,7 @@
         {{-- Usamos la MISMA ruta de guardar profesores porque la lógica de BD es idéntica --}}
         <form action="{{ route('grupos.guardar_profesores') }}" method="POST">
             @csrf
-            <div class="card border border-light-subtle shadow-sm rounded-3">
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4 overflow-hidden">
                 <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
                     <h5 class="fw-bold text-uppercase text-white mb-0">
                         Asignar Docentes a Grupos de Inducción
@@ -218,35 +218,35 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-muted small text-uppercase">
                                 <tr>
-                                    <th class="px-4 py-3">Grupo</th>
-                                    <th class="py-3">Docente Asignado</th>
-                                    <th class="py-3">Acción</th>
+                                    <th class="px-4 py-3 border-bottom-0">Grupo</th>
+                                    <th class="py-3 border-bottom-0">Docente Asignado</th>
+                                    <th class="py-3 border-bottom-0">Acción</th>
                                 </tr>
                             </thead>
                             <tbody class="small">
                                 @forelse($grupos as $grupo)
                                 <tr class="registro-row" data-search="{{ strtolower($grupo->nombre_grupo) }}">
-                                    <td class="px-4 py-3 fw-bold text-dark">
+                                    <td class="px-4 py-3 fw-bold text-dark border-light-subtle">
                                         {{ $grupo->nombre_grupo }}
                                     </td>
-                                    <td class="py-3 text-dark">
-                                        @if($grupo->num_empleado && $grupo->num_empleado != 23)
+                                    <td class="py-3 text-dark border-light-subtle">
+                                        @if($grupo->id_usuario && $grupo->id_usuario != auth()->user()->id_usuario)
                                             @php
-                                                $docenteAsignado = $docentes->firstWhere('num_empleado', $grupo->num_empleado);
+                                                $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-primary fw-semibold">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
                                         @else
-                                            <span class="text-danger fw-semibold">Sin asignar</span>
+                                            <span class="text-danger fw-semibold bg-danger bg-opacity-10 px-3 py-1 rounded-pill">Sin asignar</span>
                                         @endif
                                     </td>
-                                    <td class="py-3">
-                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select w-100 shadow-sm">
+                                    <td class="py-3 border-light-subtle">
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
                                             <option value="" selected disabled>Seleccionar docente</option>
                                             @foreach($docentes as $docente)
-                                                <option value="{{ $docente->num_empleado }}" {{ $grupo->num_empleado == $docente->num_empleado ? 'selected' : '' }}>
+                                                <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>
                                                     {{ $docente->nombre }} {{ $docente->ap_pat }}
                                                 </option>
                                             @endforeach
@@ -255,7 +255,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="3" class="text-center py-5 text-muted">
+                                    <td colspan="3" class="text-center py-5 text-muted border-light-subtle">
                                         <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
                                         Aún no hay grupos creados para Inducción.
                                     </td>
@@ -265,21 +265,21 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-between align-items-center">
-                    <span class="small text-muted fw-semibold">
-                        {{ $grupos->count() }} grupos disponibles
-                    </span>
-                    <div class="d-flex gap-2">
-                        <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                            Guardar
-                        </button>
-                    </div>
                 </div>
             </div>{{-- /card --}}
+
+            {{-- BARRA DE ACCIÓN INFERIOR --}}
+            <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
+                <span class="small text-muted fw-semibold me-3">
+                    {{ $grupos->count() }} grupos disponibles
+                </span>
+                <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Guardar
+                </button>
+            </div>
         </form>
 
     @endif

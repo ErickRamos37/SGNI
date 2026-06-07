@@ -8,7 +8,7 @@ use App\Http\Middleware\CheckRole; // Importa el Middleware
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\GrupoController;
 use App\Models\Grupo;
-use App\Http\Middleware\ValidarSesionGoogle;
+//use App\Http\Middleware\ValidarSesionGoogle;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
 use App\Http\Controllers\SeguimientoController;

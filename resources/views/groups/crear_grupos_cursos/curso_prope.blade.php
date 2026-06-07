@@ -46,7 +46,7 @@
         {{-- VISTA: CREAR GRUPOS (CON ASISTENTE PASO A PASO) --}}
         <form action="{{ route('grupos.store') }}" method="POST" enctype="multipart/form-data" id="formCrearGrupos">
             @csrf
-            <input type="hidden" name="tipo_grupo" value="Propedéutico">
+            <input type="hidden" name="tipo_grupo" value="propedeutico">
 
             {{-- ==================== PASO 1: CONFIGURAR GRUPOS ==================== --}}
             <div id="paso1">
@@ -264,9 +264,9 @@
                                         {{ $grupo->nombre_grupo }}
                                     </td>
                                     <td class="py-3 text-dark border-light-subtle">
-                                        @if($grupo->num_empleado && $grupo->num_empleado != auth()->user()->num_empleado)
+                                        @if($grupo->id_usuario && $grupo->id_usuario != auth()->user()->id_usuario)
                                             @php
-                                                $docenteAsignado = $docentes->firstWhere('num_empleado', $grupo->num_empleado);
+                                                $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
                                             <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
@@ -280,7 +280,7 @@
                                         <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
                                             <option value="" selected disabled>Seleccionar docente</option>
                                             @foreach($docentes as $docente)
-                                                <option value="{{ $docente->num_empleado }}" {{ $grupo->num_empleado == $docente->num_empleado ? 'selected' : '' }}>
+                                                <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>
                                                     {{ $docente->nombre }} {{ $docente->ap_pat }}
                                                 </option>
                                             @endforeach
@@ -325,9 +325,9 @@
                                         {{ $grupo->nombre_grupo }}
                                     </td>
                                     <td class="py-3 text-dark border-light-subtle">
-                                        @if($grupo->num_empleado && $grupo->num_empleado != auth()->user()->num_empleado)
+                                        @if($grupo->id_usuario && $grupo->id_usuario != auth()->user()->id_usuario)
                                             @php
-                                                $docenteAsignado = $docentes->firstWhere('num_empleado', $grupo->num_empleado);
+                                                $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
                                             <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
@@ -341,7 +341,7 @@
                                         <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
                                             <option value="" selected disabled>Seleccionar docente</option>
                                             @foreach($docentes as $docente)
-                                                <option value="{{ $docente->num_empleado }}" {{ $grupo->num_empleado == $docente->num_empleado ? 'selected' : '' }}>
+                                                <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>
                                                     {{ $docente->nombre }} {{ $docente->ap_pat }}
                                                 </option>
                                             @endforeach
