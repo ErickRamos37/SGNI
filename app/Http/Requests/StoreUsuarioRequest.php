@@ -40,10 +40,13 @@ class StoreUsuarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'num_empleado'         => 'required|numeric',
-            'nombre'               => 'required|string|max:255',
-            'ap_pat'               => 'required|string|max:255',
-            'ap_mat'               => 'nullable|string|max:255',
+            // Solo acepta números (sin letras, espacios ni decimales)
+            'num_empleado' => 'required|regex:/^[0-9]+$/',
+            
+            // Solo acepta letras y espacios (\pL incluye acentos y la ñ)
+            'nombre'       => 'required|string|max:45|regex:/^[\pL\s]+$/u',
+            'ap_pat'       => 'required|string|max:25|regex:/^[\pL\s]+$/u',
+            'ap_mat'       => 'nullable|string|max:25|regex:/^[\pL\s]+$/u',
             'correo_institucional' => ['required', 'email', 'ends_with:@uabc.edu.mx', 'unique:usuarios,correo_institucional'],
             'id_rol'               => 'required|exists:roles,id_rol'
         ];
@@ -103,6 +106,12 @@ class StoreUsuarioRequest extends FormRequest
             'correo_institucional.ends_with' => 'El correo debe ser una cuenta institucional válida (@uabc.edu.mx).',
             'correo_institucional.unique'    => 'Este correo electrónico ya está registrado con otro rol/usuario.',
             'id_rol.required'                => 'Debe seleccionar un rol para el usuario.',
+
+            // --- MENSAJES PARA REGEX ---
+            'num_empleado.regex' => 'El número de empleado solo debe contener números (sin letras ni espacios).',
+            'nombre.regex'       => 'El nombre solo debe contener letras.',
+            'ap_pat.regex'       => 'El apellido paterno solo debe contener letras.',
+            'ap_mat.regex'       => 'El apellido materno solo debe contener letras.',
         ];
     }
 }
