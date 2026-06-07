@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Validator;
+use App\Models\Usuario;
 
 class StoreUsuarioRequest extends FormRequest
 {
@@ -38,13 +40,55 @@ class StoreUsuarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'num_empleado'         => 'required|numeric|unique:usuarios,num_empleado',
+            'num_empleado'         => 'required|numeric',
             'nombre'               => 'required|string|max:255',
             'ap_pat'               => 'required|string|max:255',
             'ap_mat'               => 'nullable|string|max:255',
-            // Validación del dominio de la UABC y que no se repita
             'correo_institucional' => ['required', 'email', 'ends_with:@uabc.edu.mx', 'unique:usuarios,correo_institucional'],
             'id_rol'               => 'required|exists:roles,id_rol'
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                $numEmpleado = $this->input('num_empleado');
+                $idRol = $this->input('id_rol');
+
+                // Si falta el número de empleado o el rol, dejamos que las reglas base manejen el error
+                if (!$numEmpleado || !$idRol) return;
+
+                // 1. VALIDACIÓN DE ROL DUPLICADO PARA EL MISMO EMPLEADO
+                $rolExistente = Usuario::where('num_empleado', $numEmpleado)
+                    ->where('id_rol', $idRol)
+                    ->exists();
+
+                if ($rolExistente) {
+                    $validator->errors()->add(
+                        'id_rol',
+                        "El empleado con número {$numEmpleado} ya tiene una cuenta activa con este rol. No se puede duplicar."
+                    );
+                }
+
+                // 2. VALIDACIÓN DE CONSISTENCIA DE DATOS PERSONALES
+                // Buscamos cualquier registro existente de este empleado para comparar nombres
+                $usuarioExistente = Usuario::where('num_empleado', $numEmpleado)->first();
+
+                if ($usuarioExistente) {
+                    $nombreCoincide = Str::lower($usuarioExistente->nombre) === Str::lower($this->input('nombre'));
+                    $apPatCoincide = Str::lower($usuarioExistente->ap_pat) === Str::lower($this->input('ap_pat'));
+                    $apMatCoincide = Str::lower($usuarioExistente->ap_mat ?? '') === Str::lower($this->input('ap_mat') ?? '');
+
+                    // Si alguno no coincide, avisamos al usuario
+                    if (!$nombreCoincide || !$apPatCoincide || !$apMatCoincide) {
+                        $validator->errors()->add(
+                            'num_empleado',
+                            "El número de empleado {$numEmpleado} pertenece a '{$usuarioExistente->nombre} {$usuarioExistente->ap_pat}'. Los datos ingresados no coinciden."
+                        );
+                    }
+                }
+            }
         ];
     }
 
@@ -54,12 +98,11 @@ class StoreUsuarioRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'num_empleado.required' => 'El número de empleado es obligatorio.',
-            'num_empleado.unique'   => 'Este número de empleado ya está registrado en el sistema.',
-            'correo_institucional.required' => 'El correo es obligatorio.',
+            'num_empleado.required'          => 'El número de empleado es obligatorio.',
+            'correo_institucional.required'  => 'El correo es obligatorio.',
             'correo_institucional.ends_with' => 'El correo debe ser una cuenta institucional válida (@uabc.edu.mx).',
-            'correo_institucional.unique'   => 'Este correo electrónico ya está en uso.',
-            'id_rol.required'       => 'Debe seleccionar un rol para el usuario.',
+            'correo_institucional.unique'    => 'Este correo electrónico ya está registrado con otro rol/usuario.',
+            'id_rol.required'                => 'Debe seleccionar un rol para el usuario.',
         ];
     }
 }
