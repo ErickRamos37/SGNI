@@ -19,7 +19,6 @@ class Grupo extends Model
         'id_estado'      
     ];
 
-    // La función intacta de tus compañeros
     public function alumnos(): HasMany
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
@@ -33,6 +32,21 @@ class Grupo extends Model
     public function alumnosPropedeutico()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
+    }
+
+    public function turno()
+    {
+        return $this->belongsTo(Turno::class, 'id_turno', 'id_turno');
+    }
+
+    public function curso()
+    {
+        return $this->belongsTo(Curso::class, 'id_curso', 'id_curso');
+    }
+
+    public function docente()
+    {
+        return $this->belongsTo(Usuario::class, 'num_empleado', 'num_empleado');
     }
 
 }

@@ -32,7 +32,7 @@
                 Crear Grupos
             </a>
             <a href="?tab=asignar" class="btn btn-sm rounded-pill px-4 py-2 fw-semibold text-decoration-none {{ $tabActive === 'asignar' ? 'btn-outline-dark active' : 'btn-outline-dark border-0' }}">
-                Asignar Profesores a Grupos
+                Asignar Docentes a Grupos
             </a>
         </div>
     </div>
@@ -58,19 +58,18 @@
                         
                         {{-- GRUPOS GENERALES (INDUC NO SEPARA CARRERAS) --}}
                         <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-people-fill text-secondary fs-4 me-2"></i>
                             <span class="fw-bold text-dark text-uppercase fs-6">Grupos Generales (Tronco Común)</span>
                         </div>
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
+                                    <label for="grupos_manana" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Matutino</label>
                                     <input type="number" name="grupos_manana" id="grupos_manana" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
+                                    <label for="grupos_tarde" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Vespertino</label>
                                     <input type="number" name="grupos_tarde" id="grupos_tarde" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
                                 </div>
                             </div>
@@ -161,7 +160,7 @@
                 if(manana === 0 && tarde === 0) {
                     Swal.fire({
                         title: 'Faltan datos',
-                        text: 'Por favor, solicita al menos un grupo (ya sea en la mañana o en la tarde) para continuar.',
+                        text: 'Por favor, solicita al menos un grupo (ya sea en turno matutino o vespertino) para continuar.',
                         icon: 'warning',
                         customClass: { confirmButton: 'btn btn-primary' },
                         buttonsStyling: false,
@@ -210,7 +209,7 @@
             <div class="card border border-light-subtle shadow-sm rounded-3">
                 <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
                     <h5 class="fw-bold text-uppercase text-white mb-0">
-                        Asignar Profesores a Grupos de Inducción
+                        Asignar Docentes a Grupos de Inducción
                     </h5>
                 </div>
 
@@ -220,7 +219,7 @@
                             <thead class="table-light text-muted small text-uppercase">
                                 <tr>
                                     <th class="px-4 py-3">Grupo</th>
-                                    <th class="py-3">Profesor Asignado</th>
+                                    <th class="py-3">Docente Asignado</th>
                                     <th class="py-3">Acción</th>
                                 </tr>
                             </thead>
@@ -233,22 +232,22 @@
                                     <td class="py-3 text-dark">
                                         @if($grupo->num_empleado && $grupo->num_empleado != 23)
                                             @php
-                                                $profeAsignado = $profesores->firstWhere('num_empleado', $grupo->num_empleado);
+                                                $docenteAsignado = $docentes->firstWhere('num_empleado', $grupo->num_empleado);
                                             @endphp
                                             <span class="text-primary fw-semibold">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
-                                                {{ $profeAsignado ? $profeAsignado->nombre . ' ' . $profeAsignado->ap_pat : 'Profesor Asignado' }}
+                                                {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
                                         @else
                                             <span class="text-danger fw-semibold">Sin asignar</span>
                                         @endif
                                     </td>
                                     <td class="py-3">
-                                        <select name="profesores[{{ $grupo->id_grupo }}]" class="form-select w-100 shadow-sm">
-                                            <option value="" selected disabled>Seleccionar profesor</option>
-                                            @foreach($profesores as $profe)
-                                                <option value="{{ $profe->num_empleado }}" {{ $grupo->num_empleado == $profe->num_empleado ? 'selected' : '' }}>
-                                                    {{ $profe->nombre }} {{ $profe->ap_pat }}
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select w-100 shadow-sm">
+                                            <option value="" selected disabled>Seleccionar docente</option>
+                                            @foreach($docentes as $docente)
+                                                <option value="{{ $docente->num_empleado }}" {{ $grupo->num_empleado == $docente->num_empleado ? 'selected' : '' }}>
+                                                    {{ $docente->nombre }} {{ $docente->ap_pat }}
                                                 </option>
                                             @endforeach
                                         </select>
