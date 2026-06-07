@@ -35,6 +35,8 @@
             }
         }
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
@@ -185,7 +187,7 @@
                     </ul>
                 </li>
 
-                
+
                 {{-- Capturar Asistencia --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
@@ -253,9 +255,7 @@
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('usuarios.alta_usuarios', 'usuarios.index')
-                                   ? 'text-dark bg-secondary fw-bold shadow-sm'
-                                   : 'text-white' }}"
+                           {{ request()->routeIs('usuarios.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <span>Personal</span>
@@ -264,14 +264,14 @@
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
                         <li>
                             <a class="dropdown-item fw-bold py-2 mb-1 rounded-2
-                                      {{ request()->routeIs('usuarios.alta_usuarios') ? 'text-primary bg-light' : 'text-dark' }}"
-                                href="{{ route('usuarios.alta_usuarios') }}">
+                      {{ request()->routeIs('usuarios.create') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('usuarios.create') }}">
                                 Alta Personal
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
-                                      {{ request()->routeIs('usuarios.index') ? 'text-primary bg-light' : 'text-dark' }}"
+                      {{ request()->routeIs('usuarios.index', 'usuarios.edit') ? 'text-primary bg-light' : 'text-dark' }}"
                                 href="{{ route('usuarios.index') }}">
                                 Lista del Personal
                             </a>

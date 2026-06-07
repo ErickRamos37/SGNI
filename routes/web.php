@@ -35,12 +35,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas EXCLUSIVAS para Administradores
     Route::middleware(['rol:Administrador'])->group(function () {
-        // Alta de los usuarios
-        Route::get('/usuarios/alta', [UsuarioController::class, 'create'])->name('usuarios.alta_usuarios');
-        Route::post('/usuarios/alta', [UsuarioController::class, 'store'])->name('usuarios.store');
-
-        // Tabla de los usuarios (Llama DataTables)
-        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+        // Rutas index, create, store, edit, update, show y destroy del Usuario
+        Route::resource('usuarios', UsuarioController::class)->except(['show']);
     });
 
 
