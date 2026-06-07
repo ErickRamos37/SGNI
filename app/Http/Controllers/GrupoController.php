@@ -7,6 +7,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\DB;
 use App\Models\Grupo;
 use App\Models\Alumno;
+use App\Models\Turno;
+use App\Models\Curso;
+use App\Models\Carrera;
 
 use App\Models\Usuario;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -45,33 +48,63 @@ class GrupoController extends Controller
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($request->file('archivo_alumnos')->getRealPath());
             $filas = $spreadsheet->getActiveSheet()->toArray();
 
+            // =========================================================
+            // Leemos los encabezados de la fila 0 y los normalizamos
+            // =========================================================
+            $encabezados = array_map(function($col) {
+                return strtolower(trim($col));
+            }, $filas[0]);
+
+            // Mapa: nombre de columna => índice numérico
+            $mapa = array_flip($encabezados);
+
+            // Precargamos las carreras de la BD para buscar dinámicamente
+            $carreras = Carrera::all();
+
             $alumnosInge = [];
             $alumnosArqui = [];
             
             for ($i = 1; $i < count($filas); $i++) {
-                if (count($filas[$i]) < 10) continue; 
+                $fila = $filas[$i];
                 
-                $matricula = trim($filas[$i][5]);
+                $matricula = isset($mapa['matricula']) ? trim($fila[$mapa['matricula']]) : '';
                 if (empty($matricula)) continue; 
 
-                $programa = strtoupper(trim($filas[$i][4])); 
-                $telefono = !empty($filas[$i][11]) ? trim($filas[$i][11]) : substr($matricula . rand(100, 999), 0, 10);
-                $correo_alt = !empty($filas[$i][9]) ? trim($filas[$i][9]) : $matricula . '@sin-correo.com';
+                $programa = isset($mapa['programa_desc']) ? strtoupper(trim($fila[$mapa['programa_desc']])) : '';
+                $telefono = isset($mapa['telefono']) && !empty(trim($fila[$mapa['telefono']])) ? trim($fila[$mapa['telefono']]) : substr($matricula . rand(100, 999), 0, 10);
+                $correo_alt = isset($mapa['correo_alter']) && !empty(trim($fila[$mapa['correo_alter']])) ? trim($fila[$mapa['correo_alter']]) : $matricula . '@sin-correo.com';
+                $correo_inst = isset($mapa['correo']) && !empty(trim($fila[$mapa['correo']])) ? trim($fila[$mapa['correo']]) : null;
+                $puntaje = isset($mapa['puntaje']) && !empty(trim($fila[$mapa['puntaje']])) ? trim($fila[$mapa['puntaje']]) : null;
+
+                // Determinar la carrera dinámicamente buscando en la tabla carrera
+                $id_carrera = 1; // Por defecto Ingeniería
+                if (str_contains($programa, 'ARQUITECTURA')) {
+                    $carreraObj = $carreras->first(function($c) {
+                        return str_contains(strtoupper($c->nombre_carrera), 'ARQUITECTURA');
+                    });
+                    $id_carrera = $carreraObj ? $carreraObj->id_carrera : 2;
+                } else {
+                    $carreraObj = $carreras->first(function($c) {
+                        return str_contains(strtoupper($c->nombre_carrera), 'INGENIERIA');
+                    });
+                    $id_carrera = $carreraObj ? $carreraObj->id_carrera : 1;
+                }
 
                 $datosAlumno = [
-                    'matricula'          => $matricula,
-                    'nombre'             => substr(trim($filas[$i][6]), 0, 45),
-                    'ap_pat'             => substr(trim($filas[$i][7]), 0, 25),
-                    'ap_mat'             => substr(trim($filas[$i][8]), 0, 25),
-                    'correo_alternativo' => substr($correo_alt, 0, 150),
-                    'telefono'           => $telefono,
+                    'matricula'             => $matricula,
+                    'nombre'                => isset($mapa['nombre']) ? substr(trim($fila[$mapa['nombre']]), 0, 45) : '',
+                    'ap_pat'                => isset($mapa['apellido_paterno']) ? substr(trim($fila[$mapa['apellido_paterno']]), 0, 25) : '',
+                    'ap_mat'                => isset($mapa['apellido_materno']) ? substr(trim($fila[$mapa['apellido_materno']]), 0, 25) : '',
+                    'correo_institucional'  => $correo_inst,
+                    'correo_alternativo'    => substr($correo_alt, 0, 150),
+                    'telefono'              => $telefono,
+                    'puntaje_ingreso'       => $puntaje,
+                    'id_carrera'            => $id_carrera,
                 ];
 
                 if (str_contains($programa, 'ARQUITECTURA')) {
-                    $datosAlumno['id_carrera'] = 2; 
                     $alumnosArqui[] = $datosAlumno;
                 } else {
-                    $datosAlumno['id_carrera'] = 1; 
                     $alumnosInge[] = $datosAlumno;
                 }
             }
@@ -107,12 +140,19 @@ class GrupoController extends Controller
         $gruposCreados = [];
         $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
 
-        $idCurso = ($tipoGrupo === 'Propedéutico') ? 1 : 2;
+        // Buscar el curso por nombre
+        $nombreCursoBuscado = ($tipoGrupo === 'Propedéutico') ? 'prepedeutico' : 'induccion';
+        $cursoObj = Curso::where('nombre_curso', 'LIKE', '%' . $nombreCursoBuscado . '%')->first();
+        $idCurso = $cursoObj ? $cursoObj->id_curso : null;
+
+        // Buscar los turnos por nombre
+        $turnoMatutino = Turno::where('tipo_turno', 'matutino')->first();
+        $turnoVespertino = Turno::where('tipo_turno', 'vespertino')->first();
 
         $idAdminActual = auth()->user()->num_empleado;
 
         for ($i = 0; $i < $totalGrupos; $i++) {
-            $idTurno = ($i < $gruposManana) ? 1 : 2; 
+            $idTurno = ($i < $gruposManana) ? ($turnoMatutino ? $turnoMatutino->id_turno : 1) : ($turnoVespertino ? $turnoVespertino->id_turno : 2); 
             $prefijo = ($tipoGrupo === 'Propedéutico') ? 'Prope' : 'Induc';
 
             $gruposCreados[] = Grupo::create([
@@ -128,36 +168,50 @@ class GrupoController extends Controller
         // Revolvemos a los alumnos de forma aleatoria
         // =========================================================
         shuffle($alumnos);
-
-        $chunks = array_chunk($alumnos, ceil(count($alumnos) / $totalGrupos));
         
         $nuevos = 0;
         $repetidos = 0;
+        $indiceGrupo = 0;
 
-        foreach ($gruposCreados as $index => $grupo) {
-            if (isset($chunks[$index])) {
-                foreach ($chunks[$index] as $data) {
-                    $columnaGrupo = ($tipoGrupo === 'Propedéutico') ? 'id_grupo_propedeutico' : 'id_grupo_induccion';
-                    // Insertamos o actualizamos
-                    $alumno = Alumno::updateOrCreate(
-                        ['matricula' => $data['matricula']],
-                        [
-                            'nombre'             => $data['nombre'],
-                            'ap_pat'             => $data['ap_pat'],
-                            'ap_mat'             => $data['ap_mat'],
-                            'correo_alternativo' => $data['correo_alternativo'],
-                            'telefono'           => $data['telefono'],
-                            'id_carrera'         => $data['id_carrera'],
-                            $columnaGrupo        => $grupo->id_grupo,
-                        ]
-                    );
+        // Algoritmo Round-Robin: Repartir como baraja para balancear los grupos
+        foreach ($alumnos as $data) {
+            $grupo = $gruposCreados[$indiceGrupo];
+            $columnaGrupo = ($tipoGrupo === 'Propedéutico') ? 'id_grupo_propedeutico' : 'id_grupo_induccion';
+            
+            // Insertamos o actualizamos
+            $datosUpdate = [
+                'nombre'             => $data['nombre'],
+                'ap_pat'             => $data['ap_pat'],
+                'ap_mat'             => $data['ap_mat'],
+                'correo_alternativo' => $data['correo_alternativo'],
+                'telefono'           => $data['telefono'],
+                'id_carrera'         => $data['id_carrera'],
+                $columnaGrupo        => $grupo->id_grupo,
+            ];
 
-                    if ($alumno->wasRecentlyCreated) {
-                        $nuevos++;
-                    } else {
-                        $repetidos++;
-                    }
-                }
+            // Solo incluir campos opcionales si vienen con valor
+            if (!empty($data['correo_institucional'])) {
+                $datosUpdate['correo_institucional'] = $data['correo_institucional'];
+            }
+            if (!empty($data['puntaje_ingreso'])) {
+                $datosUpdate['puntaje_ingreso'] = $data['puntaje_ingreso'];
+            }
+
+            $alumno = Alumno::updateOrCreate(
+                ['matricula' => $data['matricula']],
+                $datosUpdate
+            );
+
+            if ($alumno->wasRecentlyCreated) {
+                $nuevos++;
+            } else {
+                $repetidos++;
+            }
+
+            // Pasamos al siguiente grupo. Si llegamos al último, volvemos a empezar.
+            $indiceGrupo++;
+            if ($indiceGrupo >= count($gruposCreados)) {
+                $indiceGrupo = 0;
             }
         }
 
@@ -196,8 +250,11 @@ class GrupoController extends Controller
     {
         $grupo = Grupo::findOrFail($id_grupo);
 
-        // Si es Inducción (2), cargamos la relación correcta
-        if ($grupo->id_curso == 2) {
+        $cursoInduccion = Curso::where('nombre_curso', 'LIKE', '%induccion%')->first();
+        $isInduccion = $cursoInduccion && $grupo->id_curso == $cursoInduccion->id_curso;
+
+        // Si es Inducción, cargamos la relación correcta
+        if ($isInduccion) {
             $grupo->load('alumnosInduccion');
             $grupo->alumnos = $grupo->alumnosInduccion; // Truco para engañar a la Vista
         } else {
@@ -212,18 +269,22 @@ class GrupoController extends Controller
     {
         $grupo = Grupo::findOrFail($id_grupo);
         
+        $cursoInduccion = Curso::where('nombre_curso', 'LIKE', '%induccion%')->first();
+        $isInduccion = $cursoInduccion && $grupo->id_curso == $cursoInduccion->id_curso;
+
         // El mismo truco para que el Excel sepa a quién exportar
-        if ($grupo->id_curso == 2) {
+        if ($isInduccion) {
             $grupo->load('alumnosInduccion');
             $grupo->alumnos = $grupo->alumnosInduccion; 
         } else {
             $grupo->load('alumnos');
         }
         
-        $profesor = \App\Models\Usuario::where('num_empleado', $grupo->num_empleado)->first();
-        $nombreDocente = $profesor ? mb_strtoupper($profesor->nombre . ' ' . $profesor->ap_pat . ' ' . $profesor->ap_mat) : 'SIN ASIGNAR';
+        $docente = \App\Models\Usuario::where('num_empleado', $grupo->num_empleado)->first();
+        $nombreDocente = $docente ? mb_strtoupper($docente->nombre . ' ' . $docente->ap_pat . ' ' . $docente->ap_mat) : 'SIN ASIGNAR';
         
-        $turnoStr = $grupo->id_turno == 1 ? 'Matutino' : 'Vespertino';
+        $grupo->load('turno');
+        $turnoStr = $grupo->turno ? ucfirst($grupo->turno->tipo_turno) : 'SIN ASIGNAR';
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -296,20 +357,23 @@ class GrupoController extends Controller
 
     public function showCursoPrope()
     {
-        // 1. Buscamos TODOS los grupos que contengan 'Prope' (esto traerá a los de Inge y Arqui automáticamente)
-        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%Prope%')->get();
+        // 1. Buscamos TODOS los grupos que contengan 'Prope Inge' o 'Prope Arqui'
+        $gruposInge = Grupo::where('nombre_grupo', 'LIKE', '%Prope Inge%')->get();
+        $gruposArqui = Grupo::where('nombre_grupo', 'LIKE', '%Prope Arqui%')->get();
 
-        // 2. Traemos a los profesores de la tabla usuarios
-        $profesores = \App\Models\Usuario::all();
+        // 2. Traemos a los docentes de la tabla usuarios
+        $docentes = \App\Models\Usuario::whereHas('rol', function($q) {
+            $q->where('nombre_rol', 'docente');
+        })->get();
 
-        return view('groups.crear_grupos_cursos.curso_prope', compact('grupos', 'profesores'));
+        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes'));
     }
 
     public function guardarProfesores(Request $request)
     {
-        // 1. Validamos que el formulario nos envíe el arreglo de 'profesores'
+        // 1. Validamos que el formulario nos envíe el arreglo de 'docentes'
         $request->validate([
-            'profesores' => 'required|array',
+            'docentes' => 'required|array',
         ]);
 
         // 2. Iniciamos una transacción por seguridad
@@ -317,23 +381,23 @@ class GrupoController extends Controller
 
         try {
             // 3. Recorremos el arreglo. $id_grupo es la llave, $num_empleado es el valor seleccionado
-            foreach ($request->profesores as $id_grupo => $num_empleado) {
-                // Solo actualizamos si el administrador realmente seleccionó un profesor (no está vacío)
+            foreach ($request->docentes as $id_grupo => $num_empleado) {
+                // Solo actualizamos si el administrador realmente seleccionó un docente (no está vacío)
                 if (!empty($num_empleado)) {
                     $grupo = Grupo::findOrFail($id_grupo);
-                    $grupo->num_empleado = $num_empleado; // Asignamos el profe al grupo
+                    $grupo->num_empleado = $num_empleado; // Asignamos el docente al grupo
                     $grupo->save(); // Guardamos el cambio en la base de datos
                 }
             }
 
             // 4. Si todo salió bien, confirmamos y regresamos con mensaje de éxito
             \Illuminate\Support\Facades\DB::commit();
-            return redirect()->back()->with('success', '¡Profesores asignados correctamente a los grupos!');
+            return redirect()->back()->with('success', '¡Docentes asignados correctamente a los grupos!');
 
         } catch (\Exception $e) {
             // Si algo falla, deshacemos todo para no dejar la base de datos a medias
             \Illuminate\Support\Facades\DB::rollBack();
-            return back()->withErrors(['Error al asignar profesores: ' . $e->getMessage()]);
+            return back()->withErrors(['Error al asignar docentes: ' . $e->getMessage()]);
         }
     }
 
@@ -342,10 +406,12 @@ class GrupoController extends Controller
         // Traemos solo los grupos que tengan la palabra 'Induc'
         $grupos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')->get();
         
-        // Traemos todos los profesores para el menú desplegable
-        $profesores = \App\Models\Usuario::all();
+        // Traemos todos los docentes para el menú desplegable
+        $docentes = \App\Models\Usuario::whereHas('rol', function($q) {
+            $q->where('nombre_rol', 'docente');
+        })->get();
 
-        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'profesores'));
+        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes'));
     }
 
     public function storeInduc(Request $request)
@@ -371,29 +437,56 @@ class GrupoController extends Controller
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($request->file('archivo_alumnos')->getRealPath());
             $filas = $spreadsheet->getActiveSheet()->toArray();
 
+            // =========================================================
+            // Leemos los encabezados de la fila 0 y los normalizamos
+            // =========================================================
+            $encabezados = array_map(function($col) {
+                return strtolower(trim($col));
+            }, $filas[0]);
+
+            $mapa = array_flip($encabezados);
+
+            // Precargamos las carreras de la BD para buscar dinámicamente
+            $carreras = Carrera::all();
+
             $alumnosGenerales = []; // Solo una cubeta, aquí van todos revueltos
             
             for ($i = 1; $i < count($filas); $i++) {
-                if (count($filas[$i]) < 10) continue; 
+                $fila = $filas[$i];
                 
-                $matricula = trim($filas[$i][5]);
+                $matricula = isset($mapa['matricula']) ? trim($fila[$mapa['matricula']]) : '';
                 if (empty($matricula)) continue; 
 
-                $programa = strtoupper(trim($filas[$i][4])); 
-                $telefono = !empty($filas[$i][11]) ? trim($filas[$i][11]) : substr($matricula . rand(100, 999), 0, 10);
-                $correo_alt = !empty($filas[$i][9]) ? trim($filas[$i][9]) : $matricula . '@sin-correo.com';
+                $programa = isset($mapa['programa_desc']) ? strtoupper(trim($fila[$mapa['programa_desc']])) : '';
+                $telefono = isset($mapa['telefono']) && !empty(trim($fila[$mapa['telefono']])) ? trim($fila[$mapa['telefono']]) : substr($matricula . rand(100, 999), 0, 10);
+                $correo_alt = isset($mapa['correo_alter']) && !empty(trim($fila[$mapa['correo_alter']])) ? trim($fila[$mapa['correo_alter']]) : $matricula . '@sin-correo.com';
+                $correo_inst = isset($mapa['correo']) && !empty(trim($fila[$mapa['correo']])) ? trim($fila[$mapa['correo']]) : null;
+                $puntaje = isset($mapa['puntaje']) && !empty(trim($fila[$mapa['puntaje']])) ? trim($fila[$mapa['puntaje']]) : null;
 
-                // Aunque vayan en el mismo grupo, les registramos su carrera correcta en la BD por si son nuevos
-                $id_carrera = str_contains($programa, 'ARQUITECTURA') ? 2 : 1;
+                // Determinar la carrera dinámicamente
+                $id_carrera = 1;
+                if (str_contains($programa, 'ARQUITECTURA')) {
+                    $carreraObj = $carreras->first(function($c) {
+                        return str_contains(strtoupper($c->nombre_carrera), 'ARQUITECTURA');
+                    });
+                    $id_carrera = $carreraObj ? $carreraObj->id_carrera : 2;
+                } else {
+                    $carreraObj = $carreras->first(function($c) {
+                        return str_contains(strtoupper($c->nombre_carrera), 'INGENIERIA');
+                    });
+                    $id_carrera = $carreraObj ? $carreraObj->id_carrera : 1;
+                }
 
                 $alumnosGenerales[] = [
-                    'matricula'          => $matricula,
-                    'nombre'             => substr(trim($filas[$i][6]), 0, 45),
-                    'ap_pat'             => substr(trim($filas[$i][7]), 0, 25),
-                    'ap_mat'             => substr(trim($filas[$i][8]), 0, 25),
-                    'correo_alternativo' => substr($correo_alt, 0, 150),
-                    'telefono'           => $telefono,
-                    'id_carrera'         => $id_carrera,
+                    'matricula'             => $matricula,
+                    'nombre'                => isset($mapa['nombre']) ? substr(trim($fila[$mapa['nombre']]), 0, 45) : '',
+                    'ap_pat'                => isset($mapa['apellido_paterno']) ? substr(trim($fila[$mapa['apellido_paterno']]), 0, 25) : '',
+                    'ap_mat'                => isset($mapa['apellido_materno']) ? substr(trim($fila[$mapa['apellido_materno']]), 0, 25) : '',
+                    'correo_institucional'  => $correo_inst,
+                    'correo_alternativo'    => substr($correo_alt, 0, 150),
+                    'telefono'              => $telefono,
+                    'puntaje_ingreso'       => $puntaje,
+                    'id_carrera'            => $id_carrera,
                 ];
             }
 

@@ -33,7 +33,7 @@
                 Crear Grupos
             </a>
             <a href="?tab=asignar" class="btn btn-sm rounded-pill px-4 py-2 fw-semibold text-decoration-none {{ $tabActive === 'asignar' ? 'btn-outline-dark active' : 'btn-outline-dark border-0' }}">
-                Asignar Profesores a Grupos
+                Asignar Docentes a Grupos
             </a>
         </div>
     </div>
@@ -58,19 +58,18 @@
 
                         {{-- INGENIERÍA --}}
                         <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-gear-fill text-secondary fs-4 me-2"></i>
                             <span class="fw-bold text-dark text-uppercase fs-6">Grupos para Ingeniería</span>
                         </div>
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana_inge" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
+                                    <label for="grupos_manana_inge" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Matutino</label>
                                     <input type="number" name="grupos_manana_inge" id="grupos_manana_inge" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde_inge" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
+                                    <label for="grupos_tarde_inge" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Vespertino</label>
                                     <input type="number" name="grupos_tarde_inge" id="grupos_tarde_inge" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
                                 </div>
                             </div>
@@ -80,19 +79,18 @@
 
                         {{-- ARQUITECTURA --}}
                         <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-palette-fill text-secondary fs-4 me-2"></i>
                             <span class="fw-bold text-dark text-uppercase fs-6">Grupos para Arquitectura y Diseño</span>
                         </div>
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana_arqui" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
+                                    <label for="grupos_manana_arqui" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Matutino</label>
                                     <input type="number" name="grupos_manana_arqui" id="grupos_manana_arqui" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde_arqui" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
+                                    <label for="grupos_tarde_arqui" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Vespertino</label>
                                     <input type="number" name="grupos_tarde_arqui" id="grupos_tarde_arqui" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
                                 </div>
                             </div>
@@ -241,70 +239,141 @@
         {{-- ========================================================= --}}
         <form action="{{ route('grupos.guardar_profesores') }}" method="POST">
             @csrf
-            <div class="card border border-light-subtle shadow-sm rounded-3">
-
+            
+            {{-- SECCIÓN INGENIERÍA --}}
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4 overflow-hidden">
                 <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
                     <h5 class="fw-bold text-uppercase text-white mb-0">
-                        Asignar Profesores a Grupos
+                        Asignar Docentes - Ingeniería
                     </h5>
                 </div>
-
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-muted small text-uppercase">
                                 <tr>
-                                    <th class="px-4 py-3">Grupo</th>
-                                    <th class="py-3">Profesor Asignado</th>
-                                    <th class="py-3">Acción</th>
+                                    <th class="px-4 py-3 border-bottom-0">Grupo</th>
+                                    <th class="py-3 border-bottom-0">Docente Asignado</th>
+                                    <th class="py-3 border-bottom-0">Acción</th>
                                 </tr>
                             </thead>
                             <tbody class="small">
-                                @foreach($grupos as $grupo)
+                                @forelse($gruposInge as $grupo)
                                 <tr class="registro-row" data-search="{{ strtolower($grupo->nombre_grupo) }}">
-                                    <td class="px-4 py-3 fw-bold text-dark">
+                                    <td class="px-4 py-3 fw-bold text-dark border-light-subtle">
                                         {{ $grupo->nombre_grupo }}
                                     </td>
-                                    <td class="py-3 text-dark">
+                                    <td class="py-3 text-dark border-light-subtle">
                                         @if($grupo->num_empleado && $grupo->num_empleado != auth()->user()->num_empleado)
                                             @php
-                                                $profeAsignado = $profesores->firstWhere('num_empleado', $grupo->num_empleado);
+                                                $docenteAsignado = $docentes->firstWhere('num_empleado', $grupo->num_empleado);
                                             @endphp
-                                            <span class="text-primary fw-semibold">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
-                                                {{ $profeAsignado ? $profeAsignado->nombre . ' ' . $profeAsignado->ap_pat : 'Profesor Asignado' }}
+                                                {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
                                         @else
-                                            <span class="text-danger fw-semibold">Sin asignar</span>
+                                            <span class="text-danger fw-semibold bg-danger bg-opacity-10 px-3 py-1 rounded-pill">Sin asignar</span>
                                         @endif
                                     </td>
-                                    <td class="py-3">
-                                        <select name="profesores[{{ $grupo->id_grupo }}]" class="form-select shadow-sm">
-                                            <option value="" selected disabled>Seleccionar profesor</option>
-                                            @foreach($profesores as $profe)
-                                                <option value="{{ $profe->num_empleado }}" {{ $grupo->num_empleado == $profe->num_empleado ? 'selected' : '' }}>
-                                                    {{ $profe->nombre }} {{ $profe->ap_pat }}
+                                    <td class="py-3 border-light-subtle">
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
+                                            <option value="" selected disabled>Seleccionar docente</option>
+                                            @foreach($docentes as $docente)
+                                                <option value="{{ $docente->num_empleado }}" {{ $grupo->num_empleado == $docente->num_empleado ? 'selected' : '' }}>
+                                                    {{ $docente->nombre }} {{ $docente->ap_pat }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </td>
                                 </tr>
-                                @endforeach
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted border-light-subtle">
+                                        <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
+                                        Aún no hay grupos creados para Ingeniería.
+                                    </td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-end gap-2">
-                    <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                        Guardar
-                    </button>
+            {{-- SECCIÓN ARQUITECTURA --}}
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4 overflow-hidden">
+                <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
+                    <h5 class="fw-bold text-uppercase text-white mb-0">
+                        Asignar Docentes - Arquitectura y Diseño
+                    </h5>
                 </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-muted small text-uppercase">
+                                <tr>
+                                    <th class="px-4 py-3 border-bottom-0">Grupo</th>
+                                    <th class="py-3 border-bottom-0">Docente Asignado</th>
+                                    <th class="py-3 border-bottom-0">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="small">
+                                @forelse($gruposArqui as $grupo)
+                                <tr class="registro-row" data-search="{{ strtolower($grupo->nombre_grupo) }}">
+                                    <td class="px-4 py-3 fw-bold text-dark border-light-subtle">
+                                        {{ $grupo->nombre_grupo }}
+                                    </td>
+                                    <td class="py-3 text-dark border-light-subtle">
+                                        @if($grupo->num_empleado && $grupo->num_empleado != auth()->user()->num_empleado)
+                                            @php
+                                                $docenteAsignado = $docentes->firstWhere('num_empleado', $grupo->num_empleado);
+                                            @endphp
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+                                                {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
+                                            </span>
+                                        @else
+                                            <span class="text-danger fw-semibold bg-danger bg-opacity-10 px-3 py-1 rounded-pill">Sin asignar</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 border-light-subtle">
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
+                                            <option value="" selected disabled>Seleccionar docente</option>
+                                            @foreach($docentes as $docente)
+                                                <option value="{{ $docente->num_empleado }}" {{ $grupo->num_empleado == $docente->num_empleado ? 'selected' : '' }}>
+                                                    {{ $docente->nombre }} {{ $docente->ap_pat }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted border-light-subtle">
+                                        <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
+                                        Aún no hay grupos creados para Arquitectura y Diseño.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-            </div>{{-- /card --}}
+            {{-- BARRA DE ACCIÓN INFERIOR --}}
+            <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
+                <span class="small text-muted fw-semibold me-3">
+                    {{ $gruposInge->count() + $gruposArqui->count() }} grupos disponibles
+                </span>
+                <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Guardar
+                </button>
+            </div>
         </form>
 
     @endif

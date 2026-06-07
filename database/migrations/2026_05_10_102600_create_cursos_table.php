@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table)
+        Schema::create('cursos', function (Blueprint $table)
         {
-            $table->tinyIncrements('id_rol');
-            $table->string('nombre_rol', 30);
+            $table->id('id_curso');
+            $table->string('nombre_curso', 40);
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin');
             $table->timestamps();
         });
     }

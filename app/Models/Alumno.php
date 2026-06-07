@@ -28,8 +28,10 @@ class Alumno extends Model
         'ap_mat',
         'id_grupo_propedeutico',
         'id_resultados_propedeutico',
+        'correo_institucional',
         'correo_alternativo',
         'telefono',
+        'puntaje_ingreso',
         'id_carrera',
         'id_grupo_induccion'
     ];

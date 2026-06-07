@@ -39,8 +39,8 @@
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light text-muted small text-uppercase">
+                <table id="tablaGruposInduc" class="table table-hover align-middle mb-0 w-100">
+                    <thead class="table-light text-muted small text-uppercase text-start">
                         <tr>
                             <th class="px-4 py-3">Nombre del Grupo</th>
                             <th class="py-3">Programa</th>
@@ -49,7 +49,7 @@
                             <th class="py-3">Lista</th>
                         </tr>
                     </thead>
-                    <tbody class="small">
+                    <tbody class="small text-center">
                         @forelse($gruposInduc as $grupo)
                         <tr>
                             <td class="px-4 fw-bold text-dark">{{ $grupo->nombre_grupo }}</td>
@@ -59,10 +59,10 @@
                                 </span>
                             </td>
                             <td>
-                                @if($grupo->id_turno == 1)
-                                    <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">Mañana</span>
+                                @if($grupo->turno && strtolower($grupo->turno->tipo_turno) == 'matutino')
+                                    <span class="badge rounded-pill bg-secondary text-dark px-3 py-2 fw-semibold">Matutino</span>
                                 @else
-                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">Tarde</span>
+                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-semibold">Vespertino</span>
                                 @endif
                             </td>
                             <td class="text-dark">
@@ -93,4 +93,23 @@
     </div>{{-- /card --}}
 
 </div>
+
+<script type="module">
+    $(document).ready(function() {
+        const opcionesBase = {
+            searching: false, // Desactiva el buscador
+            order: [[0, 'asc']],
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            columnDefs: [
+                { orderable: false, targets: [1, 4] } // Desactiva ordenamiento en 'Programa' (1) y 'Lista' (4)
+            ],
+            dom: '<"d-flex flex-wrap justify-content-between align-items-center"l>rt<"d-flex flex-wrap justify-content-between align-items-center mt-2"ip>'
+        };
+
+        if ($('#tablaGruposInduc tbody tr').length > 0 && !$('#tablaGruposInduc tbody tr td[colspan]').length) {
+            $('#tablaGruposInduc').DataTable(opcionesBase);
+        }
+    });
+</script>
 @endsection
