@@ -268,7 +268,7 @@
                                             @php
                                                 $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
+                                            <span class="text-success fw-semibold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
@@ -329,7 +329,7 @@
                                             @php
                                                 $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
+                                            <span class="text-success fw-semibold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
