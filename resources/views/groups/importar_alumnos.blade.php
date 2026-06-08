@@ -33,6 +33,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     @endif
+                    
                     <form action="{{ route('alumnos.importar.post') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-5">
