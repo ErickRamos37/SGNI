@@ -59,7 +59,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
 
     Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
-
+    // Ruta para obtener los datos de la tabla de seguimiento (AJAX)
+    Route::get('/seguimiento/datos', [App\Http\Controllers\SeguimientoController::class, 'getDatosSeguimiento'])->name('seguimiento.datos');
 
 
     Route::get('/curso_prope', [GrupoController::class, 'showCursoPrope'])->name('curso_prope');
