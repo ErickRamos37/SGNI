@@ -96,6 +96,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update-batch', [CalificacionController::class, 'updateBatch'])->name('updateBatch');
     });
 
+    // Rutas para las vistas relacionadas con la catura y muestra de calificaciones de los examenes propedeuticos.
     Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
     Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
     Route::get('/calificaciones/descargar-formato-base', [CalificacionController::class, 'descargarFormatoBase'])->name('calificaciones.descargarFormatoBase');
@@ -109,19 +110,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
 
-
-
     Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
 
-    Route::get('/grupos_final/criterios', function () {
-        return view('grupos_final.criterios');
-    })->name('grupos_final.criterios');
+    // Rutas para las vistas relacionadas a los grupos de primer semestre
+    Route::get('/grupos_finales/criterios', [App\Http\Controllers\GrupoFinalController::class, 'configurar'])->name('grupos_finales.criterios');
 
-    Route::get('/grupos_final/grupos_finales', function () {
-        return view('grupos_final.grupos_finales');
-    })->name('grupos_final.grupos_finales');
+    // Ruta para visualizar la tabla de grupos generados - Conectada al Controlador
+    Route::get('/grupos_finales/grupos_finales', [App\Http\Controllers\GrupoFinalController::class, 'gruposFinales'])->name('grupos_finales.grupos_finales');
 
-    Route::get('/grupos_final/modo_lectura', function () {
-        return view('grupos_final.modo_lectura');
-    })->name('grupos_final.modo_lectura');
+    // Ruta para el modo lectura
+    Route::get('/grupos_finales/modo_lectura', function () {
+        return view('grupos_finales.modo_lectura');
+    })->name('grupos_finales.modo_lectura');
 });
