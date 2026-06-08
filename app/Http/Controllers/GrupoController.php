@@ -301,47 +301,100 @@ class GrupoController extends Controller
         $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
         // --- DATOS DEL GRUPO Y PROFESOR ---
+        // --- DATOS DEL GRUPO Y PROFESOR ---
         $sheet->setCellValue('B3', 'Docente:');
         $sheet->setCellValue('C3', $nombreDocente);
-        $sheet->getStyle('B3:C3')->getFont()->setBold(true);
+        $sheet->getStyle('B3')->getFont()->setBold(true);
 
         $sheet->setCellValue('B4', 'Turno:');
         $sheet->setCellValue('C4', $turnoStr);
         $sheet->setCellValue('E4', 'Horario:');
-        $sheet->setCellValue('F4', '08:00 - 13:00'); 
-        $sheet->setCellValue('J4', 'Salón:');
-        $sheet->setCellValue('K4', 'Por definir'); 
-        $sheet->getStyle('B4:K4')->getFont()->setBold(true);
+        $sheet->setCellValue('F4', '08:00-13:00'); 
+        $sheet->setCellValue('K4', 'Salón:');
+        $sheet->setCellValue('L4', 'Por definir'); 
+        $sheet->getStyle('B4')->getFont()->setBold(true);
+        $sheet->getStyle('E4')->getFont()->setBold(true);
+        $sheet->getStyle('K4')->getFont()->setBold(true);
 
         // --- ENCABEZADOS DE LA TABLA ---
-        $sheet->setCellValue('H6', 'Asistencias');
-        $sheet->mergeCells('H6:L6');
+        $sheet->setCellValue('H6', 'Calificaciones');
+        $sheet->mergeCells('H6:I6');
         $sheet->getStyle('H6')->getAlignment()->setHorizontal('center');
         $sheet->getStyle('H6')->getFont()->setBold(true);
 
-        $headers = ['No.', 'Nombre', 'Apellido Paterno', 'Apellido Materno', 'Matrícula', 'Carrera a cursar', 'Correo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-        $colIndex = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($colIndex . '7', $header);
-            $sheet->getStyle($colIndex . '7')->getFont()->setBold(true);
-            $colIndex++;
+        $sheet->setCellValue('J6', 'Asistencias');
+        $sheet->mergeCells('J6:N6');
+        $sheet->getStyle('J6')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('J6')->getFont()->setBold(true);
+
+        $sheet->setCellValue('H7', 'Examen 1');
+        $sheet->setCellValue('I7', 'Examen 2');
+        $sheet->getStyle('H7:I7')->getFont()->setBold(true);
+        $sheet->getStyle('H7:I7')->getAlignment()->setHorizontal('center');
+
+        // Subencabezados de fechas para asistencias
+        $sheet->setCellValue('J7', 'Lunes');
+        $sheet->setCellValue('K7', 'Martes');
+        $sheet->setCellValue('L7', 'Miércoles');
+        $sheet->setCellValue('M7', 'Jueves');
+        $sheet->setCellValue('N7', 'Viernes');
+        $sheet->getStyle('J7:N7')->getFont()->setBold(true);
+        $sheet->getStyle('J7:N7')->getAlignment()->setHorizontal('center');
+
+        // Columnas combinadas verticalmente para Nombre, etc.
+        $mainHeaders = [
+            'A' => '',
+            'B' => 'Nombre',
+            'C' => 'Apellido Paterno',
+            'D' => 'Apellido Materno',
+            'E' => 'Matrícula',
+            'F' => 'Carrera a cursar',
+            'G' => 'Correo'
+        ];
+
+        foreach ($mainHeaders as $col => $title) {
+            $sheet->setCellValue($col . '6', $title);
+            $sheet->mergeCells($col . '6:' . $col . '7');
+            $sheet->getStyle($col . '6')->getFont()->setBold(true);
+            $sheet->getStyle($col . '6')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle($col . '6')->getAlignment()->setVertical('center');
         }
+
+        // --- BORDES PARA ENCABEZADOS ---
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+        ];
+        $sheet->getStyle('A6:N7')->applyFromArray($styleArray);
 
         // --- IMPRIMIR ALUMNOS ---
         $row = 8;
         $contador = 1;
+        
+        // Cargar relación carrera si no viene
+        $grupo->alumnos->load('carrera');
+
         foreach ($grupo->alumnos as $alumno) {
             $sheet->setCellValue('A' . $row, $contador);
             $sheet->setCellValue('B' . $row, mb_strtoupper($alumno->nombre));
             $sheet->setCellValue('C' . $row, mb_strtoupper($alumno->ap_pat));
             $sheet->setCellValue('D' . $row, mb_strtoupper($alumno->ap_mat));
             $sheet->setCellValue('E' . $row, $alumno->matricula);
+            $sheet->setCellValue('F' . $row, ''); // Se deja en blanco
+            
+            $sheet->setCellValue('G' . $row, ''); // Se deja en blanco
+            
+            // Bordes para la fila de datos
+            $sheet->getStyle('A' . $row . ':N' . $row)->applyFromArray($styleArray);
             
             $row++;
             $contador++;
         }
 
-        foreach (range('A', 'L') as $col) {
+        foreach (range('A', 'N') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
