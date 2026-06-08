@@ -112,18 +112,24 @@
                         </label>
 
                         @if($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    Swal.fire({
+                                        title: 'Error de Validación',
+                                        html: `{!! implode('<br><br>', $errors->all()) !!}`,
+                                        icon: 'error',
+                                        customClass: { confirmButton: 'btn btn-primary' },
+                                        buttonsStyling: false,
+                                        confirmButtonText: 'Entendido'
+                                    });
+                                });
+                            </script>
                         @endif
                         <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-0" role="alert">
                             <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                             <div class="small">
-                                <strong>Formato esperado:</strong> El archivo debe contener  "unidad_desc|programaestudios|programa_des|matricula|Nombre|apellido_paterno|apellido_materno".
+                                <strong>Formato esperado:</strong> El archivo debe contener los encabezados exactos: "matricula | nombre | apellido_paterno | apellido_materno | programa_desc | puntaje | correo_alter".
                             </div>
                         </div>
 

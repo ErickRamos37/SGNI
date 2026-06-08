@@ -58,6 +58,20 @@ class GrupoController extends Controller
             // Mapa: nombre de columna => índice numérico
             $mapa = array_flip($encabezados);
 
+            // Validar que vengan las columnas requeridas
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'puntaje', 'correo_alter'];
+            $faltantes = [];
+            foreach ($requeridos as $req) {
+                if (!isset($mapa[$req])) {
+                    $faltantes[] = $req;
+                }
+            }
+
+            if (!empty($faltantes)) {
+                DB::rollBack();
+                return back()->withErrors(['El archivo de Excel no tiene el formato correcto. Faltan las siguientes columnas o están mal escritas: ' . implode(', ', $faltantes)]);
+            }
+
             // Precargamos las carreras de la BD para buscar dinámicamente
             $carreras = Carrera::all();
 
@@ -498,6 +512,20 @@ class GrupoController extends Controller
             }, $filas[0]);
 
             $mapa = array_flip($encabezados);
+
+            // Validar que vengan las columnas requeridas
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'puntaje', 'correo_alter'];
+            $faltantes = [];
+            foreach ($requeridos as $req) {
+                if (!isset($mapa[$req])) {
+                    $faltantes[] = $req;
+                }
+            }
+
+            if (!empty($faltantes)) {
+                DB::rollBack();
+                return back()->withErrors(['El archivo de Excel no tiene el formato correcto. Faltan las siguientes columnas o están mal escritas: ' . implode(', ', $faltantes)]);
+            }
 
             // Precargamos las carreras de la BD para buscar dinámicamente
             $carreras = Carrera::all();
