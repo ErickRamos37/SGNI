@@ -47,14 +47,14 @@
                             </div>
                         </div>
 
-                        {{-- MENSAJE INFORMATIVO TOTALMENTE CORREGIDO --}}
+                        {{-- MENSAJE INFORMATIVO --}}
                         <div class="alert alert-info border-0 mb-0 p-3 rounded-3 shadow-sm text-start" role="alert">
                             <p class="mb-0 fs-6 text-dark">
                                 <strong>Autocompletado de asistencia:</strong> El sistema buscará las matrículas del archivo Excel dentro de los alumnos ya inscritos en este grupo y marcará de forma automática los días correspondientes (Lunes a Viernes).
                             </p>
                         </div>
 
-                        {{-- BOTÓN DE SUBIDA AJAX --}}
+                        {{-- BOTONES DE ACCIÓN --}}
                         <hr class="my-4 border-light-subtle">
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
@@ -161,15 +161,19 @@
                     uploadBtn.innerHTML = textoOriginal;
 
                     if (data.success) {
-                        window.location.href = data.redirect;
+                        alert(data.mensaje || "¡Archivo procesado con éxito!");
+                        // OPCIÓN A: Redirección automática a la vista anterior (Pase de Lista)
+                        window.location.href = "{{ url()->previous() }}";
                     } else {
-                        alert(data.mensaje);
+                        alert("Error del sistema: " + data.mensaje);
                     }
                 })
                 .catch(async errorResponse => {
                     uploadBtn.disabled = false;
                     uploadBtn.innerHTML = textoOriginal;
-                    alert("Ocurrió un error de conexión con el servidor.");
+                    
+                    console.error("Detalles del error en el servidor:", errorResponse);
+                    alert("Ocurrió un error al procesar el archivo en el servidor. Verifica que el formato del Excel sea correcto.");
                 });
         });
     });
