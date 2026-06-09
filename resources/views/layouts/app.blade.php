@@ -110,11 +110,10 @@
                             </li>
                         </ul>
                     </li>
-                    {{-- Ver Grupos --}}
                     <li class="nav-item mb-1 dropdown dropend">
                         <a href="#"
                             class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('curso_prope_creado', 'curso_induc_creado', 'grupos_finales.criterios')
+                               {{ request()->routeIs('curso_prope_creado', 'curso_induc_creado', 'grupos_finales.lista')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
                             data-bs-toggle="dropdown" aria-expanded="false">
