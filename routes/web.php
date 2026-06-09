@@ -128,14 +128,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('lista', [GrupoFinalController::class, 'gruposFinales'])
             ->name('lista');
 
-        // 4. Modo lectura -> URL final: /grupos-finales/modo-lectura | Nombre: grupos_finales.modo_lectura
-        Route::get('modo-lectura', function () {
-            return view('grupos_finales.modo_lectura');
-        })->name('modo_lectura');
-
         Route::get('{id}/lista', [GrupoFinalController::class, 'verListaGrupo'])
             ->name('lista_grupo_final');
-       
 
     });
 
