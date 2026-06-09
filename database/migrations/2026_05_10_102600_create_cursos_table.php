@@ -15,8 +15,6 @@ return new class extends Migration
         {
             $table->id('id_curso');
             $table->string('nombre_curso', 40);
-            $table->date('fecha_inicio');
-            $table->date('fecha_fin');
             $table->timestamps();
         });
     }
