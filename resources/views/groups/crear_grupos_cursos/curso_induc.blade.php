@@ -12,9 +12,6 @@
         <div>
             <h2 class="fw-bold text-dark mb-1">Crear Grupos</h2>
             <p class="text-muted mb-0">Seleccione el programa y configure los grupos</p>
-            <a href="{{ route('crear_grupo') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center mt-2">
-                Atras
-            </a>
         </div>
     </div>
 
@@ -35,7 +32,7 @@
                 Crear Grupos
             </a>
             <a href="?tab=asignar" class="btn btn-sm rounded-pill px-4 py-2 fw-semibold text-decoration-none {{ $tabActive === 'asignar' ? 'btn-outline-dark active' : 'btn-outline-dark border-0' }}">
-                Asignar Profesores a Grupos
+                Asignar Docentes a Grupos
             </a>
         </div>
     </div>
@@ -48,15 +45,64 @@
         {{-- VISTA: CREAR GRUPOS (CON ASISTENTE PASO A PASO) --}}
         <form action="{{ route('grupos_induc.store') }}" method="POST" enctype="multipart/form-data" id="formCrearGrupos">
             @csrf
-            <input type="hidden" name="tipo_grupo" value="Inducción">
+            <input type="hidden" name="tipo_grupo" value="induccion">
 
-            {{-- ==================== PASO 1: SUBIR EXCEL ==================== --}}
+            {{-- ==================== PASO 1: CONFIGURAR GRUPOS ==================== --}}
             <div id="paso1">
                 <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
                     <div class="card-body p-4 p-md-5">
                         <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
+                            Paso 1: Configurar Cantidad de Grupos
+                            <span class="text-danger ms-1">*</span>
+                        </h5>
+
+                        {{-- PERIODO / CICLO ESCOLAR --}}
+                        <div class="mb-4">
+                            <label for="periodo" class="form-label fw-bold text-dark text-uppercase fs-6">
+                                <i class="bi bi-calendar-event me-1"></i> Periodo / Ciclo Escolar
+                            </label>
+                            <input type="text" name="periodo" id="periodo" class="form-control shadow-sm fw-bold fs-5 w-50" placeholder="Ej. 2026-1" maxlength="10" required>
+                            <div class="form-text text-muted">Escribe el ciclo escolar para estos grupos (Ej. 2026-1, 2026-2).</div>
+                        </div>
+
+                        <hr class="my-4 border-light-subtle">
+                        
+                        {{-- GRUPOS GENERALES (INDUC NO SEPARA CARRERAS) --}}
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="fw-bold text-dark text-uppercase fs-6">Grupos Generales (Tronco Común)</span>
+                        </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
+                                    <label for="grupos_manana" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Matutino</label>
+                                    <input type="number" name="grupos_manana" id="grupos_manana" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
+                                    <label for="grupos_tarde" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Vespertino</label>
+                                    <input type="number" name="grupos_tarde" id="grupos_tarde" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" placeholder="Ej. 2" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 border-light-subtle">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" id="btnSiguiente" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ==================== PASO 2: SUBIR EXCEL ==================== --}}
+            <div id="paso2" class="d-none">
+                <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
                             <i class="bi bi-file-earmark-excel-fill text-primary me-2 fs-3"></i>
-                            Paso 1: Importar Lista de Estudiantes
+                            Paso 2: Importar Lista de Estudiantes
                             <span class="text-danger ms-1">*</span>
                         </h5>
 
@@ -77,67 +123,31 @@
                         </label>
 
                         @if($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    Swal.fire({
+                                        title: 'Error de Validación',
+                                        html: `{!! implode('<br><br>', $errors->all()) !!}`,
+                                        icon: 'error',
+                                        customClass: { confirmButton: 'btn btn-primary' },
+                                        buttonsStyling: false,
+                                        confirmButtonText: 'Entendido'
+                                    });
+                                });
+                            </script>
                         @endif
                         <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-0" role="alert">
                             <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                             <div class="small">
-                                <strong>Formato esperado:</strong> El archivo debe contener  "unidad_desc|programaestudios|programa_des|matricula|Nombre|apellido_paterno|apellido_materno".
-                            </div>
-                        </div>
-
-                        <hr class="my-4 border-light-subtle">
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Cancelar
-                            </button>
-                            <button type="button" id="btnSiguiente" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Siguiente
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- ==================== PASO 2: CONFIGURAR GRUPOS ==================== --}}
-            <div id="paso2" class="d-none">
-                <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
-                    <div class="card-body p-4 p-md-5">
-                        <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
-                            <i class="bi bi-sliders text-warning me-2 fs-3"></i>
-                            Paso 2: Configurar Cantidad de Grupos
-                        </h5>
-                        
-                        {{-- GRUPOS GENERALES (INDUC NO SEPARA CARRERAS) --}}
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-people-fill text-secondary fs-4 me-2"></i>
-                            <span class="fw-bold text-dark text-uppercase fs-6">Grupos Generales (Tronco Común)</span>
-                        </div>
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_manana" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Mañana</label>
-                                    <input type="number" name="grupos_manana" id="grupos_manana" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="bg-light rounded-3 p-3 text-center border border-light-subtle">
-                                    <label for="grupos_tarde" class="form-label text-dark fw-semibold d-block mb-2 small text-uppercase">Tarde</label>
-                                    <input type="number" name="grupos_tarde" id="grupos_tarde" class="form-control shadow-sm text-center fw-bold fs-5 mx-auto w-50" value="0" min="0" required>
-                                </div>
+                                <strong>Formato esperado:</strong> El archivo debe contener los encabezados exactos: "matricula | nombre | apellido_paterno | apellido_materno | programa_desc | puntaje | correo_alter".
                             </div>
                         </div>
 
                         <hr class="my-4 border-light-subtle">
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" id="btnCancelar" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Atras
+                                Cancelar
                             </button>
                             <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                 Crear
@@ -158,18 +168,28 @@
             });
 
             document.getElementById('btnSiguiente').addEventListener('click', function() {
-                const inputArchivo = document.getElementById('archivo_alumnos');
-                if(inputArchivo.files.length === 0) {
+                const inputManana = document.getElementById('grupos_manana');
+                const inputTarde = document.getElementById('grupos_tarde');
+                
+                let manana = parseInt(inputManana.value) || 0;
+                let tarde = parseInt(inputTarde.value) || 0;
+                
+                if(manana === 0 && tarde === 0) {
                     Swal.fire({
-                        title: 'Archivo requerido',
-                        text: 'Por favor selecciona un archivo Excel con la lista de estudiantes antes de continuar al Paso 2.',
+                        title: 'Faltan datos',
+                        text: 'Por favor, solicita al menos un grupo (ya sea en turno matutino o vespertino) para continuar.',
                         icon: 'warning',
                         customClass: { confirmButton: 'btn btn-primary' },
                         buttonsStyling: false,
-                        confirmButtonText: '<i class="bi bi-hand-thumbs-up-fill me-1"></i> Entendido'
+                        confirmButtonText: ' Entendido'
                     });
                     return;
                 }
+
+                // Autocompletar los vacíos con 0 para evitar errores al guardar
+                if(inputManana.value === '') inputManana.value = '0';
+                if(inputTarde.value === '') inputTarde.value = '0';
+
                 document.getElementById('paso1').classList.add('d-none');
                 document.getElementById('paso2').classList.remove('d-none');
             });
@@ -178,6 +198,21 @@
                 document.getElementById('paso2').classList.add('d-none');
                 document.getElementById('paso1').classList.remove('d-none');
             });
+
+            document.getElementById('formCrearGrupos').addEventListener('submit', function(e) {
+                const inputArchivo = document.getElementById('archivo_alumnos');
+                if(inputArchivo.files.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Archivo requerido',
+                        text: 'Por favor selecciona un archivo Excel con la lista de estudiantes antes de crear los grupos.',
+                        icon: 'warning',
+                        customClass: { confirmButton: 'btn btn-primary' },
+                        buttonsStyling: false,
+                        confirmButtonText: '<i class="bi bi-hand-thumbs-up-fill me-1"></i> Entendido'
+                    });
+                }
+            });
         </script>
 
     @else
@@ -185,13 +220,39 @@
         {{-- ========================================================= --}}
         {{-- VISTA: ASIGNAR PROFESORES A GRUPOS                        --}}
         {{-- ========================================================= --}}
+
+        {{-- SELECTOR DE PERIODO --}}
+        @if($periodos->count() > 0)
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar-range fs-4 text-primary me-3"></i>
+                        <div>
+                            <span class="fw-bold text-dark">Periodo Activo:</span>
+                            <span class="text-muted small ms-1">Selecciona el ciclo escolar a visualizar</span>
+                        </div>
+                    </div>
+                    <select id="selectorPeriodoInduc" class="form-select w-auto fw-bold shadow-sm">
+                        @foreach($periodos as $p)
+                            <option value="{{ $p }}" @if($p == $periodoActual) selected @endif>{{ $p }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <script>
+                document.getElementById('selectorPeriodoInduc').addEventListener('change', function() {
+                    window.location.href = '?tab=asignar&periodo=' + this.value;
+                });
+            </script>
+        @endif
+
         {{-- Usamos la MISMA ruta de guardar profesores porque la lógica de BD es idéntica --}}
         <form action="{{ route('grupos.guardar_profesores') }}" method="POST">
             @csrf
-            <div class="card border border-light-subtle shadow-sm rounded-3">
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4 overflow-hidden">
                 <div class="card-header bg-primary p-4 border-bottom border-light-subtle">
                     <h5 class="fw-bold text-uppercase text-white mb-0">
-                        Asignar Profesores a Grupos de Inducción
+                        Asignar Docentes a Grupos de Inducción
                     </h5>
                 </div>
 
@@ -200,36 +261,36 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-muted small text-uppercase">
                                 <tr>
-                                    <th class="px-4 py-3">Grupo</th>
-                                    <th class="py-3">Profesor Asignado</th>
-                                    <th class="py-3">Acción</th>
+                                    <th class="px-4 py-3 border-bottom-0">Grupo</th>
+                                    <th class="py-3 border-bottom-0">Docente Asignado</th>
+                                    <th class="py-3 border-bottom-0">Acción</th>
                                 </tr>
                             </thead>
                             <tbody class="small">
                                 @forelse($grupos as $grupo)
                                 <tr class="registro-row" data-search="{{ strtolower($grupo->nombre_grupo) }}">
-                                    <td class="px-4 py-3 fw-bold text-dark">
+                                    <td class="px-4 py-3 fw-bold text-dark border-light-subtle">
                                         {{ $grupo->nombre_grupo }}
                                     </td>
-                                    <td class="py-3 text-dark">
-                                        @if($grupo->num_empleado && $grupo->num_empleado != 23)
+                                    <td class="py-3 text-dark border-light-subtle">
+                                        @if($grupo->id_usuario && $grupo->id_usuario != auth()->user()->id_usuario)
                                             @php
-                                                $profeAsignado = $profesores->firstWhere('num_empleado', $grupo->num_empleado);
+                                                $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-primary fw-semibold">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
-                                                {{ $profeAsignado ? $profeAsignado->nombre . ' ' . $profeAsignado->ap_pat : 'Profesor Asignado' }}
+                                                {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
                                         @else
-                                            <span class="text-danger fw-semibold">Sin asignar</span>
+                                            <span class="text-danger fw-semibold bg-danger bg-opacity-10 px-3 py-1 rounded-pill">Sin asignar</span>
                                         @endif
                                     </td>
-                                    <td class="py-3">
-                                        <select name="profesores[{{ $grupo->id_grupo }}]" class="form-select w-100 shadow-sm">
-                                            <option value="" selected disabled>Seleccionar profesor</option>
-                                            @foreach($profesores as $profe)
-                                                <option value="{{ $profe->num_empleado }}" {{ $grupo->num_empleado == $profe->num_empleado ? 'selected' : '' }}>
-                                                    {{ $profe->nombre }} {{ $profe->ap_pat }}
+                                    <td class="py-3 border-light-subtle">
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
+                                            <option value="" selected disabled>Seleccionar docente</option>
+                                            @foreach($docentes as $docente)
+                                                <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>
+                                                    {{ $docente->nombre }} {{ $docente->ap_pat }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -237,7 +298,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="3" class="text-center py-5 text-muted">
+                                    <td colspan="3" class="text-center py-5 text-muted border-light-subtle">
                                         <i class="bi bi-inbox display-6 d-block mb-2 text-light-subtle"></i>
                                         Aún no hay grupos creados para Inducción.
                                     </td>
@@ -247,21 +308,21 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="card-footer bg-white border-top border-light-subtle p-3 d-flex justify-content-between align-items-center">
-                    <span class="small text-muted fw-semibold">
-                        {{ $grupos->count() }} grupos disponibles
-                    </span>
-                    <div class="d-flex gap-2">
-                        <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                            Guardar
-                        </button>
-                    </div>
                 </div>
             </div>{{-- /card --}}
+
+            {{-- BARRA DE ACCIÓN INFERIOR --}}
+            <div class="d-flex justify-content-end align-items-center gap-2 mb-4">
+                <span class="small text-muted fw-semibold me-3">
+                    {{ $grupos->count() }} grupos disponibles
+                </span>
+                <button type="button" onclick="window.history.back();" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                    Guardar
+                </button>
+            </div>
         </form>
 
     @endif
@@ -278,7 +339,7 @@
                     title: '¡Acción Denegada!',
                     text: "{{ session('error_grupos_existentes') }}",
                     icon: 'error',
-                    customClass: { confirmButton: 'btn btn-danger' },
+                    customClass: { confirmButton: 'btn btn-primary' },
                     buttonsStyling: false,
                     confirmButtonText: 'Entendido'
                 });

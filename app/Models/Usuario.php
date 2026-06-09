@@ -9,13 +9,10 @@ class Usuario extends Authenticatable
 {
     protected $table = 'usuarios';
 
-    protected $primaryKey = 'num_empleado';
-    public $incrementing = false; // El número de empleado se le asigna manualmente
+    protected $primaryKey = 'id_usuario';
 
-    public function rol()
-    {
-        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
-    }
+    // Le indicamos que sigue siendo autoincremental (true por defecto, pero es buena práctica declararlo)
+    public $incrementing = true;
 
     protected $fillable = [
         'num_empleado',
@@ -25,4 +22,9 @@ class Usuario extends Authenticatable
         'correo_institucional',
         'id_rol'
     ];
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
 }

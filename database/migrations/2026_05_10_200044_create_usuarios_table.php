@@ -11,7 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('usuarios', function (Blueprint $table) {
-            $table->integer('num_empleado')->primary();
+            $table->id('id_usuario');
+
+            $table->integer('num_empleado')->index();
             $table->string('nombre', 45);
             $table->string('ap_pat', 25);
             $table->string('ap_mat', 25)->nullable();

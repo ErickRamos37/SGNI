@@ -14,12 +14,12 @@ class Grupo extends Model
     protected $fillable = [
         'nombre_grupo',
         'id_curso',
-        'id_turno',      
-        'num_empleado', 
-        'id_estado'      
+        'id_turno',
+        'id_usuario',
+        'id_estado',
+        'periodo'
     ];
 
-    // La función intacta de tus compañeros
     public function alumnos(): HasMany
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
@@ -33,6 +33,21 @@ class Grupo extends Model
     public function alumnosPropedeutico()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
+    }
+
+    public function turno()
+    {
+        return $this->belongsTo(Turno::class, 'id_turno', 'id_turno');
+    }
+
+    public function curso()
+    {
+        return $this->belongsTo(Curso::class, 'id_curso', 'id_curso');
+    }
+
+    public function docente()
+    {
+        return $this->belongsTo(Usuario::class, 'id_usuario', 'num_empleado');
     }
 
 }

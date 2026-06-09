@@ -19,7 +19,24 @@
         .nav-link[aria-expanded="true"] .toggle-icon {
             transform: rotate(-180deg);
         }
+
+        @media (min-width: 992px) {
+            #sidebarMenu {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 1030;
+            }
+
+            main {
+                margin-left: 280px;
+            }
+        }
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
@@ -58,7 +75,16 @@
             <ul class="nav nav-pills flex-column mb-auto w-100">
 
                 @auth
+                {{-- Guardamos el rol en una variable para mantener el código limpio --}}
+                @php 
+                    $rolUsuario = Auth::user()->rol->nombre_rol; 
+                @endphp
 
+                {{-- ========================================================== --}}
+                {{-- EXCLUSIVO ADMINISTRADOR --}}
+                {{-- ========================================================== --}}
+                @if($rolUsuario === 'Administrador')
+                
                 {{-- Crear Grupos --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
@@ -132,7 +158,13 @@
                         </li>
                     </ul>
                 </li>
+                @endif
 
+
+                {{-- ========================================================== --}}
+                {{-- COMPARTIDO: ADMINISTRADOR Y PSICOPEDAGÓGICO --}}
+                {{-- ========================================================== --}}
+                @if(in_array($rolUsuario, ['Administrador', 'psicopedagogico']))
                 {{-- Alumnos --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
@@ -146,6 +178,9 @@
                         <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
                     </a>
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
+                        
+                        {{-- Alta exclusiva para Administrador --}}
+                        @if($rolUsuario === 'Administrador')
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('alumnos.nuevo') ? 'text-primary bg-light' : 'text-dark' }}"
@@ -153,6 +188,8 @@
                                 Alta de Alumnos
                             </a>
                         </li>
+                        @endif
+
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('alumnos.info') ? 'text-primary bg-light' : 'text-dark' }}"
@@ -169,7 +206,13 @@
                         </li>
                     </ul>
                 </li>
+                @endif
 
+
+                {{-- ========================================================== --}}
+                {{-- COMPARTIDO: ADMINISTRADOR Y DOCENTE --}}
+                {{-- ========================================================== --}}
+                @if(in_array($rolUsuario, ['Administrador', 'Docente']))
                 
                 {{-- Capturar Asistencia --}}
                 <li class="nav-item mb-1 dropdown dropend">
@@ -230,17 +273,18 @@
                         </li>
                     </ul>
                 </li>
+                @endif
 
-                {{--- Vistas del Administrador ---}}
-                @if(Auth::user()->rol->nombre_rol === 'Administrador')
 
+                {{-- ========================================================== --}}
+                {{-- ADMINISTRADOR (MÓDULOS FINALES) --}}
+                {{-- ========================================================== --}}
+                @if($rolUsuario === 'Administrador')
                 {{-- Personal --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
                         class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('usuarios.alta_usuarios', 'usuarios.index')
-                                   ? 'text-dark bg-secondary fw-bold shadow-sm'
-                                   : 'text-white' }}"
+                               {{ request()->routeIs('usuarios.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <span>Personal</span>
@@ -249,14 +293,14 @@
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
                         <li>
                             <a class="dropdown-item fw-bold py-2 mb-1 rounded-2
-                                      {{ request()->routeIs('usuarios.alta_usuarios') ? 'text-primary bg-light' : 'text-dark' }}"
-                                href="{{ route('usuarios.alta_usuarios') }}">
+                                  {{ request()->routeIs('usuarios.create') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('usuarios.create') }}">
                                 Alta Personal
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
-                                      {{ request()->routeIs('usuarios.index') ? 'text-primary bg-light' : 'text-dark' }}"
+                                  {{ request()->routeIs('usuarios.index', 'usuarios.edit') ? 'text-primary bg-light' : 'text-dark' }}"
                                 href="{{ route('usuarios.index') }}">
                                 Lista del Personal
                             </a>
@@ -264,14 +308,13 @@
                     </ul>
                 </li>
 
-                {{-- Modo Lectura (sin submenú) --}}
+                {{-- Modo Lectura --}}
                 <li class="nav-item mb-1">
                     <a href="{{ route('grupos_final.modo_lectura') }}"
                         class="nav-link {{ request()->routeIs('grupos_final.modo_lectura') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
                         Modo Lectura
                     </a>
                 </li>
-
                 @endif
 
             </ul>
@@ -280,7 +323,6 @@
 
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <!-- Mostramos el nombre guardado en la sesión -->
                     <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>
                 </a>
 
