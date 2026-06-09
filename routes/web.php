@@ -12,6 +12,7 @@ use App\Models\Grupo;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
 use App\Http\Controllers\SeguimientoController;
+use App\Http\Controllers\GrupoFinalController;
 
 // --- Rutas del referentes al inicio de sesion ---
 Route::get('/', function () {
@@ -113,13 +114,35 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
 
     // Rutas para las vistas relacionadas a los grupos de primer semestre
-    Route::get('/grupos_finales/criterios', [App\Http\Controllers\GrupoFinalController::class, 'configurar'])->name('grupos_finales.criterios');
+    Route::prefix('grupos-finales')->name('grupos_finales.')->group(function () {
 
-    // Ruta para visualizar la tabla de grupos generados - Conectada al Controlador
-    Route::get('/grupos_finales/grupos_finales', [App\Http\Controllers\GrupoFinalController::class, 'gruposFinales'])->name('grupos_finales.grupos_finales');
+        // 1. Formulario de criterios -> URL final: /grupos-finales/configurar | Nombre: grupos_finales.criterios
+        Route::get('configurar', [GrupoFinalController::class, 'configurar'])
+            ->name('criterios');
 
-    // Ruta para el modo lectura
-    Route::get('/grupos_finales/modo_lectura', function () {
-        return view('grupos_finales.modo_lectura');
-    })->name('grupos_finales.modo_lectura');
+        // 2. Procesar algoritmo -> URL final: /grupos-finales/generar | Nombre: grupos_finales.generar
+        Route::post('generar', [GrupoFinalController::class, 'generarDistribucion'])
+            ->name('generar');
+
+        // 3. Tabla de resultados -> URL final: /grupos-finales/lista | Nombre: grupos_finales.lista
+        Route::get('lista', [GrupoFinalController::class, 'gruposFinales'])
+            ->name('lista');
+
+        // 4. Modo lectura -> URL final: /grupos-finales/modo-lectura | Nombre: grupos_finales.modo_lectura
+        Route::get('modo-lectura', function () {
+            return view('grupos_finales.modo_lectura');
+        })->name('modo_lectura');
+
+        Route::get('{id}/lista', [GrupoFinalController::class, 'verListaGrupo'])
+            ->name('lista_grupo_final');
+       
+
+    });
+
+     // Vista para ver la lista en pantalla
+        Route::get('/grupos-finales/lista/{id}', [GrupoFinalController::class, 'verListaGrupo'])->name('grupos_finales.lista_grupo_final');
+
+        // Acción para descargar el CSV
+        Route::get('/grupos-finales/descargar/{id}', [GrupoFinalController::class, 'descargarLista'])->name('grupos_finales.descargar_lista');
 });
+

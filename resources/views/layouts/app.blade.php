@@ -69,7 +69,7 @@
                     <li class="nav-item mb-1 dropdown dropend">
                         <a href="#"
                             class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('curso_prope', 'curso_induc', 'grupos_final.criterios')
+                               {{ request()->routeIs('curso_prope', 'curso_induc', 'grupos_finales.criterios')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -104,7 +104,7 @@
                     <li class="nav-item mb-1 dropdown dropend">
                         <a href="#"
                             class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('curso_prope_creado', 'curso_induc_creado', 'grupos_final.grupos_finales')
+                               {{ request()->routeIs('curso_prope_creado', 'curso_induc_creado', 'grupos_finales.criterios')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -129,7 +129,7 @@
                             <li>
                                 <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('grupos_finales.grupos_finales') ? 'text-primary bg-light' : 'text-dark' }}"
-                                    href="{{ route('grupos_finales.grupos_finales') }}">
+                                    href="{{ route('grupos_finales.lista') }}">
                                     Primer Semestre
                                 </a>
                             </li>

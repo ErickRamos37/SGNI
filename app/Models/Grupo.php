@@ -23,7 +23,7 @@ class Grupo extends Model
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
     }
-    
+
     public function alumnosInduccion()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_induccion', 'id_grupo');
@@ -39,6 +39,12 @@ class Grupo extends Model
         return $this->belongsTo(Turno::class, 'id_turno', 'id_turno');
     }
 
+    public function alumnosFinales()
+    {
+        // Asumiendo que la llave foránea en la tabla alumno es 'id_grupo_definitivo'
+        return $this->hasMany(Alumno::class, 'id_grupo_definitivo', 'id_grupo');
+    }
+
     public function curso()
     {
         return $this->belongsTo(Curso::class, 'id_curso', 'id_curso');
@@ -47,6 +53,11 @@ class Grupo extends Model
     public function docente()
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'num_empleado');
+    }
+
+    public function carrera()
+    {
+        return $this->belongsTo(Carrera::class, 'id_carrera', 'id_carrera');
     }
 
 }
