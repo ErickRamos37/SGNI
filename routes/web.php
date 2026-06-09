@@ -53,6 +53,9 @@ Route::middleware(['auth'])->group(function () {
         // Alumnos (Altas e Importación)
         Route::get('/alumnos/nuevo', function () { return view('alumnos.nuealum'); })->name('alumnos.nuevo');
         Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
+        
+        // * RUTAS INTEGRADAS DEL MERGE *
+        Route::get('/grupos/importar', function () { return view('groups.importar_alumnos'); })->name('grupos.importar');
         Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 
         // Cierres y Grupos Finales
@@ -100,5 +103,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/alumnos/info', function () { return view('alumnos.info'); })->name('alumnos.info');
         Route::post('/alumnos/buscar', [AlumnoController::class, 'buscar'])->name('alumnos.buscar');
         Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
+        
+        // * RUTA INTEGRADA DEL MERGE *
+        Route::get('/seguimiento/datos', [SeguimientoController::class, 'getDatosSeguimiento'])->name('seguimiento.datos');
     });
 });
