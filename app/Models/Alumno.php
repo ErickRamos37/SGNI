@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ResultadosPropedeutico;
-use App\Models\Grupo; // <-- Importación que ya tenían ellos
-
+use App\Models\Grupo;
 use App\Models\Asistencia;
 use App\Models\SeguimientoAcademico;
 
@@ -29,11 +28,12 @@ class Alumno extends Model
         'id_grupo_propedeutico',
         'id_resultados_propedeutico',
         'correo_alternativo',
+        'correo_institucional',
+        'puntaje_ingreso',
         'telefono',
         'id_carrera',
         'id_grupo_induccion'
     ];
-
 
     public function carrera()
     {
@@ -50,10 +50,6 @@ class Alumno extends Model
         return $this->belongsTo(Grupo::class, 'id_grupo_propedeutico');
     }
 
-    // =========================================================
-    // RELACIONES CONSUMIDAS POR LA VISTA DEL PSICÓLOGO
-    // =========================================================
-
     public function asistencias()
     {
         return $this->hasMany(Asistencia::class, 'matricula', 'matricula');
@@ -64,11 +60,6 @@ class Alumno extends Model
         return $this->hasOne(SeguimientoAcademico::class, 'matricula', 'matricula');
     }
 
-
-    // =========================================================
-    // ACCESSORS (CAMPOS DINÁMICOS) IMPRESOS EN LA VISTA
-    // =========================================================
-
     public function getNombreCompletoAttribute()
     {
         return "{$this->nombre} {$this->ap_pat} {$this->ap_mat}";
@@ -78,7 +69,7 @@ class Alumno extends Model
     {
         $total = $this->asistencias()->where('id_grupo', 1)->count();
         if ($total === 0) return 0;
-        
+
         $asistidas = $this->asistencias()->where('id_grupo', 1)->where('asistio', 1)->count();
         return round(($asistidas / $total) * 100);
     }
@@ -87,7 +78,7 @@ class Alumno extends Model
     {
         $total = $this->asistencias()->where('id_grupo', 2)->count();
         if ($total === 0) return 0;
-        
+
         $asistidas = $this->asistencias()->where('id_grupo', 2)->where('asistio', 1)->count();
         return round(($asistidas / $total) * 100);
     }
@@ -95,12 +86,12 @@ class Alumno extends Model
     public function getMejoriaAttribute()
     {
         $resultados = $this->resultadosPropedeutico;
-        
+
         if ($resultados && isset($resultados->examen_final) && isset($resultados->examen_inicial)) {
             $diferencia = $resultados->examen_final - $resultados->examen_inicial;
             return $diferencia >= 0 ? "+{$diferencia}" : $diferencia;
         }
-        
+
         return 'N/A';
     }
 }

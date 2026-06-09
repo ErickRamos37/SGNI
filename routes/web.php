@@ -84,9 +84,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/alumnos/buscar', [AlumnoController::class, 'buscar'])->name('alumnos.buscar');
 
-    Route::get('/alumnos/nuevo', function () {
-        return view('alumnos.nuealum');
-    })->name('alumnos.nuevo');
+    Route::get('/alumnos/nuevo', [AlumnoController::class, 'create'])->name('alumnos.nuevo');
+
+    Route::get('/alumnos/{alumno}/editar', [AlumnoController::class, 'edit'])->name('alumnos.edit');
+    Route::put('/alumnos/{alumno}', [AlumnoController::class, 'update'])->name('alumnos.update');
+ 
 
     // 2. Ruta POST para que el JavaScript envíe los datos a la BD
     Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');

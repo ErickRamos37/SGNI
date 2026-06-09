@@ -25,8 +25,8 @@
         </div>
     </div>
 
-    {{-- ─── Contenido del perfil (oculto hasta buscar) ────────────── --}}
-    <div id="contenedor-info-alumno" class="d-none">
+    {{-- ─── Contenido del perfil (Visible desde el inicio como esqueleto) ────────────── --}}
+    <div id="contenedor-info-alumno">
 
         {{-- Banner del alumno --}}
         <div class="card bg-primary text-white border border-light-subtle shadow-sm rounded-3 mb-4">
@@ -35,8 +35,8 @@
                     <i class="bi bi-person fs-1"></i>
                 </div>
                 <div>
-                    <h3 class="fw-bold mb-0" id="lbl-nombre-completo">-</h3>
-                    <p class="mb-0 fw-medium">Matrícula: <span id="lbl-matricula">-</span></p>
+                    <h3 class="fw-bold mb-0" id="lbl-nombre-completo">Haga una búsqueda para mostrar los datos</h3>
+                    <p class="mb-0 fw-medium">Matrícula: <span id="lbl-matricula">N/A</span></p>
                 </div>
             </div>
         </div>
@@ -55,33 +55,33 @@
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-person-fill text-primary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Nombres</small>
+                                <small class="text-muted text-uppercase fw-bold">Nombres</small>
                             </div>
-                            <span class="fs-6 fw-bold text-dark" id="lbl-nombres">-</span>
+                            <span class="fs-6 fw-bold text-dark" id="lbl-nombres">No registrado</span>
                         </div>
 
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-person-fill text-primary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Apellidos</small>
+                                <small class="text-muted text-uppercase fw-bold">Apellidos</small>
                             </div>
-                            <span class="fs-6 fw-bold text-dark" id="lbl-apellidos">-</span>
+                            <span class="fs-6 fw-bold text-dark" id="lbl-apellidos">No registrado</span>
                         </div>
 
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
-                                <i class="bi bi-telephone-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Teléfono</small>
+                                <i class="bi bi-telephone-fill text-primary me-2"></i>
+                                <small class="text-muted text-uppercase fw-bold">Teléfono</small>
                             </div>
-                            <span class="fs-6 fw-bold text-dark" id="lbl-telefono">-</span>
+                            <span class="fs-6 fw-bold text-dark" id="lbl-telefono">No registrado</span>
                         </div>
 
                         <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
-                                <i class="bi bi-envelope-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Correo Institucional</small>
+                                <i class="bi bi-envelope-fill text-primary me-2"></i>
+                                <small class="text-muted text-uppercase fw-bold">Correo Institucional</small>
                             </div>
-                            <span class="fs-6 fw-bold text-dark" id="lbl-correo">-</span>
+                            <span class="fs-6 fw-bold text-dark" id="lbl-correo">No registrado</span>
                         </div>
 
                     </div>
@@ -99,28 +99,28 @@
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-award-fill text-primary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Puntaje de Ingreso</small>
+                                <small class="text-muted text-uppercase fw-bold">Puntaje de Ingreso</small>
                             </div>
                             <div>
-                                <span class="fs-1 fw-bold text-primary" id="lbl-puntaje">-</span>
+                                <span class="fs-1 fw-bold text-primary" id="lbl-puntaje">N/A</span>
                                 <span class="text-muted ms-2">de 1300 puntos</span>
                             </div>
                         </div>
 
                         <div class="bg-white rounded-3 p-3 mb-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
-                                <i class="bi bi-book-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Carrera</small>
+                                <i class="bi bi-book-fill text-primary me-2"></i>
+                                <small class="text-muted text-uppercase fw-bold">Carrera</small>
                             </div>
-                            <span class="fs-6 fw-bold text-dark" id="lbl-carrera">-</span>
+                            <span class="fs-6 fw-bold text-dark" id="lbl-carrera">No asignada</span>
                         </div>
 
                         <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
-                                <i class="bi bi-people-fill text-secondary me-2"></i>
-                                <small class="text-secondary text-uppercase fw-bold">Grupo de Inducción</small>
+                                <i class="bi bi-people-fill text-primary me-2"></i>
+                                <small class="text-muted text-uppercase fw-bold">Grupo de Inducción</small>
                             </div>
-                            <span class="fs-6 fw-bold text-dark" id="lbl-grupo">-</span>
+                            <span class="fs-6 fw-bold text-dark" id="lbl-grupo">No asignado</span>
                         </div>
 
                     </div>
@@ -128,6 +128,14 @@
             </div>
 
         </div>
+
+        {{-- Botón Editar — oculto hasta que haya una búsqueda exitosa --}}
+        <div class="d-flex justify-content-start mt-4">
+            <a id="btn-editar" href="#" class="btn btn-outline-dark px-5 fw-semibold rounded-3 d-none">
+                <i class="bi bi-pencil-square me-2"></i>Editar información
+            </a>
+        </div>
+
     </div>
 </div>
 
@@ -138,25 +146,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnBuscar = document.getElementById('btn-buscar');
     const btnText = document.getElementById('btn-text');
     const btnSpinner = document.getElementById('btn-spinner');
-    const containerInfo = document.getElementById('contenedor-info-alumno');
     const errorFeedback = document.getElementById('matricula-error');
+    const btnEditar = document.getElementById('btn-editar');
+
+    function restaurarEsqueleto() {
+        document.getElementById('lbl-nombre-completo').innerText = 'Haga una búsqueda para mostrar los datos';
+        document.getElementById('lbl-matricula').innerText = 'N/A';
+        document.getElementById('lbl-nombres').innerText = 'No registrado';
+        document.getElementById('lbl-apellidos').innerText = 'No registrado';
+        document.getElementById('lbl-telefono').innerText = 'No registrado';
+        document.getElementById('lbl-correo').innerText = 'No registrado';
+        document.getElementById('lbl-puntaje').innerText = 'N/A';
+        document.getElementById('lbl-carrera').innerText = 'No asignada';
+        document.getElementById('lbl-grupo').innerText = 'No asignado';
+        btnEditar.classList.add('d-none');
+        btnEditar.href = '#';
+    }
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const matricula = inputMatricula.value.trim();
-        
-        // 1. Prevención de Doble Envío y Spinner
+
         btnBuscar.disabled = true;
         btnText.classList.add('d-none');
         btnSpinner.classList.remove('d-none');
-        
-        // Limpiar errores previos
+
         inputMatricula.classList.remove('is-invalid');
         errorFeedback.innerText = '';
-        containerInfo.classList.add('d-none'); // Ocultar info si hay una nueva busqueda
+        restaurarEsqueleto();
 
-        // 2. Envío Asíncrono (Fetch API)
         fetch(`/alumnos/buscar`, {
             method: 'POST',
             headers: {
@@ -169,42 +188,36 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(async response => {
             const data = await response.json();
-            
-            // Si el código no es 2xx, lanzamos el error para procesarlo en el catch
             if (!response.ok) {
                 throw { status: response.status, data: data };
             }
             return data;
         })
         .then(data => {
-            // 3. Respuesta Exitosa: Llenar el DOM
             const alumno = data.alumno;
             const apellidos = `${alumno.ap_pat} ${alumno.ap_mat || ''}`.trim();
 
             document.getElementById('lbl-nombre-completo').innerText = `${alumno.nombre} ${apellidos}`;
             document.getElementById('lbl-matricula').innerText = alumno.matricula;
-            
             document.getElementById('lbl-nombres').innerText = alumno.nombre;
             document.getElementById('lbl-apellidos').innerText = apellidos;
             document.getElementById('lbl-telefono').innerText = alumno.telefono || 'No registrado';
             document.getElementById('lbl-correo').innerText = alumno.correo_institucional || 'No registrado';
-            
             document.getElementById('lbl-puntaje').innerText = alumno.puntaje_ingreso || 'N/A';
-            
-            // Asumiendo que mandas las relaciones desde el controlador (con "with")
             document.getElementById('lbl-carrera').innerText = alumno.carrera ? alumno.carrera.nombre_carrera : 'No asignada';
             document.getElementById('lbl-grupo').innerText = alumno.grupos ? alumno.grupos.nombre_grupo : 'No asignado';
 
-            // Mostrar el contenedor con la animación
-            containerInfo.classList.remove('d-none');
-            inputMatricula.value = ''; // Opcional: limpiar input
+            // Mostrar botón editar apuntando a la matrícula encontrada
+            btnEditar.href = `/alumnos/${alumno.matricula}/editar`;
+            btnEditar.classList.remove('d-none');
+
+            inputMatricula.value = '';
         })
         .catch(error => {
-            // 4. Manejo de Errores Visuales (422 Validación o 404 No encontrado)
             inputMatricula.classList.add('is-invalid');
-            
+            restaurarEsqueleto();
+
             if (error.status === 422 && error.data.errors) {
-                // Errores de validación del FormRequest
                 errorFeedback.innerText = error.data.errors.matricula[0];
             } else if (error.status === 404) {
                 errorFeedback.innerText = 'No se encontró ningún alumno con esa matrícula.';
@@ -213,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .finally(() => {
-            // Restaurar botón
             btnBuscar.disabled = false;
             btnText.classList.remove('d-none');
             btnSpinner.classList.add('d-none');
