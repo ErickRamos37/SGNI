@@ -94,18 +94,18 @@ class SeguimientoController extends Controller
             $porcentajeAsistencia = $totalClases > 0 ? round(($clasesAsistidas / $totalClases) * 100) : 0;
 
             if ($totalClases == 0) {
-    // Gris claro opaco con letras negras (sustituye al bg-secondary original)
-    $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #E5E7E9; border: 1px solid #BDC3C7;">Sin Registro</span>';
-} elseif ($porcentajeAsistencia < 60) {
-    // Rojo/Rosa opaco elegante (tipo salmón oscuro/ladrillo suave) con letras negras
-    $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #F5B7B1;">Riesgo Alto</span>';
-} elseif ($porcentajeAsistencia <= 80) {
-    // Amarillo mostaza/ocre suave con letras negras
-    $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #F9E79F;">Riesgo Medio</span>';
-} else {
-    // Tu color azul original ("Regular") se queda intacto con letras blancas
-    $riesgoHtml = '<span class="badge rounded-pill bg-primary text-white px-3 py-2 text-uppercase fw-bold">Regular</span>';
-}
+                // Gris claro opaco con letras negras
+                $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #E5E7E9; border: 1px solid #BDC3C7;">Sin Registro</span>';
+            } elseif ($porcentajeAsistencia < 60) {
+                // Rojo/Rosa opaco elegante (tipo salmón oscuro/ladrillo suave) con letras negras
+                $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #F5B7B1;">Riesgo Alto</span>';
+            } elseif ($porcentajeAsistencia <= 80) {
+                // Amarillo mostaza/ocre suave con letras negras
+                $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #F9E79F;">Riesgo Medio</span>';
+            } else {
+                // Verde menta pastel elegante con letras negras para combinar con el resto
+                $riesgoHtml = '<span class="badge rounded-pill text-dark px-3 py-2 text-uppercase fw-bold" style="background-color: #A9DFBF;">Regular</span>';
+            }
 
             // Datos base compartidos por ambas tablas
             $resultado = [
