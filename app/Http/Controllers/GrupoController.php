@@ -20,18 +20,7 @@ class GrupoController extends Controller
     public function store(Request $request)
     {
         // =======================================================
-        // 1. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos)
-        // =======================================================
-        $prefijo = ($request->tipo_grupo === 'propedeutico') ? 'Prope' : 'Induc';
-        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%' . $prefijo . '%')->exists();
-
-        if ($gruposExistentes) {
-            // Si ya hay grupos, detenemos la ejecución inmediatamente y mandamos la alerta
-            return redirect()->back()->with('error_grupos_existentes', 'Los grupos iniciales ya fueron generados anteriormente. Si deseas inscribir a más estudiantes, por favor utiliza el módulo de Alta de Alumnos tardíos.');
-        }
-
-        // =======================================================
-        // 2. Si pasó el candado, validamos los datos del formulario
+        // 1. Si pasó el candado, validamos los datos del formulario
         // =======================================================
         $request->validate([
             'grupos_manana_inge'  => 'required|integer|min:0',
@@ -39,8 +28,21 @@ class GrupoController extends Controller
             'grupos_manana_arqui' => 'required|integer|min:0',
             'grupos_tarde_arqui'  => 'required|integer|min:0',
             'archivo_alumnos'     => 'required|mimes:xlsx,xls,csv',
-            'tipo_grupo'          => 'required|string'
+            'tipo_grupo'          => 'required|string',
+            'periodo'             => 'required|string|max:10'
         ]);
+
+        // =======================================================
+        // 2. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos PARA ESTE PERIODO)
+        // =======================================================
+        $prefijo = ($request->tipo_grupo === 'propedeutico') ? 'Prope' : 'Induc';
+        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%' . $prefijo . '%')
+            ->where('periodo', $request->periodo)
+            ->exists();
+
+        if ($gruposExistentes) {
+            return redirect()->back()->with('error_grupos_existentes', 'Los grupos para el periodo ' . $request->periodo . ' ya fueron generados. Si deseas inscribir a más estudiantes, utiliza el módulo de Alumnos Tardíos.');
+        }
 
         try {
             DB::beginTransaction();
@@ -57,6 +59,20 @@ class GrupoController extends Controller
 
             // Mapa: nombre de columna => índice numérico
             $mapa = array_flip($encabezados);
+
+            // Validar que vengan las columnas requeridas
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'puntaje', 'correo_alter'];
+            $faltantes = [];
+            foreach ($requeridos as $req) {
+                if (!isset($mapa[$req])) {
+                    $faltantes[] = $req;
+                }
+            }
+
+            if (!empty($faltantes)) {
+                DB::rollBack();
+                return back()->withErrors(['El archivo de Excel no tiene el formato correcto. Faltan las siguientes columnas o están mal escritas: ' . implode(', ', $faltantes)]);
+            }
 
             // Precargamos las carreras de la BD para buscar dinámicamente
             $carreras = Carrera::all();
@@ -109,8 +125,8 @@ class GrupoController extends Controller
                 }
             }
 
-            $statsInge = $this->procesarGrupos($request->grupos_manana_inge, $request->grupos_tarde_inge, 'Inge', $alumnosInge, $request->tipo_grupo);
-            $statsArqui = $this->procesarGrupos($request->grupos_manana_arqui, $request->grupos_tarde_arqui, 'Arqui', $alumnosArqui, $request->tipo_grupo);
+            $statsInge = $this->procesarGrupos($request->grupos_manana_inge, $request->grupos_tarde_inge, 'Inge', $alumnosInge, $request->tipo_grupo, $request->periodo);
+            $statsArqui = $this->procesarGrupos($request->grupos_manana_arqui, $request->grupos_tarde_arqui, 'Arqui', $alumnosArqui, $request->tipo_grupo, $request->periodo);
 
             $totalNuevos = $statsInge['nuevos'] + $statsArqui['nuevos'];
             $totalRepetidos = $statsInge['repetidos'] + $statsArqui['repetidos'];
@@ -128,7 +144,7 @@ class GrupoController extends Controller
         }
     }
 
-    private function procesarGrupos($gruposManana, $gruposTarde, $etiqueta, $alumnos, $tipoGrupo)
+    private function procesarGrupos($gruposManana, $gruposTarde, $etiqueta, $alumnos, $tipoGrupo, $periodo)
     {
         $totalGrupos = $gruposManana + $gruposTarde;
         
@@ -161,6 +177,7 @@ class GrupoController extends Controller
                 'id_curso'     => $idCurso,
                 'id_usuario'   => auth()->user()->id_usuario,
                 'id_estado'    => 1,
+                'periodo'      => $periodo,
             ]);
         }
 
@@ -220,29 +237,73 @@ class GrupoController extends Controller
 
     public function showPropeCreado()
     {
-        // 1. Buscamos los grupos de Ingeniería (que tengan 'Prope Inge' en el nombre)
-        $gruposInge = Grupo::withCount('alumnos')
-                           ->where('nombre_grupo', 'LIKE', '%Prope Inge%')
-                           ->get();
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Prope%')
+                         ->select('periodo')
+                         ->distinct()
+                         ->whereNotNull('periodo')
+                         ->orderBy('periodo', 'desc')
+                         ->pluck('periodo');
 
-        // 2. Buscamos los grupos de Arquitectura (que tengan 'Prope Arqui' en el nombre)
-        $gruposArqui = Grupo::withCount('alumnos')
-                            ->where('nombre_grupo', 'LIKE', '%Prope Arqui%')
-                            ->get();
+        $periodoActual = request('periodo', $periodos->first());
+
+        // 1. Buscamos los grupos de Ingeniería
+        $queryInge = Grupo::withCount('alumnos')->where('nombre_grupo', 'LIKE', '%Prope Inge%');
+        if ($periodoActual) { $queryInge->where('periodo', $periodoActual); }
+        $gruposInge = $queryInge->get();
+
+        // 2. Buscamos los grupos de Arquitectura
+        $queryArqui = Grupo::withCount('alumnos')->where('nombre_grupo', 'LIKE', '%Prope Arqui%');
+        if ($periodoActual) { $queryArqui->where('periodo', $periodoActual); }
+        $gruposArqui = $queryArqui->get();
 
         // 3. Mandamos las dos listas por separado a la vista
-        return view('groups.crear_grupos_cursos.curso_prope_creado', compact('gruposInge', 'gruposArqui'));
+        return view('groups.crear_grupos_cursos.curso_prope_creado', compact('gruposInge', 'gruposArqui', 'periodos', 'periodoActual'));
     }
 
     public function showInducCreado()
     {
-        // Le pedimos que cuente usando la nueva relación, pero que le ponga el mismo 
-        // apodo 'alumnos_count' para que tu HTML no se rompa y lo lea igualito.
-        $gruposInduc = Grupo::withCount('alumnosInduccion as alumnos_count')
-                            ->where('nombre_grupo', 'LIKE', '%Induc%')
-                            ->get();
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+                         ->select('periodo')
+                         ->distinct()
+                         ->whereNotNull('periodo')
+                         ->orderBy('periodo', 'desc')
+                         ->pluck('periodo');
 
-        return view('groups.crear_grupos_cursos.curso_induc_creado', compact('gruposInduc'));
+        $periodoActual = request('periodo', $periodos->first());
+
+        $queryInduc = Grupo::withCount('alumnosInduccion as alumnos_count')
+                           ->where('nombre_grupo', 'LIKE', '%Induc%');
+        if ($periodoActual) { $queryInduc->where('periodo', $periodoActual); }
+        $gruposInduc = $queryInduc->get();
+
+        return view('groups.crear_grupos_cursos.curso_induc_creado', compact('gruposInduc', 'periodos', 'periodoActual'));
+    }
+
+    // ==========================================================
+    // SISTEMA DE SEGURIDAD: CAMBIAR MODO DE GRUPO (LECTURA/EDITABLE)
+    // ==========================================================
+    public function cambiarModoEstado(Request $request, $id_grupo)
+    {
+        $grupo = Grupo::findOrFail($id_grupo);
+        
+        $estadoLectura = DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        $estadoEditable = DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['editable'])->first();
+
+        if (!$estadoLectura || !$estadoEditable) {
+            return redirect()->back()->withErrors(['Faltan los estados requeridos en el catálogo (Lectura/Editable).']);
+        }
+
+        if ($grupo->id_estado == $estadoLectura->id_estado) {
+            $grupo->id_estado = $estadoEditable->id_estado;
+            $mensaje = 'El grupo ha regresado al modo Editable.';
+        } else {
+            $grupo->id_estado = $estadoLectura->id_estado;
+            $mensaje = 'El grupo ha sido bloqueado (Modo Lectura).';
+        }
+
+        $grupo->save();
+
+        return redirect()->back()->with('success', $mensaje);
     }
 
     // 2. ACTUALIZAR ESTA FUNCIÓN:
@@ -280,7 +341,7 @@ class GrupoController extends Controller
             $grupo->load('alumnos');
         }
         
-        $docente = \App\Models\Usuario::where('num_empleado', $grupo->id_usuario)->first();
+        $docente = \App\Models\Usuario::find($grupo->id_usuario);
         $nombreDocente = $docente ? mb_strtoupper($docente->nombre . ' ' . $docente->ap_pat . ' ' . $docente->ap_mat) : 'SIN ASIGNAR';
         
         $grupo->load('turno');
@@ -301,47 +362,125 @@ class GrupoController extends Controller
         $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
         // --- DATOS DEL GRUPO Y PROFESOR ---
+        // --- DATOS DEL GRUPO Y PROFESOR ---
         $sheet->setCellValue('B3', 'Docente:');
         $sheet->setCellValue('C3', $nombreDocente);
-        $sheet->getStyle('B3:C3')->getFont()->setBold(true);
+        $sheet->getStyle('B3')->getFont()->setBold(true);
 
         $sheet->setCellValue('B4', 'Turno:');
         $sheet->setCellValue('C4', $turnoStr);
         $sheet->setCellValue('E4', 'Horario:');
-        $sheet->setCellValue('F4', '08:00 - 13:00'); 
-        $sheet->setCellValue('J4', 'Salón:');
-        $sheet->setCellValue('K4', 'Por definir'); 
-        $sheet->getStyle('B4:K4')->getFont()->setBold(true);
+        $sheet->setCellValue('F4', '08:00-13:00'); 
+        $sheet->setCellValue('K4', 'Salón:');
+        $sheet->setCellValue('L4', 'Por definir'); 
+        $sheet->getStyle('B4')->getFont()->setBold(true);
+        $sheet->getStyle('E4')->getFont()->setBold(true);
+        $sheet->getStyle('K4')->getFont()->setBold(true);
 
         // --- ENCABEZADOS DE LA TABLA ---
-        $sheet->setCellValue('H6', 'Asistencias');
-        $sheet->mergeCells('H6:L6');
+        $sheet->setCellValue('H6', 'Calificaciones');
+        $sheet->mergeCells('H6:I6');
         $sheet->getStyle('H6')->getAlignment()->setHorizontal('center');
         $sheet->getStyle('H6')->getFont()->setBold(true);
 
-        $headers = ['No.', 'Nombre', 'Apellido Paterno', 'Apellido Materno', 'Matrícula', 'Carrera a cursar', 'Correo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-        $colIndex = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($colIndex . '7', $header);
-            $sheet->getStyle($colIndex . '7')->getFont()->setBold(true);
-            $colIndex++;
+        $sheet->setCellValue('J6', 'Asistencias');
+        $sheet->mergeCells('J6:N6');
+        $sheet->getStyle('J6')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('J6')->getFont()->setBold(true);
+
+        $sheet->setCellValue('H7', 'Examen 1');
+        $sheet->setCellValue('I7', 'Examen 2');
+        $sheet->getStyle('H7:I7')->getFont()->setBold(true);
+        $sheet->getStyle('H7:I7')->getAlignment()->setHorizontal('center');
+
+        // Subencabezados de fechas para asistencias
+        $sheet->setCellValue('J7', 'Lunes');
+        $sheet->setCellValue('K7', 'Martes');
+        $sheet->setCellValue('L7', 'Miércoles');
+        $sheet->setCellValue('M7', 'Jueves');
+        $sheet->setCellValue('N7', 'Viernes');
+        $sheet->getStyle('J7:N7')->getFont()->setBold(true);
+        $sheet->getStyle('J7:N7')->getAlignment()->setHorizontal('center');
+
+        // Columnas combinadas verticalmente para Nombre, etc.
+        $mainHeaders = [
+            'A' => '',
+            'B' => 'Nombre',
+            'C' => 'Apellido Paterno',
+            'D' => 'Apellido Materno',
+            'E' => 'Matrícula',
+            'F' => 'Carrera a cursar',
+            'G' => 'Correo'
+        ];
+
+        foreach ($mainHeaders as $col => $title) {
+            $sheet->setCellValue($col . '6', $title);
+            $sheet->mergeCells($col . '6:' . $col . '7');
+            $sheet->getStyle($col . '6')->getFont()->setBold(true);
+            $sheet->getStyle($col . '6')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle($col . '6')->getAlignment()->setVertical('center');
         }
+
+        // --- BORDES PARA ENCABEZADOS ---
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+        ];
+        $sheet->getStyle('A6:N7')->applyFromArray($styleArray);
 
         // --- IMPRIMIR ALUMNOS ---
         $row = 8;
         $contador = 1;
+        
+        // Cargar relación carrera si no viene
+        $grupo->alumnos->load('carrera');
+
+        $lunesSemana = \Carbon\Carbon::now()->startOfWeek();
+        $fechasSemana = [];
+        for ($i = 0; $i < 5; $i++) {
+            $fechasSemana[] = $lunesSemana->copy()->addDays($i)->toDateString();
+        }
+
         foreach ($grupo->alumnos as $alumno) {
             $sheet->setCellValue('A' . $row, $contador);
             $sheet->setCellValue('B' . $row, mb_strtoupper($alumno->nombre));
             $sheet->setCellValue('C' . $row, mb_strtoupper($alumno->ap_pat));
             $sheet->setCellValue('D' . $row, mb_strtoupper($alumno->ap_mat));
             $sheet->setCellValue('E' . $row, $alumno->matricula);
+            $sheet->setCellValue('F' . $row, ''); // Se deja en blanco
+            $sheet->setCellValue('G' . $row, ''); // Se deja en blanco
+            
+            // Cargar las asistencias guardadas para la semana actual
+            $alumno->load(['asistencias' => function ($query) use ($fechasSemana, $grupo) {
+                $query->where('id_grupo', $grupo->id_grupo)
+                      ->whereIn('fecha', $fechasSemana);
+            }]);
+            
+            $asistenciasAlu = $alumno->asistencias->keyBy('fecha');
+            $columnasAsis = ['J', 'K', 'L', 'M', 'N'];
+            
+            foreach ($fechasSemana as $idx => $fecha) {
+                $asistencia = $asistenciasAlu->get($fecha);
+                $col = $columnasAsis[$idx];
+                if ($asistencia) {
+                    $sheet->setCellValue($col . $row, $asistencia->asistio ? 'P' : 'A');
+                    $sheet->getStyle($col . $row)->getAlignment()->setHorizontal('center');
+                } else {
+                    $sheet->setCellValue($col . $row, '');
+                }
+            }
+            
+            // Bordes para la fila de datos
+            $sheet->getStyle('A' . $row . ':N' . $row)->applyFromArray($styleArray);
             
             $row++;
             $contador++;
         }
 
-        foreach (range('A', 'L') as $col) {
+        foreach (range('A', 'N') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -357,16 +496,34 @@ class GrupoController extends Controller
 
     public function showCursoPrope()
     {
-        // 1. Buscamos TODOS los grupos que contengan 'Prope Inge' o 'Prope Arqui'
-        $gruposInge = Grupo::where('nombre_grupo', 'LIKE', '%Prope Inge%')->get();
-        $gruposArqui = Grupo::where('nombre_grupo', 'LIKE', '%Prope Arqui%')->get();
+        // Obtener todos los periodos disponibles de grupos Prope
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Prope%')
+            ->whereNotNull('periodo')
+            ->select('periodo')
+            ->distinct()
+            ->orderBy('periodo', 'desc')
+            ->pluck('periodo');
 
-        // 2. Traemos a los docentes de la tabla usuarios
+        // Tomar el periodo seleccionado por URL o el más reciente
+        $periodoActual = request('periodo', $periodos->first());
+
+        // Filtrar grupos por periodo
+        $gruposInge = Grupo::where('nombre_grupo', 'LIKE', '%Prope Inge%')
+            ->where('periodo', $periodoActual)
+            ->get();
+        $gruposArqui = Grupo::where('nombre_grupo', 'LIKE', '%Prope Arqui%')
+            ->where('periodo', $periodoActual)
+            ->get();
+
+        // Traemos a los docentes
         $docentes = \App\Models\Usuario::whereHas('rol', function($q) {
             $q->where('nombre_rol', 'docente');
         })->get();
 
-        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes'));
+        $estadoLectura = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        $idEstadoLectura = $estadoLectura ? $estadoLectura->id_estado : null;
+
+        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes', 'periodos', 'periodoActual', 'idEstadoLectura'));
     }
 
     public function guardarProfesores(Request $request)
@@ -380,11 +537,20 @@ class GrupoController extends Controller
         \Illuminate\Support\Facades\DB::beginTransaction();
 
         try {
+            $estadoLectura = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+            $idEstadoLectura = $estadoLectura ? $estadoLectura->id_estado : null;
+
             // 3. Recorremos el arreglo. $id_grupo es la llave, $num_empleado es el valor seleccionado
             foreach ($request->docentes as $id_grupo => $num_empleado) {
                 // Solo actualizamos si el administrador realmente seleccionó un docente (no está vacío)
                 if (!empty($num_empleado)) {
                     $grupo = Grupo::findOrFail($id_grupo);
+
+                    // VALIDACIÓN DE SEGURIDAD: Abortar todo si el grupo está bloqueado
+                    if ($idEstadoLectura && $grupo->id_estado == $idEstadoLectura) {
+                        throw new \Exception('El grupo "' . $grupo->nombre_grupo . '" está en Modo Lectura. No se pueden realizar cambios.');
+                    }
+
                     $grupo->id_usuario = $num_empleado;
                     $grupo->save();
                 }
@@ -397,39 +563,58 @@ class GrupoController extends Controller
         } catch (\Exception $e) {
             // Si algo falla, deshacemos todo para no dejar la base de datos a medias
             \Illuminate\Support\Facades\DB::rollBack();
-            return back()->withErrors(['Error al asignar docentes: ' . $e->getMessage()]);
+            return back()->withErrors([$e->getMessage()]);
         }
     }
 
     public function showCursoInduc()
     {
-        // Traemos solo los grupos que tengan la palabra 'Induc'
-        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')->get();
+        // Obtener todos los periodos disponibles de grupos Induc
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+            ->whereNotNull('periodo')
+            ->select('periodo')
+            ->distinct()
+            ->orderBy('periodo', 'desc')
+            ->pluck('periodo');
+
+        // Tomar el periodo seleccionado por URL o el más reciente
+        $periodoActual = request('periodo', $periodos->first());
+
+        // Filtrar grupos por periodo
+        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+            ->where('periodo', $periodoActual)
+            ->get();
         
         // Traemos todos los docentes para el menú desplegable
         $docentes = \App\Models\Usuario::whereHas('rol', function($q) {
             $q->where('nombre_rol', 'docente');
         })->get();
 
-        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes'));
+        $estadoLectura = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        $idEstadoLectura = $estadoLectura ? $estadoLectura->id_estado : null;
+
+        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes', 'periodos', 'periodoActual', 'idEstadoLectura'));
     }
 
     public function storeInduc(Request $request)
     {
-        // 1. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos de Inducción)
-        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')->exists();
-
-        if ($gruposExistentes) {
-            return redirect()->back()->with('error_grupos_existentes', 'Los grupos de Inducción iniciales ya fueron generados. Para agregar más estudiantes, utiliza el módulo de Alumnos Tardíos.');
-        }
-
-        // 2. Validar que vengan los datos (ahora solo pedimos 2 cajitas)
+        // 1. Validar que vengan los datos
         $request->validate([
             'grupos_manana'   => 'required|integer|min:0',
             'grupos_tarde'    => 'required|integer|min:0',
             'archivo_alumnos' => 'required|mimes:xlsx,xls,csv',
-            'tipo_grupo'      => 'required|string' // Siempre dirá "Inducción"
+            'tipo_grupo'      => 'required|string',
+            'periodo'         => 'required|string|max:10'
         ]);
+
+        // 2. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos de Inducción PARA ESTE PERIODO)
+        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+            ->where('periodo', $request->periodo)
+            ->exists();
+
+        if ($gruposExistentes) {
+            return redirect()->back()->with('error_grupos_existentes', 'Los grupos de Inducción para el periodo ' . $request->periodo . ' ya fueron generados. Para agregar más estudiantes, utiliza el módulo de Alumnos Tardíos.');
+        }
 
         try {
             DB::beginTransaction();
@@ -445,6 +630,20 @@ class GrupoController extends Controller
             }, $filas[0]);
 
             $mapa = array_flip($encabezados);
+
+            // Validar que vengan las columnas requeridas
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'puntaje', 'correo_alter'];
+            $faltantes = [];
+            foreach ($requeridos as $req) {
+                if (!isset($mapa[$req])) {
+                    $faltantes[] = $req;
+                }
+            }
+
+            if (!empty($faltantes)) {
+                DB::rollBack();
+                return back()->withErrors(['El archivo de Excel no tiene el formato correcto. Faltan las siguientes columnas o están mal escritas: ' . implode(', ', $faltantes)]);
+            }
 
             // Precargamos las carreras de la BD para buscar dinámicamente
             $carreras = Carrera::all();
@@ -496,7 +695,8 @@ class GrupoController extends Controller
                 $request->grupos_tarde, 
                 'Gral', // Etiqueta para el nombre del grupo
                 $alumnosGenerales, 
-                $request->tipo_grupo
+                $request->tipo_grupo,
+                $request->periodo
             );
 
             DB::commit();

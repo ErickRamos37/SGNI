@@ -101,7 +101,7 @@
                 // 1. Inyectamos las clases de Bootstrap
                 customClass: {
                     confirmButton: 'btn btn-danger me-3', // Botón rojo con margen derecho
-                    cancelButton: 'btn btn-dark' // Botón oscuro con efecto hover
+                    cancelButton: 'btn btn-primary' // Botón oscuro con efecto hover
                 },
                 // 2. Apagamos los estilos nativos de SweetAlert para que Bootstrap haga su magia
                 buttonsStyling: false
@@ -128,7 +128,7 @@
                                     icon: 'success',
                                     confirmButtonText: 'Aceptar',
                                     customClass: {
-                                        confirmButton: 'btn btn-dark'
+                                        confirmButton: 'btn btn-primary'
                                     },
                                     buttonsStyling: false
                                 });
@@ -142,7 +142,7 @@
                                     icon: 'error',
                                     confirmButtonText: 'Entendido',
                                     customClass: {
-                                        confirmButton: 'btn btn-dark'
+                                        confirmButton: 'btn btn-primary'
                                     },
                                     buttonsStyling: false
                                 });
@@ -157,7 +157,7 @@
                                 icon: 'error',
                                 confirmButtonText: 'Entendido',
                                 customClass: {
-                                    confirmButton: 'btn btn-dark'
+                                    confirmButton: 'btn btn-primary'
                                 },
                                 buttonsStyling: false
                             });

@@ -56,6 +56,17 @@
                             Paso 1: Configurar Cantidad de Grupos
                         </h5>
 
+                        {{-- PERIODO / CICLO ESCOLAR --}}
+                        <div class="mb-4">
+                            <label for="periodo" class="form-label fw-bold text-dark text-uppercase fs-6">
+                                <i class="bi bi-calendar-event me-1"></i> Periodo / Ciclo Escolar
+                            </label>
+                            <input type="text" name="periodo" id="periodo" class="form-control shadow-sm fw-bold fs-5 w-50" placeholder="Ej. 2026-1" maxlength="10" required>
+                            <div class="form-text text-muted">Escribe el ciclo escolar para estos grupos (Ej. 2026-1, 2026-2).</div>
+                        </div>
+
+                        <hr class="my-4 border-light-subtle">
+
                         {{-- INGENIERÍA --}}
                         <div class="d-flex align-items-center mb-3">
                             <span class="fw-bold text-dark text-uppercase fs-6">Grupos para Ingeniería</span>
@@ -133,19 +144,25 @@
                         </label>
 
                         @if($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    Swal.fire({
+                                        title: 'Error de Validación',
+                                        html: `{!! implode('<br><br>', $errors->all()) !!}`,
+                                        icon: 'error',
+                                        customClass: { confirmButton: 'btn btn-primary' },
+                                        buttonsStyling: false,
+                                        confirmButtonText: 'Entendido'
+                                    });
+                                });
+                            </script>
                         @endif
 
                         <div class="alert bg-info-subtle border border-info-subtle text-dark rounded-3 d-flex align-items-center p-3 mb-0" role="alert">
                             <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                             <div class="small">
-                                <strong>Formato esperado:</strong> El archivo debe contener  "unidad_desc|programaestudios|programa_des|matricula|Nombre|apellido_paterno|apellido_materno".
+                                <strong>Formato esperado:</strong> El archivo debe contener los encabezados exactos: "matricula | nombre | apellido_paterno | apellido_materno | programa_desc | puntaje | correo_alter".
                             </div>
                         </div>
 
@@ -237,6 +254,32 @@
         {{-- ========================================================= --}}
         {{-- VISTA: ASIGNAR PROFESORES A GRUPOS                        --}}
         {{-- ========================================================= --}}
+
+        {{-- SELECTOR DE PERIODO --}}
+        @if($periodos->count() > 0)
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar-range fs-4 text-primary me-3"></i>
+                        <div>
+                            <span class="fw-bold text-dark">Periodo Activo:</span>
+                            <span class="text-muted small ms-1">Selecciona el ciclo escolar a visualizar</span>
+                        </div>
+                    </div>
+                    <select id="selectorPeriodoPrope" class="form-select w-auto fw-bold shadow-sm">
+                        @foreach($periodos as $p)
+                            <option value="{{ $p }}" @if($p == $periodoActual) selected @endif>{{ $p }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <script>
+                document.getElementById('selectorPeriodoPrope').addEventListener('change', function() {
+                    window.location.href = '?tab=asignar&periodo=' + this.value;
+                });
+            </script>
+        @endif
+
         <form action="{{ route('grupos.guardar_profesores') }}" method="POST">
             @csrf
             
@@ -268,7 +311,7 @@
                                             @php
                                                 $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-success fw-semibold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
@@ -277,7 +320,10 @@
                                         @endif
                                     </td>
                                     <td class="py-3 border-light-subtle">
-                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
+                                        @php
+                                            $esLectura = isset($idEstadoLectura) && $grupo->id_estado == $idEstadoLectura;
+                                        @endphp
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle {{ $esLectura ? 'bg-light text-muted' : '' }}" {{ $esLectura ? 'disabled' : '' }}>
                                             <option value="" selected disabled>Seleccionar docente</option>
                                             @foreach($docentes as $docente)
                                                 <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>
@@ -329,7 +375,7 @@
                                             @php
                                                 $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-success fw-semibold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
@@ -338,7 +384,10 @@
                                         @endif
                                     </td>
                                     <td class="py-3 border-light-subtle">
-                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
+                                        @php
+                                            $esLectura = isset($idEstadoLectura) && $grupo->id_estado == $idEstadoLectura;
+                                        @endphp
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle {{ $esLectura ? 'bg-light text-muted' : '' }}" {{ $esLectura ? 'disabled' : '' }}>
                                             <option value="" selected disabled>Seleccionar docente</option>
                                             @foreach($docentes as $docente)
                                                 <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>

@@ -65,11 +65,21 @@
 
             <ul class="nav nav-pills flex-column mb-auto w-100">
                 @auth
-                    {{-- Crear Grupos --}}
-                    <li class="nav-item mb-1 dropdown dropend">
-                        <a href="#"
-                            class="nav-link w-100 d-flex justify-content-between align-items-center
-                               {{ request()->routeIs('curso_prope', 'curso_induc', 'grupos_finales.criterios')
+                {{-- Guardamos el rol en una variable para mantener el código limpio --}}
+                @php
+                    $rolUsuario = Auth::user()->rol->nombre_rol;
+                @endphp
+
+                {{-- ========================================================== --}}
+                {{-- EXCLUSIVO ADMINISTRADOR --}}
+                {{-- ========================================================== --}}
+                @if($rolUsuario === 'Administrador')
+
+                {{-- Crear Grupos --}}
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link w-100 d-flex justify-content-between align-items-center
+                               {{ request()->routeIs('curso_prope', 'curso_induc', 'grupos_final.criterios')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -122,40 +132,53 @@
                             <li>
                                 <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('curso_induc_creado') ? 'text-primary bg-light' : 'text-dark' }}"
-                                    href="{{ route('curso_induc_creado') }}">
-                                    Inducción
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item fw-bold py-2 rounded-2
-                                      {{ request()->routeIs('grupos_finales.grupos_finales') ? 'text-primary bg-light' : 'text-dark' }}"
-                                    href="{{ route('grupos_finales.lista') }}">
-                                    Primer Semestre
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    {{-- Alumnos --}}
-                    <li class="nav-item mb-1 dropdown dropend">
-                        <a href="#"
-                            class="nav-link w-100 d-flex justify-content-between align-items-center
+                                href="{{ route('curso_induc_creado') }}">
+                                Inducción
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item fw-bold py-2 rounded-2
+                                      {{ request()->routeIs('grupos_final.grupos_finales') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('grupos_final.grupos_finales') }}">
+                                Primer Semestre
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+
+
+                {{-- ========================================================== --}}
+                {{-- COMPARTIDO: ADMINISTRADOR Y PSICOPEDAGÓGICO --}}
+                {{-- ========================================================== --}}
+                @if(in_array($rolUsuario, ['Administrador', 'psicopedagogico']))
+                {{-- Alumnos --}}
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link w-100 d-flex justify-content-between align-items-center
                                {{ request()->routeIs('alumnos.nuevo', 'alumnos.info', 'psicologo')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <span>Alumnos</span>
-                            <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
-                        </a>
-                        <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
-                            <li>
-                                <a class="dropdown-item fw-bold py-2 rounded-2
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <span>Alumnos</span>
+                        <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
+                    </a>
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
+
+                        {{-- Alta exclusiva para Administrador --}}
+                        @if($rolUsuario === 'Administrador')
+                        <li>
+                            <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('alumnos.nuevo') ? 'text-primary bg-light' : 'text-dark' }}"
-                                    href="{{ route('alumnos.nuevo') }}">
-                                    Alta de Alumnos
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item fw-bold py-2 rounded-2
+                                href="{{ route('alumnos.nuevo') }}">
+                                Alta de Alumnos
+                            </a>
+                        </li>
+                        @endif
+
+                        <li>
+                            <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('alumnos.info') ? 'text-primary bg-light' : 'text-dark' }}"
                                     href="{{ route('alumnos.info') }}">
                                     Buscar Alumno
@@ -164,21 +187,51 @@
                             <li>
                                 <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('psicologo') ? 'text-primary bg-light' : 'text-dark' }}"
-                                    href="{{ route('psicologo') }}">
-                                    Seguimiento del Alumno
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                                href="{{ route('psicologo') }}">
+                                Seguimiento del Alumno
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
 
-                    {{-- Capturar Asistencia --}}
-                    <li class="nav-item mb-1 dropdown dropend">
-                        <a href="#"
-                            class="nav-link w-100 d-flex justify-content-between align-items-center
+
+                {{-- ========================================================== --}}
+                {{-- COMPARTIDO: ADMINISTRADOR Y DOCENTE --}}
+                {{-- ========================================================== --}}
+                @if(in_array($rolUsuario, ['Administrador', 'Docente']))
+
+                {{-- Capturar Asistencia --}}
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link w-100 d-flex justify-content-between align-items-center
                                {{ request()->routeIs('asistencia.paselista', 'asistencia.grupal', 'asistencias.importar')
                                    ? 'text-dark bg-secondary fw-bold shadow-sm'
                                    : 'text-white' }}"
-                            data-bs-toggle="dropdown" aria-expanded="false">
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <span>{{ $rolUsuario === 'Administrador' ? 'Asistencias' : 'Capturar Asistencia' }}</span>
+                        <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
+                    </a>
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
+                        @if($rolUsuario !== 'Administrador')
+                        <li>
+                            <a class="dropdown-item fw-bold py-2 rounded-2
+                                      {{ request()->routeIs('asistencia.paselista') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('asistencia.paselista') }}">
+                                Pasar Lista
+                            </a>
+                        </li>
+                        @endif
+                        <li>
+                            <a class="dropdown-item fw-bold py-2 rounded-2
+                                      {{ request()->routeIs('asistencia.grupal') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('asistencia.grupal') }}">
+                                Mostrar Asistencias
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                             <span>Capturar Asistencia</span>
 
@@ -227,22 +280,35 @@
                             <li>
                                 <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('calificaciones.mostrar') ? 'text-primary bg-light' : 'text-dark' }}"
-                                    href="{{ route('calificaciones.mostrar') }}">
-                                    Mostrar Calificaciones Capturadas
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    {{-- - Vistas del Administrador - --}}
-                    @if (Auth::user()->rol->nombre_rol === 'Administrador')
-                        {{-- Personal --}}
-                        <li class="nav-item mb-1 dropdown dropend">
-                            <a href="#"
-                                class="nav-link w-100 d-flex justify-content-between align-items-center
-                           {{ request()->routeIs('usuarios.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <span>Personal</span>
-                                <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
+                                href="{{ route('calificaciones.mostrar') }}">
+                                Mostrar Calificaciones Capturadas
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+
+
+                {{-- ========================================================== --}}
+                {{-- ADMINISTRADOR (MÓDULOS FINALES) --}}
+                {{-- ========================================================== --}}
+                @if($rolUsuario === 'Administrador')
+                {{-- Personal --}}
+                <li class="nav-item mb-1 dropdown dropend">
+                    <a href="#"
+                        class="nav-link w-100 d-flex justify-content-between align-items-center
+                               {{ request()->routeIs('usuarios.*') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <span>Personal</span>
+                        <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
+                    </a>
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
+                        <li>
+                            <a class="dropdown-item fw-bold py-2 mb-1 rounded-2
+                                  {{ request()->routeIs('usuarios.create') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('usuarios.create') }}">
+                                Alta Personal
                             </a>
                             <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
                                 <li>
@@ -279,15 +345,43 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger bg-light">
-                                    Cerrar sesión
-                                </button>
-                            </form>
+                            <a class="dropdown-item fw-bold py-2 rounded-2
+                                  {{ request()->routeIs('usuarios.index', 'usuarios.edit') ? 'text-primary bg-light' : 'text-dark' }}"
+                                href="{{ route('usuarios.index') }}">
+                                Lista del Personal
+                            </a>
                         </li>
                     </ul>
-                </div>
+                </li>
+                @endif
+
+            </ul>
+
+            <hr>
+
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-white text-small shadow">
+                    <li><span class="dropdown-item-text text-dark-50">
+                            {{ Auth::user()->correo_institucional }}
+                        </span></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger bg-light">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
             @endauth
         </div>
         <main class="flex-grow-1 p-4 bg-light overflow-auto">
