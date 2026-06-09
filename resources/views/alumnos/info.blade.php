@@ -3,7 +3,7 @@
 @section('contenido')
 <div class="container-fluid">
 
-    {{-- ─── Encabezado de página + Buscador ──────────────────────── --}}
+    {{-- Encabezado + Buscador --}}
     <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
             <h2 class="fw-bold text-dark mb-1">Información Estudiantil</h2>
@@ -25,10 +25,10 @@
         </div>
     </div>
 
-    {{-- ─── Contenido del perfil (Visible desde el inicio como esqueleto) ────────────── --}}
+    {{-- Perfil --}}
     <div id="contenedor-info-alumno">
 
-        {{-- Banner del alumno --}}
+        {{-- Banner --}}
         <div class="card bg-primary text-white border border-light-subtle shadow-sm rounded-3 mb-4">
             <div class="card-body d-flex align-items-center p-4">
                 <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm p-3">
@@ -41,7 +41,6 @@
             </div>
         </div>
 
-        {{-- Tarjetas de información --}}
         <div class="row g-4">
 
             {{-- Información de contacto --}}
@@ -115,10 +114,11 @@
                             <span class="fs-6 fw-bold text-dark" id="lbl-carrera">No asignada</span>
                         </div>
 
+                        {{-- GRUPO ACTUAL (antes "Grupo de Inducción") --}}
                         <div class="bg-white rounded-3 p-3 shadow-sm border border-light">
                             <div class="d-flex align-items-center mb-1">
                                 <i class="bi bi-people-fill text-primary me-2"></i>
-                                <small class="text-muted text-uppercase fw-bold">Grupo de Inducción</small>
+                                <small class="text-muted text-uppercase fw-bold">Grupo Actual</small>
                             </div>
                             <span class="fs-6 fw-bold text-dark" id="lbl-grupo">No asignado</span>
                         </div>
@@ -129,7 +129,7 @@
 
         </div>
 
-        {{-- Botón Editar — oculto hasta que haya una búsqueda exitosa --}}
+        {{-- Botón Editar --}}
         <div class="d-flex justify-content-start mt-4">
             <a id="btn-editar" href="#" class="btn btn-outline-dark px-5 fw-semibold rounded-3 d-none">
                 <i class="bi bi-pencil-square me-2"></i>Editar información
@@ -140,30 +140,30 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('form-buscar-alumno');
+document.addEventListener('DOMContentLoaded', function () {
+    const form           = document.getElementById('form-buscar-alumno');
     const inputMatricula = document.getElementById('matricula-input');
-    const btnBuscar = document.getElementById('btn-buscar');
-    const btnText = document.getElementById('btn-text');
-    const btnSpinner = document.getElementById('btn-spinner');
-    const errorFeedback = document.getElementById('matricula-error');
-    const btnEditar = document.getElementById('btn-editar');
+    const btnBuscar      = document.getElementById('btn-buscar');
+    const btnText        = document.getElementById('btn-text');
+    const btnSpinner     = document.getElementById('btn-spinner');
+    const errorFeedback  = document.getElementById('matricula-error');
+    const btnEditar      = document.getElementById('btn-editar');
 
     function restaurarEsqueleto() {
         document.getElementById('lbl-nombre-completo').innerText = 'Haga una búsqueda para mostrar los datos';
-        document.getElementById('lbl-matricula').innerText = 'N/A';
-        document.getElementById('lbl-nombres').innerText = 'No registrado';
-        document.getElementById('lbl-apellidos').innerText = 'No registrado';
-        document.getElementById('lbl-telefono').innerText = 'No registrado';
-        document.getElementById('lbl-correo').innerText = 'No registrado';
-        document.getElementById('lbl-puntaje').innerText = 'N/A';
-        document.getElementById('lbl-carrera').innerText = 'No asignada';
-        document.getElementById('lbl-grupo').innerText = 'No asignado';
+        document.getElementById('lbl-matricula').innerText  = 'N/A';
+        document.getElementById('lbl-nombres').innerText    = 'No registrado';
+        document.getElementById('lbl-apellidos').innerText  = 'No registrado';
+        document.getElementById('lbl-telefono').innerText   = 'No registrado';
+        document.getElementById('lbl-correo').innerText     = 'No registrado';
+        document.getElementById('lbl-puntaje').innerText    = 'N/A';
+        document.getElementById('lbl-carrera').innerText    = 'No asignada';
+        document.getElementById('lbl-grupo').innerText      = 'No asignado';
         btnEditar.classList.add('d-none');
         btnEditar.href = '#';
     }
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
 
         const matricula = inputMatricula.value.trim();
@@ -179,38 +179,42 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/alumnos/buscar`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type':      'application/json',
+                'Accept':            'application/json',
+                'X-Requested-With':  'XMLHttpRequest',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ matricula: matricula })
+            body: JSON.stringify({ matricula })
         })
         .then(async response => {
             const data = await response.json();
-            if (!response.ok) {
-                throw { status: response.status, data: data };
-            }
+            if (!response.ok) throw { status: response.status, data };
             return data;
         })
         .then(data => {
-            const alumno = data.alumno;
+            const alumno   = data.alumno;
             const apellidos = `${alumno.ap_pat} ${alumno.ap_mat || ''}`.trim();
 
             document.getElementById('lbl-nombre-completo').innerText = `${alumno.nombre} ${apellidos}`;
-            document.getElementById('lbl-matricula').innerText = alumno.matricula;
-            document.getElementById('lbl-nombres').innerText = alumno.nombre;
-            document.getElementById('lbl-apellidos').innerText = apellidos;
-            document.getElementById('lbl-telefono').innerText = alumno.telefono || 'No registrado';
-            document.getElementById('lbl-correo').innerText = alumno.correo_institucional || 'No registrado';
-            document.getElementById('lbl-puntaje').innerText = alumno.puntaje_ingreso || 'N/A';
-            document.getElementById('lbl-carrera').innerText = alumno.carrera ? alumno.carrera.nombre_carrera : 'No asignada';
-            document.getElementById('lbl-grupo').innerText = alumno.grupos ? alumno.grupos.nombre_grupo : 'No asignado';
+            document.getElementById('lbl-matricula').innerText  = alumno.matricula;
+            document.getElementById('lbl-nombres').innerText    = alumno.nombre;
+            document.getElementById('lbl-apellidos').innerText  = apellidos;
+            document.getElementById('lbl-telefono').innerText   = alumno.telefono || 'No registrado';
+            document.getElementById('lbl-correo').innerText     = alumno.correo_institucional || 'No registrado';
+            document.getElementById('lbl-puntaje').innerText    = alumno.puntaje_ingreso || 'N/A';
+            document.getElementById('lbl-carrera').innerText    = alumno.carrera ? alumno.carrera.nombre_carrera : 'No asignada';
 
-            // Mostrar botón editar apuntando a la matrícula encontrada
+            // Grupo actual: primero inducción, si no propedéutico
+            let grupoActual = 'No asignado';
+            if (alumno.grupo_induccion && alumno.grupo_induccion.nombre_grupo) {
+                grupoActual = alumno.grupo_induccion.nombre_grupo;
+            } else if (alumno.grupo_propedeutico && alumno.grupo_propedeutico.nombre_grupo) {
+                grupoActual = alumno.grupo_propedeutico.nombre_grupo;
+            }
+            document.getElementById('lbl-grupo').innerText = grupoActual;
+
             btnEditar.href = `/alumnos/${alumno.matricula}/editar`;
             btnEditar.classList.remove('d-none');
-
             inputMatricula.value = '';
         })
         .catch(error => {
