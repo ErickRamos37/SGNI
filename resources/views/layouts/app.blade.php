@@ -223,10 +223,11 @@
                                    : 'text-white' }}"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        <span>Capturar Asistencia</span>
+                        <span>{{ $rolUsuario === 'Administrador' ? 'Asistencias' : 'Capturar Asistencia' }}</span>
                         <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
                     </a>
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
+                        @if($rolUsuario !== 'Administrador')
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('asistencia.paselista') ? 'text-primary bg-light' : 'text-dark' }}"
@@ -234,6 +235,7 @@
                                 Pasar Lista
                             </a>
                         </li>
+                        @endif
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('asistencia.grupal') ? 'text-primary bg-light' : 'text-dark' }}"

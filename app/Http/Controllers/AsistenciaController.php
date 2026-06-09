@@ -10,126 +10,167 @@ use App\Models\Grupo;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class AsistenciaController extends Controller
 {
-    public function paselista()
+    public function paselista(Request $request)
     {
-        $asistenciasExcel = session('alumnos_importados', []);
-        $alumnosDB = Alumno::all();
-
-        if ($alumnosDB->isEmpty() && !empty($asistenciasExcel)) {
-            $alumnos = collect($asistenciasExcel)->map(function ($item) {
-                return (object) [
-                    'matricula_alumno' => $item['matricula'],
-                    'nombres_alumno'   => $item['nombre_solo'] ?? 'ALUMNO',
-                    'apellidos_alumno' => ($item['ap_pat'] ?? '') . ' ' . ($item['ap_mat'] ?? ''),
-                    'ap_pat'           => $item['ap_pat'] ?? '',
-                    'ap_mat'           => $item['ap_mat'] ?? '',
-                ];
-            });
-        } else {
-            $alumnos = $alumnosDB->map(function ($a) {
-                return (object) [
-                    'matricula_alumno' => $a->matricula,
-                    'nombres_alumno'   => $a->nombre,
-                    'apellidos_alumno' => ($a->ap_pat ?? '') . ' ' . ($a->ap_mat ?? ''),
-                    'ap_pat'           => $a->ap_pat ?? '',
-                    'ap_mat'           => $a->ap_mat ?? '',
-                ];
-            });
+        if (auth()->user()->rol->nombre_rol === 'Administrador') {
+            abort(403, 'Acceso denegado. Los administradores no pueden pasar lista.');
         }
 
-        // Cargamos los grupos para el <select> del blade
-        $grupos = Grupo::all();
-
-        return view('asistencia.paselista', compact('alumnos', 'asistenciasExcel', 'grupos'));
-    }
-
-    public function grupal()
-    {
-        $idGrupo = request('id_grupo');
-
-        // Grupos del profesor autenticado
-        $grupos = \App\Models\Grupo::where('num_empleado', auth()->user()->num_empleado)->get();
-
-        $alumnos     = collect();
-        $grupoActual = null;
-        $diasSemana  = [];
         $lunesSemana = Carbon::now()->startOfWeek();
 
-        // Fechas de lunes a viernes de la semana actual
+        // Cargamos los grupos asignados al docente autenticado (usando id_usuario de Laravel Auth)
+        $grupos = Grupo::where('id_usuario', auth()->user()->id_usuario)->get();
+
+        $idGrupo = $request->query('id_grupo');
+        $grupoActual = null;
+
+        if ($idGrupo) {
+            $grupoActual = $grupos->firstWhere('id_grupo', $idGrupo);
+        }
+
+        if (!$grupoActual && $grupos->isNotEmpty()) {
+            $grupoActual = $grupos->first();
+        }
+
+        $alumnosDB = collect();
+        $asistenciasSemana = collect();
+        $esLectura = false;
+
+        if ($grupoActual) {
+            $relacion = $grupoActual->id_curso == 1 ? 'alumnosInduccion' : 'alumnos';
+            $alumnosDB = $grupoActual->$relacion;
+
+            // Cargamos las asistencias guardadas para la semana actual
+            $asistenciasSemana = Asistencia::where('id_grupo', $grupoActual->id_grupo)
+                ->whereBetween('fecha', [
+                    $lunesSemana->toDateString(),
+                    $lunesSemana->copy()->addDays(4)->toDateString()
+                ])
+                ->get()
+                ->groupBy('matricula');
+
+            $estadoLectura = DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+            $esLectura = $estadoLectura && ($grupoActual->id_estado == $estadoLectura->id_estado);
+        }
+
+        $alumnos = $alumnosDB->map(function ($a) {
+            return (object) [
+                'matricula_alumno' => $a->matricula,
+                'nombres_alumno'   => $a->nombre,
+                'apellidos_alumno' => ($a->ap_pat ?? '') . ' ' . ($a->ap_mat ?? ''),
+                'ap_pat'           => $a->ap_pat ?? '',
+                'ap_mat'           => $a->ap_mat ?? '',
+            ];
+        });
+
+        return view('asistencia.paselista', compact('alumnos', 'grupos', 'grupoActual', 'asistenciasSemana', 'lunesSemana', 'esLectura'));
+    }
+
+    public function grupal(Request $request)
+    {
+        $idGrupo = $request->query('id_grupo');
+        $lunesSemana = Carbon::now()->startOfWeek();
+        $userRole = auth()->user()->rol->nombre_rol;
+
+        if ($userRole === 'Administrador') {
+            $grupos = Grupo::all();
+        } else {
+            $grupos = Grupo::where('id_usuario', auth()->user()->id_usuario)->get();
+        }
+
+        $grupoActual = null;
+        if ($idGrupo) {
+            $grupoActual = $grupos->firstWhere('id_grupo', $idGrupo);
+            if (!$grupoActual && $userRole === 'Administrador') {
+                $grupoActual = Grupo::find($idGrupo);
+            }
+        }
+
+        if (!$grupoActual && $grupos->isNotEmpty()) {
+            $grupoActual = $grupos->first();
+        }
+
+        $lunesStr = $lunesSemana->toDateString();
+        $martesStr = $lunesSemana->copy()->addDays(1)->toDateString();
+        $miercolesStr = $lunesSemana->copy()->addDays(2)->toDateString();
+        $juevesStr = $lunesSemana->copy()->addDays(3)->toDateString();
+        $viernesStr = $lunesSemana->copy()->addDays(4)->toDateString();
+
+        if ($request->ajax()) {
+            if (!$grupoActual) {
+                return DataTables::of(collect())->make(true);
+            }
+
+            $relacion = $grupoActual->id_curso == 1 ? 'id_grupo_induccion' : 'id_grupo_propedeutico';
+
+            $alumnos = Alumno::where($relacion, $grupoActual->id_grupo)
+                ->with(['asistencias' => function ($query) use ($grupoActual, $lunesStr, $viernesStr) {
+                    $query->where('id_grupo', $grupoActual->id_grupo)
+                          ->whereBetween('fecha', [$lunesStr, $viernesStr]);
+                }])
+                ->select('alumno.*');
+
+            return DataTables::of($alumnos)
+                ->addColumn('nombre_completo', function ($row) {
+                    return trim("{$row->nombre} {$row->ap_pat} {$row->ap_mat}");
+                })
+                ->filterColumn('nombre_completo', function ($query, $keyword) {
+                    $sql = "CONCAT(nombre, ' ', ap_pat, ' ', IFNULL(ap_mat, '')) LIKE ?";
+                    $query->whereRaw($sql, ["%{$keyword}%"]);
+                })
+                ->addColumn('lunes', function ($row) use ($lunesStr) {
+                    return $this->generarBadgeAsistencia($row, $lunesStr);
+                })
+                ->addColumn('martes', function ($row) use ($martesStr) {
+                    return $this->generarBadgeAsistencia($row, $martesStr);
+                })
+                ->addColumn('miercoles', function ($row) use ($miercolesStr) {
+                    return $this->generarBadgeAsistencia($row, $miercolesStr);
+                })
+                ->addColumn('jueves', function ($row) use ($juevesStr) {
+                    return $this->generarBadgeAsistencia($row, $juevesStr);
+                })
+                ->addColumn('viernes', function ($row) use ($viernesStr) {
+                    return $this->generarBadgeAsistencia($row, $viernesStr);
+                })
+                ->addColumn('porcentaje', function ($row) {
+                    $asistenciasSemana = $row->asistencias;
+                    $totalPresente = $asistenciasSemana->where('asistio', 1)->count();
+                    $porcentaje = round(($totalPresente / 5) * 100);
+                    $colorClass = $porcentaje >= 80 ? 'text-primary' : ($porcentaje >= 60 ? 'text-warning' : 'text-danger');
+                    return '<span class="fw-bold ' . $colorClass . '">' . $porcentaje . '%</span>';
+                })
+                ->rawColumns(['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'porcentaje'])
+                ->make(true);
+        }
+
+        $diasSemana = [];
         for ($i = 0; $i < 5; $i++) {
             $diasSemana[] = $lunesSemana->copy()->addDays($i);
         }
 
-        if ($idGrupo) {
-            $grupoActual = \App\Models\Grupo::find($idGrupo);
+        $totalAlumnos = $grupoActual ? ($grupoActual->id_curso == 1 ? $grupoActual->alumnosInduccion()->count() : $grupoActual->alumnos()->count()) : 0;
 
-            if ($grupoActual) {
-                $relacion = $grupoActual->id_curso == 2 ? 'alumnosInduccion' : 'alumnos';
-
-                $grupoActual->load([$relacion . '.asistencias' => function ($query) use ($lunesSemana) {
-                    $query->whereBetween('fecha', [
-                        $lunesSemana->toDateString(),
-                        $lunesSemana->copy()->addDays(4)->toDateString()
-                    ]);
-                }]);
-
-                $alumnos = $grupoActual->id_curso == 2
-                    ? $grupoActual->alumnosInduccion
-                    : $grupoActual->alumnos;
-            }
-        }
-
-        return view('asistencia.grupal', compact('grupos', 'grupoActual', 'alumnos', 'diasSemana'));
+        return view('asistencia.grupal', compact('grupos', 'grupoActual', 'diasSemana', 'lunesSemana', 'totalAlumnos'));
     }
 
-    public function procesar(Request $request)
+    private function generarBadgeAsistencia($alumno, $fecha)
     {
-        $request->validate([
-            'archivo_asistencia' => 'required|file|mimes:xlsx,xls,csv|max:5120'
-        ]);
+        $asistencia = $alumno->asistencias->firstWhere('fecha', $fecha);
 
-        try {
-            $archivo      = $request->file('archivo_asistencia');
-            $spreadsheet  = IOFactory::load($archivo->getRealPath());
-            $filas        = $spreadsheet->getActiveSheet()->toArray();
-
-            $alumnos = [];
-            for ($i = 7; $i < count($filas); $i++) {
-                $fila = $filas[$i];
-                if (!isset($fila[4]) || empty(trim($fila[4]))) continue;
-
-                $alumnos[] = [
-                    'matricula'   => trim($fila[4]),
-                    'nombre_solo' => mb_strtoupper($fila[1] ?? ''),
-                    'ap_pat'      => mb_strtoupper($fila[2] ?? ''),
-                    'ap_mat'      => mb_strtoupper($fila[3] ?? ''),
-                    'correo'      => $fila[6] ?? '',
-                    'lunes'       => $this->evaluarAsistencia($fila[7]  ?? null),
-                    'martes'      => $this->evaluarAsistencia($fila[8]  ?? null),
-                    'miercoles'   => $this->evaluarAsistencia($fila[9]  ?? null),
-                    'jueves'      => $this->evaluarAsistencia($fila[10] ?? null),
-                    'viernes'     => $this->evaluarAsistencia($fila[11] ?? null),
-                ];
-            }
-
-            session(['alumnos_importados' => $alumnos]);
-
-            return response()->json([
-                'success' => true,
-                'mensaje' => 'Archivo procesado con éxito'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
+        if (is_null($asistencia)) {
+            return '<span class="text-muted">—</span>';
         }
-    }
 
-    private function evaluarAsistencia($valor): bool
-    {
-        return in_array(strtolower(trim($valor ?? '')), ['presente', 'p', '1', 'sí', 'si', 'x', 'asistencia']);
+        if ($asistencia->asistio == 1) {
+            return '<span class="badge bg-primary rounded-pill px-3 py-2">P</span>';
+        } else {
+            return '<span class="badge bg-danger rounded-pill px-3 py-2">A</span>';
+        }
     }
 
     public function guardarMasivo(Request $request)
@@ -153,15 +194,24 @@ class AsistenciaController extends Controller
             ], 404);
         }
 
-        // id_curso = 1 → Propedéutico, id_curso = 2 → Inducción
-        $columnaGrupo = ($grupo->id_curso == 2)
+        // SEGURIDAD: Verificar si el grupo está en Modo Lectura
+        $estadoLectura = DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        if ($estadoLectura && $grupo->id_estado == $estadoLectura->id_estado) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'El grupo se encuentra en modo lectura (Bloqueado) y no puede ser editado actualmente.'
+            ], 403);
+        }
+
+        // id_curso = 1 → Inducción, id_curso = 2 → Propedéutico
+        $columnaGrupo = ($grupo->id_curso == 1)
             ? 'id_grupo_induccion'
             : 'id_grupo_propedeutico';
 
         try {
-            DB::transaction(function () use ($request, $idGrupo, $columnaGrupo) {
-                $lunesSemana = Carbon::now()->startOfWeek();
+            $lunesSemana = Carbon::now()->startOfWeek();
 
+            DB::transaction(function () use ($request, $idGrupo, $columnaGrupo, $lunesSemana) {
                 foreach ($request->asistencias as $data) {
                     $matricula = $data['matricula'];
 

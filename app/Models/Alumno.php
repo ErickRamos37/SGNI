@@ -30,7 +30,8 @@ class Alumno extends Model
         'correo_alternativo', 
         'telefono', 
         'id_carrera', 
-        'id_grupo_propedeutico'
+        'id_grupo_propedeutico',
+        'id_grupo_induccion'
     ];
 
 

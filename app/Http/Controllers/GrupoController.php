@@ -438,6 +438,12 @@ class GrupoController extends Controller
         // Cargar relación carrera si no viene
         $grupo->alumnos->load('carrera');
 
+        $lunesSemana = \Carbon\Carbon::now()->startOfWeek();
+        $fechasSemana = [];
+        for ($i = 0; $i < 5; $i++) {
+            $fechasSemana[] = $lunesSemana->copy()->addDays($i)->toDateString();
+        }
+
         foreach ($grupo->alumnos as $alumno) {
             $sheet->setCellValue('A' . $row, $contador);
             $sheet->setCellValue('B' . $row, mb_strtoupper($alumno->nombre));
@@ -445,8 +451,27 @@ class GrupoController extends Controller
             $sheet->setCellValue('D' . $row, mb_strtoupper($alumno->ap_mat));
             $sheet->setCellValue('E' . $row, $alumno->matricula);
             $sheet->setCellValue('F' . $row, ''); // Se deja en blanco
-            
             $sheet->setCellValue('G' . $row, ''); // Se deja en blanco
+            
+            // Cargar las asistencias guardadas para la semana actual
+            $alumno->load(['asistencias' => function ($query) use ($fechasSemana, $grupo) {
+                $query->where('id_grupo', $grupo->id_grupo)
+                      ->whereIn('fecha', $fechasSemana);
+            }]);
+            
+            $asistenciasAlu = $alumno->asistencias->keyBy('fecha');
+            $columnasAsis = ['J', 'K', 'L', 'M', 'N'];
+            
+            foreach ($fechasSemana as $idx => $fecha) {
+                $asistencia = $asistenciasAlu->get($fecha);
+                $col = $columnasAsis[$idx];
+                if ($asistencia) {
+                    $sheet->setCellValue($col . $row, $asistencia->asistio ? 'P' : 'A');
+                    $sheet->getStyle($col . $row)->getAlignment()->setHorizontal('center');
+                } else {
+                    $sheet->setCellValue($col . $row, '');
+                }
+            }
             
             // Bordes para la fila de datos
             $sheet->getStyle('A' . $row . ':N' . $row)->applyFromArray($styleArray);
