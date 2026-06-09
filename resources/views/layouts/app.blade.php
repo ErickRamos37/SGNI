@@ -285,38 +285,6 @@
                                 href="{{ route('usuarios.create') }}">
                                 Alta Personal
                             </a>
-                            <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
-                                <li>
-                                    <a class="dropdown-item fw-bold py-2 mb-1 rounded-2
-                      {{ request()->routeIs('usuarios.create') ? 'text-primary bg-light' : 'text-dark' }}"
-                                        href="{{ route('usuarios.create') }}">
-                                        Alta Personal
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item fw-bold py-2 rounded-2
-                      {{ request()->routeIs('usuarios.index', 'usuarios.edit') ? 'text-primary bg-light' : 'text-dark' }}"
-                                        href="{{ route('usuarios.index') }}">
-                                        Lista del Personal
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                </ul>
-                <hr>
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <!-- Mostramos el nombre guardado en la sesión -->
-                        <strong>{{ Auth::user()->nombre }} {{ Auth::user()->ap_pat }} {{ Auth::user()->ap_mat }}</strong>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-white text-small shadow">
-
-                        <li><span class="dropdown-item-text text-dark-50">
-                                {{ Auth::user()->correo_institucional }}
-                            </span></li>
-                        <li>
-                            <hr class="dropdown-divider">
                         </li>
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
