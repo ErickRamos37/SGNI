@@ -61,7 +61,7 @@ class GrupoController extends Controller
             $mapa = array_flip($encabezados);
 
             // Validar que vengan las columnas requeridas
-            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'puntaje', 'correo_alter'];
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'correo_alter'];
             $faltantes = [];
             foreach ($requeridos as $req) {
                 if (!isset($mapa[$req])) {
@@ -644,7 +644,7 @@ class GrupoController extends Controller
             $mapa = array_flip($encabezados);
 
             // Validar que vengan las columnas requeridas
-            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'puntaje', 'correo_alter'];
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno', 'programa_desc', 'correo_alter'];
             $faltantes = [];
             foreach ($requeridos as $req) {
                 if (!isset($mapa[$req])) {
