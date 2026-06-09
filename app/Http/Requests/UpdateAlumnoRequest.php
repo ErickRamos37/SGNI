@@ -21,23 +21,26 @@ class UpdateAlumnoRequest extends FormRequest
             'correo_alternativo'   => $this->correo_alternativo ? Str::lower(trim($this->correo_alternativo)) : null,
             'correo_institucional' => $this->correo_institucional ? Str::lower(trim($this->correo_institucional)) : null,
             'telefono'             => trim($this->telefono),
+            // Los IDs de los grupos no requieren procesamiento de strings aquí
         ]);
     }
 
     public function rules(): array
     {
-        // Obtenemos la matrícula desde la URL para excluirla en las reglas unique
         $matricula = $this->route('alumno');
 
         return [
-            'nombre'               => 'required|string|max:255',
-            'ap_pat'               => 'required|string|max:255',
-            'ap_mat'               => 'nullable|string|max:255',
-            'correo_alternativo'   => 'nullable|email|unique:alumno,correo_alternativo,' . $matricula . ',matricula',
-            'correo_institucional' => 'nullable|email|ends_with:@uabc.edu.mx|unique:alumno,correo_institucional,' . $matricula . ',matricula',
-            'telefono'             => 'required|string|max:20|unique:alumno,telefono,' . $matricula . ',matricula',
+            'nombre'               => 'required|string|max:50',
+            'ap_pat'               => 'required|string|max:50',
+            'ap_mat'               => 'nullable|string|max:50',
+            'correo_alternativo'   => 'nullable|email|max:50|unique:alumno,correo_alternativo,' . $matricula . ',matricula',
+            'correo_institucional' => 'nullable|email|max:50|ends_with:@uabc.edu.mx|unique:alumno,correo_institucional,' . $matricula . ',matricula',
+            'telefono'             => 'required|string|max:15|unique:alumno,telefono,' . $matricula . ',matricula',
             'puntaje_ingreso'      => 'nullable|integer|min:0|max:1300',
             'id_carrera'           => 'required|exists:carrera,id_carrera',
+            
+            // Un solo grupo que viene de la vista
+            'id_grupo_definitivo'  => 'nullable|integer|exists:grupos,id_grupo', 
         ];
     }
 
@@ -51,6 +54,8 @@ class UpdateAlumnoRequest extends FormRequest
             'puntaje_ingreso.min'            => 'El puntaje no puede ser negativo.',
             'puntaje_ingreso.max'            => 'El puntaje máximo de admisión es 1300 puntos.',
             'id_carrera.exists'              => 'La carrera seleccionada no es válida.',
+            // Mensaje actualizado para el grupo
+            'id_grupo_definitivo.exists'     => 'El grupo asignado seleccionado no es válido.',
         ];
     }
 }

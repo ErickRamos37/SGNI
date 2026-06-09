@@ -21,7 +21,8 @@
                         <div class="card-body p-4 p-md-5">
                             <h5 class="fw-bold text-primary mb-4 d-flex align-items-center">
                                 <i class="bi bi-pencil-square me-2 fs-4"></i>
-                                <span>Editando: {{ $alumno->nombre }} {{ $alumno->ap_pat }} {{ $alumno->ap_mat }}</span>
+                                <span id="texto-editando">Editando: {{ $alumno->nombre }} {{ $alumno->ap_pat }}
+                                    {{ $alumno->ap_mat }}</span>
                             </h5>
 
                             <form id="form-editar-alumno" novalidate>
@@ -67,8 +68,7 @@
                                         <label for="correo_alternativo" class="form-label text-dark fw-semibold">Correo
                                             alternativo</label>
                                         <input type="email" name="correo_alternativo" id="correo_alternativo"
-                                            class="form-control shadow-sm"
-                                            value="{{ $alumno->correo_alternativo ?? '' }}"
+                                            class="form-control shadow-sm" value="{{ $alumno->correo_alternativo ?? '' }}"
                                             placeholder="ejemplo@gmail.com">
                                         <div class="invalid-feedback"></div>
                                     </div>
@@ -88,25 +88,23 @@
                                             Correo institucional
                                         </label>
                                         <input type="email" name="correo_institucional" id="correo_institucional"
-                                            class="form-control shadow-sm"
-                                            value="{{ $alumno->correo_institucional ?? '' }}"
+                                            class="form-control shadow-sm" value="{{ $alumno->correo_institucional ?? '' }}"
                                             placeholder="ejemplo@uabc.edu.mx">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="puntaje_ingreso" class="form-label text-dark fw-semibold">
-                                            Puntaje de admisión 
+                                            Puntaje de admisión
                                         </label>
-                                        <input type="number" name="puntaje_ingreso" id="puntaje_ingreso"
-                                            class="form-control shadow-sm"
-                                            value="{{ $alumno->puntaje_ingreso ?? '' }}"
-                                            placeholder="Ej: 850" min="0" max="1300">
+                                        <input type="text" name="puntaje_ingreso" id="puntaje_ingreso"
+                                            class="form-control shadow-sm" value="{{ $alumno->puntaje_ingreso ?? '' }}"
+                                            placeholder="Ej: 850">
                                         <div class="form-text text-muted">Máximo 1300 puntos.</div>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
 
-                                {{-- Fila 5: Carrera (ancho completo) --}}
+                                {{-- Fila 5: Carrera --}}
                                 <div class="row g-4 mb-4">
                                     <div class="col-12">
                                         <label for="id_carrera" class="form-label text-dark fw-semibold">Carrera <span
@@ -124,17 +122,39 @@
                                     </div>
                                 </div>
 
+                                {{-- Fila 6: Selección de Grupo Asignado (Un solo select unificado) --}}
+                                <div class="row g-4 mb-4">
+                                    <div class="col-12">
+                                        <label for="id_grupo_definitivo" class="form-label text-dark fw-semibold">Grupo Asignado</label>
+                                        <select name="id_grupo_definitivo" id="id_grupo_definitivo" class="form-select shadow-sm">
+                                            <option value="">-- Sin Grupo --</option>
+                                            @foreach ($grupos as $grupo)
+                                                <option value="{{ $grupo->id_grupo }}"
+                                                    {{ ($alumno->id_grupo_induccion == $grupo->id_grupo || 
+                                                        $alumno->id_grupo_propedeutico == $grupo->id_grupo || 
+                                                        $alumno->id_grupo_definitivo == $grupo->id_grupo) ? 'selected' : '' }}>
+                                                    {{ $grupo->nombre_grupo }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                        <div class="form-text text-muted">Selecciona el grupo actual correspondiente al estudiante.</div>
+                                    </div>
+                                </div>
+
                                 <hr class="my-4 border-light-subtle">
 
                                 <div class="d-flex justify-content-between gap-2">
                                     {{-- Botón Regresar a la izquierda --}}
-                                    <a href="{{ route('alumnos.info') }}" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                    <a href="{{ route('alumnos.info') }}"
+                                        class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                         <i class="bi bi-arrow-left me-1"></i> Regresar
                                     </a>
 
                                     {{-- Botones Limpiar y Guardar a la derecha --}}
                                     <div class="d-flex gap-2">
-                                        <button type="reset" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                        <button type="reset" id="btn-limpiar"
+                                            class="btn btn-outline-dark px-5 fw-semibold rounded-3">
                                             Limpiar
                                         </button>
                                         <button type="submit" id="btn-guardar"
@@ -158,11 +178,72 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('form-editar-alumno');
             const btnGuardar = document.getElementById('btn-guardar');
+            const btnLimpiar = document.getElementById('btn-limpiar');
             const btnText = document.getElementById('btn-text');
             const btnSpinner = document.getElementById('btn-spinner');
             const alertSuccess = document.getElementById('alert-success');
+            const textoEditando = document.getElementById('texto-editando');
             const matricula = '{{ $alumno->matricula }}';
 
+            // Inputs para aplicar formatos
+            const inputNombre = document.getElementById('nombre');
+            const inputApPat = document.getElementById('ap_pat');
+            const inputApMat = document.getElementById('ap_mat');
+            const inputTelefono = document.getElementById('telefono');
+            const inputPuntaje = document.getElementById('puntaje_ingreso');
+            const inputCorreoAlt = document.getElementById('correo_alternativo');
+            const inputCorreoInst = document.getElementById('correo_institucional');
+
+            // --- 1. FUNCIÓN: ACTUALIZACIÓN DINÁMICA DEL ENCABEZADO ---
+            function actualizarEncabezado() {
+                const nom = inputNombre.value.trim();
+                const pat = inputApPat.value.trim();
+                const mat = inputApMat.value.trim();
+                textoEditando.innerText = `Editando: ${nom} ${pat} ${mat}`.trim() || 'Editando: Alumno';
+            }
+
+            // --- 2. FUNCIÓN: CONVERTIR A TITLE CASE (Nombres/Apellidos) ---
+            function toTitleCase(str) {
+                return str.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Listeners de formateo al perder el foco (blur)
+            [inputNombre, inputApPat, inputApMat].forEach(input => {
+                input.addEventListener('blur', function() {
+                    this.value = toTitleCase(this.value.trim());
+                    actualizarEncabezado();
+                });
+                // Actualiza el título de la tarjeta en tiempo real mientras escriben
+                input.addEventListener('input', actualizarEncabezado);
+            });
+
+            // Correos siempre a minúsculas al perder el foco
+            [inputCorreoAlt, inputCorreoInst].forEach(input => {
+                input.addEventListener('blur', function() {
+                    this.value = this.value.trim().toLowerCase();
+                });
+            });
+
+            // --- 3. FUNCIÓN: RESTRICCIÓN DE NÚMEROS (Teléfono y Puntaje) ---
+            inputTelefono.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, ''); // Elimina todo lo que no sea número
+            });
+
+            inputPuntaje.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+                if (parseInt(this.value) > 1300) {
+                    this.value = 1300; // Capado automático al máximo del Request
+                }
+            });
+
+            // Listener al resetear el formulario para restablecer el título original
+            btnLimpiar.addEventListener('click', function() {
+                setTimeout(() => {
+                    actualizarEncabezado();
+                }, 10);
+            });
+
+            // --- 4. ENVÍO DEL FORMULARIO (AJAX) ---
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
@@ -202,7 +283,10 @@
                     })
                     .then(() => {
                         alertSuccess.classList.remove('d-none');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
                     })
                     .catch(error => {
                         if (error.status === 422 && error.data.errors) {
@@ -210,7 +294,8 @@
                                 const input = document.getElementById(field);
                                 if (input) {
                                     input.classList.add('is-invalid');
-                                    const feedback = input.parentElement.querySelector('.invalid-feedback');
+                                    const feedback = input.parentElement.querySelector(
+                                        '.invalid-feedback');
                                     if (feedback) feedback.innerText = error.data.errors[field][0];
                                 }
                             }

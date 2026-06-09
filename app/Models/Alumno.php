@@ -33,8 +33,6 @@ class Alumno extends Model
         'puntaje_ingreso',
         'telefono',
         'id_carrera',
-        'telefono', 
-        'id_carrera', 
     ];
 
     public function carrera()

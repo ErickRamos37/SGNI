@@ -75,7 +75,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Fila 5: Carrera (ancho completo) --}}
+                                {{-- Fila 5: Carrera --}}
                                 <div class="row g-4 mb-4">
                                     <div class="col-12">
                                         <label for="id_carrera" class="form-label text-dark fw-semibold">Carrera <span class="text-danger">*</span></label>
@@ -89,30 +89,17 @@
                                     </div>
                                 </div>
 
-                                {{-- Fila 6: Grupos (se cargan dinámicamente al elegir carrera) --}}
+                                {{-- Fila 6: Único Select de Grupos --}}
                                 <div id="seccion-grupos" class="d-none">
                                     <div class="row g-4 mb-4">
-
-                                        {{-- Grupo Propedéutico --}}
-                                        <div class="col-md-6">
-                                            <label for="id_grupo_propedeutico" class="form-label text-dark fw-semibold">Grupo Propedéutico</label>
-                                            <select name="id_grupo_propedeutico" id="id_grupo_propedeutico" class="form-select shadow-sm">
+                                        <div class="col-12">
+                                            <label for="id_grupo" class="form-label text-dark fw-semibold">Curso / Grupo Asignado</label>
+                                            <select name="id_grupo" id="id_grupo" class="form-select shadow-sm">
                                                 <option value="">-- Sin asignar --</option>
                                             </select>
-                                            <div class="form-text text-muted">Opcional. Asignar si ya tiene grupo propedéutico.</div>
+                                            <div class="form-text text-muted">Seleccione el curso propedéutico o de inducción correspondiente.</div>
                                             <div class="invalid-feedback"></div>
                                         </div>
-
-                                        {{-- Grupo Inducción --}}
-                                        <div class="col-md-6">
-                                            <label for="id_grupo_induccion" class="form-label text-dark fw-semibold">Grupo Inducción</label>
-                                            <select name="id_grupo_induccion" id="id_grupo_induccion" class="form-select shadow-sm">
-                                                <option value="">-- Sin asignar --</option>
-                                            </select>
-                                            <div class="form-text text-muted">Opcional. Asignar si ya tiene grupo de inducción.</div>
-                                            <div class="invalid-feedback"></div>
-                                        </div>
-
                                     </div>
                                 </div>
 
@@ -136,17 +123,17 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const form        = document.getElementById('form-nuevo-alumno');
-            const btnGuardar  = document.getElementById('btn-guardar');
-            const btnText     = document.getElementById('btn-text');
-            const btnSpinner  = document.getElementById('btn-spinner');
+            const form         = document.getElementById('form-nuevo-alumno');
+            const btnGuardar   = document.getElementById('btn-guardar');
+            const btnText      = document.getElementById('btn-text');
+            const btnSpinner   = document.getElementById('btn-spinner');
             const alertSuccess = document.getElementById('alert-success');
-            const selectCarrera   = document.getElementById('id_carrera');
-            const seccionGrupos   = document.getElementById('seccion-grupos');
-            const selectPrope     = document.getElementById('id_grupo_propedeutico');
-            const selectInduccion = document.getElementById('id_grupo_induccion');
+            
+            const selectCarrera = document.getElementById('id_carrera');
+            const seccionGrupos = document.getElementById('seccion-grupos');
+            const selectGrupo   = document.getElementById('id_grupo');
 
-            // ── Cargar grupos al cambiar la carrera ──────────────────────────
+            // ── Cargar grupos/cursos dinámicamente al cambiar carrera ────────
             selectCarrera.addEventListener('change', function () {
                 const idCarrera = this.value;
                 if (!idCarrera) {
@@ -154,9 +141,8 @@
                     return;
                 }
 
-                // Spinner visual mientras carga
-                selectPrope.innerHTML     = '<option value="">Cargando...</option>';
-                selectInduccion.innerHTML = '<option value="">Cargando...</option>';
+                // Mostrar estado de carga temporal
+                selectGrupo.innerHTML = '<option value="">Cargando cursos disponibles...</option>';
                 seccionGrupos.classList.remove('d-none');
 
                 fetch(`/alumnos/grupos-por-carrera/${idCarrera}`, {
@@ -166,31 +152,55 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 })
-                .then(r => r.json())
+                .then(async r => {
+                    if (!r.ok) throw new Error(`Error de servidor: ${r.status}`);
+                    return r.json();
+                })
                 .then(data => {
-                    // Llenar grupos propedéuticos
-                    selectPrope.innerHTML = '<option value="">-- Sin asignar --</option>';
-                    data.propedeutico.forEach(g => {
-                        selectPrope.innerHTML += `<option value="${g.id_grupo}">${g.nombre_grupo}</option>`;
-                    });
+                    selectGrupo.innerHTML = '<option value="">-- Sin asignar --</option>';
+                    let tieneCursos = false;
 
-                    // Llenar grupos de inducción
-                    selectInduccion.innerHTML = '<option value="">-- Sin asignar --</option>';
-                    data.induccion.forEach(g => {
-                        selectInduccion.innerHTML += `<option value="${g.id_grupo}">${g.nombre_grupo}</option>`;
-                    });
+                    // Validar si viene como "propedeutico" o "propedeuticos"
+                    const listaPrope = data.propedeutico || data.propedeuticos || [];
+                    // Validar si viene como "induccion" o "inducciones"
+                    const listaInduc = data.induccion || data.inducciones || [];
 
-                    if (data.propedeutico.length === 0 && data.induccion.length === 0) {
-                        seccionGrupos.classList.add('d-none');
+                    // Construir Optgroup para Cursos Propedéuticos
+                    if (listaPrope && listaPrope.length > 0) {
+                        tieneCursos = true;
+                        const optgroupPrope = document.createElement('optgroup');
+                        optgroupPrope.label = 'Cursos Propedéuticos';
+                        
+                        listaPrope.forEach(g => {
+                            optgroupPrope.innerHTML += `<option value="${g.id_grupo}">${g.nombre_grupo}</option>`;
+                        });
+                        selectGrupo.appendChild(optgroupPrope);
+                    }
+
+                    // Construir Optgroup para Cursos de Inducción
+                    if (listaInduc && listaInduc.length > 0) {
+                        tieneCursos = true;
+                        const optgroupInduc = document.createElement('optgroup');
+                        optgroupInduc.label = 'Cursos de Inducción';
+                        
+                        listaInduc.forEach(g => {
+                            optgroupInduc.innerHTML += `<option value="${g.id_grupo}">${g.nombre_grupo}</option>`;
+                        });
+                        selectGrupo.appendChild(optgroupInduc);
+                    }
+
+                    // Mensaje en caso de que ambos bloques estén vacíos
+                    if (!tieneCursos) {
+                        selectGrupo.innerHTML += '<option value="" disabled>No hay cursos/grupos editables registrados para esta carrera</option>';
                     }
                 })
-                .catch(() => {
-                    selectPrope.innerHTML     = '<option value="">-- Sin asignar --</option>';
-                    selectInduccion.innerHTML = '<option value="">-- Sin asignar --</option>';
+                .catch(error => {
+                    console.error("Error al procesar la petición:", error);
+                    selectGrupo.innerHTML = '<option value="">-- Error al cargar (Verifica la consola) --</option>';
                 });
             });
 
-            // ── Envío del formulario ─────────────────────────────────────────
+            // ── Envío vía AJAX del formulario ───────────────────────────────
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
