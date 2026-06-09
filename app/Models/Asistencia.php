@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Asistencia extends Model
 {
-    // Tu tabla en la BD está en plural
-    protected $table = 'asistencias'; 
+    protected $table = 'asistencias';
     protected $primaryKey = 'id_asistencia';
+
+    protected $fillable = [
+        'matricula',
+        'id_grupo',
+        'fecha',
+        'asistio',
+    ];
 }

@@ -6,134 +6,213 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\Alumno;
 use App\Models\Asistencia;
+use App\Models\Grupo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AsistenciaController extends Controller
 {
-
     public function paselista()
     {
-        // 1. Traemos a los alumnos REALES de la base de datos
-        // (Aquí asumo que traes a todos, o le pones el where de tu grupo: Alumno::where('id_grupo', 1)->get())
-        $alumnos = Alumno::all(); 
-
-        // 2. Revisamos si el profe acaba de subir un Excel (atajo de autocompletado)
         $asistenciasExcel = session('alumnos_importados', []);
+        $alumnosDB = Alumno::all();
 
-        // 3. Borramos la memoria temporal para que no se queden marcados por error si recarga la página
-        session()->forget('alumnos_importados');
+        if ($alumnosDB->isEmpty() && !empty($asistenciasExcel)) {
+            $alumnos = collect($asistenciasExcel)->map(function ($item) {
+                return (object) [
+                    'matricula_alumno' => $item['matricula'],
+                    'nombres_alumno'   => $item['nombre_solo'] ?? 'ALUMNO',
+                    'apellidos_alumno' => ($item['ap_pat'] ?? '') . ' ' . ($item['ap_mat'] ?? ''),
+                    'ap_pat'           => $item['ap_pat'] ?? '',
+                    'ap_mat'           => $item['ap_mat'] ?? '',
+                ];
+            });
+        } else {
+            $alumnos = $alumnosDB->map(function ($a) {
+                return (object) [
+                    'matricula_alumno' => $a->matricula,
+                    'nombres_alumno'   => $a->nombre,
+                    'apellidos_alumno' => ($a->ap_pat ?? '') . ' ' . ($a->ap_mat ?? ''),
+                    'ap_pat'           => $a->ap_pat ?? '',
+                    'ap_mat'           => $a->ap_mat ?? '',
+                ];
+            });
+        }
 
-        return view('asistencia.paselista', compact('alumnos', 'asistenciasExcel'));
+        // Cargamos los grupos para el <select> del blade
+        $grupos = Grupo::all();
+
+        return view('asistencia.paselista', compact('alumnos', 'asistenciasExcel', 'grupos'));
     }
 
     public function grupal()
     {
-        return view('asistencia.grupal');
+        $idGrupo = request('id_grupo');
+
+        // Grupos del profesor autenticado
+        $grupos = \App\Models\Grupo::where('num_empleado', auth()->user()->num_empleado)->get();
+
+        $alumnos     = collect();
+        $grupoActual = null;
+        $diasSemana  = [];
+        $lunesSemana = Carbon::now()->startOfWeek();
+
+        // Fechas de lunes a viernes de la semana actual
+        for ($i = 0; $i < 5; $i++) {
+            $diasSemana[] = $lunesSemana->copy()->addDays($i);
+        }
+
+        if ($idGrupo) {
+            $grupoActual = \App\Models\Grupo::find($idGrupo);
+
+            if ($grupoActual) {
+                $relacion = $grupoActual->id_curso == 2 ? 'alumnosInduccion' : 'alumnos';
+
+                $grupoActual->load([$relacion . '.asistencias' => function ($query) use ($lunesSemana) {
+                    $query->whereBetween('fecha', [
+                        $lunesSemana->toDateString(),
+                        $lunesSemana->copy()->addDays(4)->toDateString()
+                    ]);
+                }]);
+
+                $alumnos = $grupoActual->id_curso == 2
+                    ? $grupoActual->alumnosInduccion
+                    : $grupoActual->alumnos;
+            }
+        }
+
+        return view('asistencia.grupal', compact('grupos', 'grupoActual', 'alumnos', 'diasSemana'));
     }
 
     public function procesar(Request $request)
     {
         $request->validate([
-            'archivo_asistencia' => 'required|file|mimes:xlsx,xls|max:5120'
+            'archivo_asistencia' => 'required|file|mimes:xlsx,xls,csv|max:5120'
         ]);
 
         try {
-            $archivo = $request->file('archivo_asistencia');
-            $rutaTemporal = $archivo->getRealPath();
-
-            $spreadsheet = IOFactory::load($rutaTemporal);
-            $hoja = $spreadsheet->getActiveSheet();
-            $filas = $hoja->toArray();
+            $archivo      = $request->file('archivo_asistencia');
+            $spreadsheet  = IOFactory::load($archivo->getRealPath());
+            $filas        = $spreadsheet->getActiveSheet()->toArray();
 
             $alumnos = [];
-            
-            // Asumimos que la fila 0 es el encabezado
-            for ($i = 4; $i < count($filas); $i++) {
+            for ($i = 7; $i < count($filas); $i++) {
                 $fila = $filas[$i];
-                
-                if (empty($fila[0])) continue;
+                if (!isset($fila[4]) || empty(trim($fila[4]))) continue;
 
                 $alumnos[] = [
-                    'matricula' => $fila[0],
-                    'nombre'    => $fila[1],
-                    'lunes'     => $this->evaluarAsistencia($fila[2] ?? null),
-                    'martes'    => $this->evaluarAsistencia($fila[3] ?? null),
-                    'miercoles' => $this->evaluarAsistencia($fila[4] ?? null),
-                    'jueves'    => $this->evaluarAsistencia($fila[5] ?? null),
-                    'viernes'   => $this->evaluarAsistencia($fila[6] ?? null),
+                    'matricula'   => trim($fila[4]),
+                    'nombre_solo' => mb_strtoupper($fila[1] ?? ''),
+                    'ap_pat'      => mb_strtoupper($fila[2] ?? ''),
+                    'ap_mat'      => mb_strtoupper($fila[3] ?? ''),
+                    'correo'      => $fila[6] ?? '',
+                    'lunes'       => $this->evaluarAsistencia($fila[7]  ?? null),
+                    'martes'      => $this->evaluarAsistencia($fila[8]  ?? null),
+                    'miercoles'   => $this->evaluarAsistencia($fila[9]  ?? null),
+                    'jueves'      => $this->evaluarAsistencia($fila[10] ?? null),
+                    'viernes'     => $this->evaluarAsistencia($fila[11] ?? null),
                 ];
             }
 
+            session(['alumnos_importados' => $alumnos]);
+
             return response()->json([
                 'success' => true,
-                'mensaje' => 'Archivo procesado correctamente',
-                'datos'   => $alumnos
+                'mensaje' => 'Archivo procesado con éxito'
             ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'Error al leer el archivo Excel: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'mensaje' => $e->getMessage()], 500);
         }
     }
 
-    // Función auxiliar para leer los "Presente" o "1" del Excel
-    private function evaluarAsistencia($valorCelda)
+    private function evaluarAsistencia($valor): bool
     {
-        if (!$valorCelda) return false;
-        
-        $valor = strtolower(trim($valorCelda));
-        return in_array($valor, ['presente', 'p', '1', 'sí', 'si', 'x', 'asistencia']);
+        return in_array(strtolower(trim($valor ?? '')), ['presente', 'p', '1', 'sí', 'si', 'x', 'asistencia']);
     }
 
     public function guardarMasivo(Request $request)
     {
-        $request->validate([
-            'id_grupo' => 'required|integer',
-            'asistencias' => 'required|array',
-            'asistencias.*.matricula' => 'required|string',
-        ]);
+        // FIX 1: Eliminada la validación que rechazaba id_grupo = 1 sin justificación
+        $idGrupo = (int) $request->id_grupo;
 
-        $idGrupo = $request->id_grupo;
-        $lunesDeEstaSemana = Carbon::now()->startOfWeek(); 
-
-        foreach ($request->asistencias as $data) {
-            
-            $alumno = Alumno::where('matricula_alumno', $data['matricula'])->first();
-            if (!$alumno) continue; 
-
-            $dias = [
-                0 => $data['lunes'] ?? false,
-                1 => $data['martes'] ?? false,
-                2 => $data['miercoles'] ?? false,
-                3 => $data['jueves'] ?? false,
-                4 => $data['viernes'] ?? false,
-            ];
-
-            foreach ($dias as $diasAgregados => $asistio) {
-                $fechaExacta = $lunesDeEstaSemana->copy()->addDays($diasAgregados)->format('Y-m-d');
-                $estadoEnum = $asistio ? 'Presente' : 'Ausente';
-
-                Asistencia::updateOrCreate(
-                    [
-                        'id_alumno' => $alumno->id_alumno,
-                        'id_grupo'  => $idGrupo,
-                        'fecha_asistencia' => $fechaExacta,
-                    ],
-                    [
-                        'estado_asistencia' => $estadoEnum
-                    ]
-                );
-            }
+        if ($idGrupo <= 0) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error: El grupo seleccionado no es válido (ID: ' . $idGrupo . ')'
+            ], 400);
         }
 
-        // Modifica el return para que quede así:
+        // FIX 2: Detectamos el tipo de grupo para saber qué columna actualizar
+        $grupo = Grupo::find($idGrupo);
+        if (!$grupo) {
             return response()->json([
-                'success' => true,
-                'mensaje' => 'Archivo procesado correctamente',
-                'datos'   => $alumnos,
-                'crudo'   => $filas // <--- ESTO NOS VA A SALVAR LA VIDA
-            ]);
+                'success' => false,
+                'mensaje' => 'Error: No existe un grupo con ID ' . $idGrupo
+            ], 404);
+        }
+
+        // id_curso = 1 → Propedéutico, id_curso = 2 → Inducción
+        $columnaGrupo = ($grupo->id_curso == 2)
+            ? 'id_grupo_induccion'
+            : 'id_grupo_propedeutico';
+
+        try {
+            DB::transaction(function () use ($request, $idGrupo, $columnaGrupo) {
+                $lunesSemana = Carbon::now()->startOfWeek();
+
+                foreach ($request->asistencias as $data) {
+                    $matricula = $data['matricula'];
+
+                    // Si no tiene correo, generamos uno único basado en la matrícula
+                    $correo = !empty($data['correo'])
+                        ? $data['correo']
+                        : $matricula . '@sin-correo.uabc.mx';
+
+                    $alumno = Alumno::updateOrCreate(
+                        ['matricula' => $matricula],
+                        [
+                            'nombre'               => $data['nombre'] ?? 'ALUMNO',
+                            'ap_pat'               => $data['ap_pat'] ?? '',
+                            'ap_mat'               => $data['ap_mat'] ?? null,
+                            'correo_institucional' => $correo,
+                            'correo_alternativo'   => $correo,
+                            'telefono'             => $data['telefono'] ?? $matricula,
+                            'id_carrera'           => 1,
+                            $columnaGrupo          => $idGrupo,
+                        ]
+                    );
+
+                    $dias = [
+                        0 => $data['lunes'],
+                        1 => $data['martes'],
+                        2 => $data['miercoles'],
+                        3 => $data['jueves'],
+                        4 => $data['viernes'],
+                    ];
+
+                    foreach ($dias as $idx => $asistio) {
+                        Asistencia::updateOrCreate(
+                            [
+                                'matricula'        => $alumno->matricula,
+                                'id_grupo'         => $idGrupo,
+                                'fecha'     => $lunesSemana->copy()->addDays($idx)->toDateString(),
+                            ],
+                            ['asistio' => $asistio ? 1 : 0]
+                        );
+                    }
+                }
+            });
+
+            return response()->json(['success' => true, 'mensaje' => 'Asistencias guardadas exitosamente.']);
+
+        } catch (\Exception $e) {
+            Log::error("Error en guardarMasivo: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error en base de datos: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
