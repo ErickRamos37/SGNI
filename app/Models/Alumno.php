@@ -26,15 +26,13 @@ class Alumno extends Model
         'ap_pat',
         'ap_mat',
         'id_grupo_propedeutico',
+        'id_grupo_induccion',
         'id_resultados_propedeutico',
         'correo_institucional',
         'correo_alternativo',
-        'correo_institucional',
         'puntaje_ingreso',
         'telefono',
-        'puntaje_ingreso',
         'id_carrera',
-        'id_grupo_induccion'
     ];
 
     public function carrera()
@@ -50,6 +48,11 @@ class Alumno extends Model
     public function grupoPropedeutico()
     {
         return $this->belongsTo(Grupo::class, 'id_grupo_propedeutico');
+    }
+
+    public function grupoInduccion()
+    {
+        return $this->belongsTo(Grupo::class, 'id_grupo_induccion');
     }
 
     public function asistencias()
@@ -71,7 +74,6 @@ class Alumno extends Model
     {
         $total = $this->asistencias()->where('id_grupo', 1)->count();
         if ($total === 0) return 0;
-
         $asistidas = $this->asistencias()->where('id_grupo', 1)->where('asistio', 1)->count();
         return round(($asistidas / $total) * 100);
     }
@@ -80,7 +82,6 @@ class Alumno extends Model
     {
         $total = $this->asistencias()->where('id_grupo', 2)->count();
         if ($total === 0) return 0;
-
         $asistidas = $this->asistencias()->where('id_grupo', 2)->where('asistio', 1)->count();
         return round(($asistidas / $total) * 100);
     }
@@ -88,12 +89,10 @@ class Alumno extends Model
     public function getMejoriaAttribute()
     {
         $resultados = $this->resultadosPropedeutico;
-
         if ($resultados && isset($resultados->examen_final) && isset($resultados->examen_inicial)) {
             $diferencia = $resultados->examen_final - $resultados->examen_inicial;
             return $diferencia >= 0 ? "+{$diferencia}" : $diferencia;
         }
-
         return 'N/A';
     }
 }

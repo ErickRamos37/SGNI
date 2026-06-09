@@ -60,8 +60,10 @@ Route::middleware(['auth'])->group(function () {
         // Alta manual de alumnos
         Route::get('/alumnos/nuevo', [AlumnoController::class, 'create'])->name('alumnos.nuevo');
         Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
-        Route::get('/alumnos/grupos-disponibles', [AlumnoController::class, 'gruposDisponibles'])
-    ->name('alumnos.grupos-disponibles');
+
+        // ── NUEVA: grupos disponibles por carrera (debe ir ANTES de /{alumno}/editar) ──
+        Route::get('/alumnos/grupos-por-carrera/{id_carrera}', [AlumnoController::class, 'gruposPorCarrera'])
+            ->name('alumnos.grupos_por_carrera');
 
         // Edición de alumnos
         Route::get('/alumnos/{alumno}/editar', [AlumnoController::class, 'edit'])->name('alumnos.edit');
