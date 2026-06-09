@@ -283,7 +283,7 @@
                             title: '¡Tabla Vacia!',
                             text: 'No hay registros válidos para actualizar.',
                             icon: 'warning',
-                            confirmButtonColor: '#dc3545',
+                            confirmButtonColor: '#00723F',
                             confirmButtonText: 'Aceptar'
                         });
                         return;
@@ -339,7 +339,7 @@
                                 title: '¡Error al Guardar!',
                                 text: error.message || 'Ocurrió un inconveniente al actualizar las calificaciones en el servidor.',
                                 icon: 'error',
-                                confirmButtonColor: '#dc3545',
+                                confirmButtonColor: '#00723F',
                                 confirmButtonText: 'Entendido'
                             });
                             btn.prop('disabled', false).html('Guardar Cambios');

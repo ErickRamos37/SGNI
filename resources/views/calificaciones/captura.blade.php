@@ -117,7 +117,7 @@
                     title: titulo,
                     html: '<p class="text-muted small text-center mb-0">' + errorTexto + '</p>',
                     icon: 'error',
-                    confirmButtonColor: '#dc3545',
+                    confirmButtonColor: '#00723F',
                     confirmButtonText: 'Entendido'
                 });
             });
