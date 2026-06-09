@@ -32,22 +32,28 @@ Route::middleware(['auth'])->group(function () {
 
     // ------------------------------------------------------
     // A. EXCLUSIVO ADMINISTRADOR
-    // Gestión de personal, creación de grupos y altas de alumnos
     // ------------------------------------------------------
     Route::middleware(['rol:Administrador'])->group(function () {
+
         // Personal
         Route::resource('usuarios', UsuarioController::class)->except(['show']);
 
         // Creación y Gestión de Grupos
         Route::get('/crear_grupo', function () { return view('groups.crear_grupos_cursos.crear_grupo'); })->name('crear_grupo');
+        // Creación y gestión de grupos
         Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
         Route::post('/grupos/guardar-profesores', [GrupoController::class, 'guardarProfesores'])->name('grupos.guardar_profesores');
         Route::get('/grupos/generados', function () { return view('groups.grupos_generados'); })->name('grupos.generados');
+        Route::get('/crear_grupo', function () { return view('groups.crear_grupos_cursos.crear_grupo'); })->name('crear_grupo');
+
+        // Curso propedéutico
         Route::post('/grupos/{id_grupo}/cambiar-estado', [GrupoController::class, 'cambiarModoEstado'])->name('grupos.cambiar_estado');
 
         // Cursos Propedéutico e Inducción
         Route::get('/curso_prope', [GrupoController::class, 'showCursoPrope'])->name('curso_prope');
         Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
+
+        // Curso inducción
         Route::get('/curso_induc', [GrupoController::class, 'showCursoInduc'])->name('curso_induc');
         Route::post('/grupos-induc/store', [GrupoController::class, 'storeInduc'])->name('grupos_induc.store');
         Route::get('/grupos/induc-creado', [GrupoController::class, 'showInducCreado'])->name('curso_induc_creado');
@@ -62,7 +68,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/grupos/importar', function () { return view('groups.importar_alumnos'); })->name('grupos.importar');
         Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 
-        // Cierres y Grupos Finales
+        // Alta manual de alumnos
+        Route::get('/alumnos/nuevo', [AlumnoController::class, 'create'])->name('alumnos.nuevo');
+        Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
+
+        // ── NUEVA: grupos disponibles por carrera (debe ir ANTES de /{alumno}/editar) ──
+        Route::get('/alumnos/grupos-por-carrera/{id_carrera}', [AlumnoController::class, 'gruposPorCarrera'])
+            ->name('alumnos.grupos_por_carrera');
+
+        // Edición de alumnos
+        Route::get('/alumnos/{alumno}/editar', [AlumnoController::class, 'edit'])->name('alumnos.edit');
+        Route::put('/alumnos/{alumno}', [AlumnoController::class, 'update'])->name('alumnos.update');
+
+        // Cierres y grupos finales
         Route::get('/cierre', function () { return view('grupos_finales.cierre'); })->name('cierre');
         Route::get('/grupos_final/criterios', function () { return view('grupos_final.criterios'); })->name('grupos_final.criterios');
         Route::get('/grupos_final/grupos_finales', function () { return view('grupos_final.grupos_finales'); })->name('grupos_final.grupos_finales');
@@ -70,11 +88,10 @@ Route::middleware(['auth'])->group(function () {
 
     // ------------------------------------------------------
     // B. COMPARTIDO: ADMINISTRADOR Y DOCENTE
-    // Listas, Calificaciones y Asistencias
     // ------------------------------------------------------
     Route::middleware(['rol:Administrador,Docente'])->group(function () {
-        
-        // Visualización de Listas
+
+        // Listas de grupos
         Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
         Route::get('/grupos/{id_grupo}/descargar-lista', [GrupoController::class, 'descargarLista'])->name('grupos.descargar_lista');
 
@@ -84,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/asistencia/grupal', [AsistenciaController::class, 'grupal'])->name('asistencia.grupal');
 
         // Calificaciones (Agrupadas correctamente bajo un solo prefijo)
+        // Calificaciones
         Route::prefix('calificaciones')->name('calificaciones.')->group(function () {
             Route::get('/captura', [CalificacionController::class, 'showCaptura'])->name('captura');
             Route::post('/upload', [CalificacionController::class, 'upload'])->name('upload');
@@ -94,11 +112,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/descargar-formato-base', [CalificacionController::class, 'descargarFormatoBase'])->name('descargarFormatoBase');
             Route::get('/data/{id_grupo}', [CalificacionController::class, 'getAlumnosData'])->name('data');
         });
-    }); // <-- ESTE ERA EL CORCHETE PRINCIPAL QUE FALTABA
+        Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
+        Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
+        Route::get('/calificaciones/descargar-formato-base', [CalificacionController::class, 'descargarFormatoBase'])->name('calificaciones.descargarFormatoBase');
+        Route::get('/calificaciones/data/{id_grupo}', [CalificacionController::class, 'getAlumnosData'])->name('calificaciones.data');
+    });
 
     // ------------------------------------------------------
     // C. COMPARTIDO: ADMINISTRADOR Y PSICOPEDAGÓGICO
-    // Búsqueda de alumnos e información general
     // ------------------------------------------------------
     Route::middleware(['rol:Administrador,Psicopedagogico'])->group(function () {
         Route::get('/alumnos/info', function () { return view('alumnos.info'); })->name('alumnos.info');

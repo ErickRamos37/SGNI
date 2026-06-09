@@ -9,7 +9,7 @@ use App\Http\Requests\UpdateAlumnoRequest;
 use App\Models\Alumno;
 use App\Models\Carrera;
 use App\Models\Curso;
-use App\Models\Grupo;
+use App\Models\Grupo; // Importación correcta (Aquí arriba)
 use App\Imports\AlumnosImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -136,12 +136,15 @@ class AlumnoController extends Controller
             $datos['id_grupo_induccion'] = null; // Limpiamos el otro
         }
     } else {
+        // Si seleccionó "-- Sin Grupo --", limpiamos ambos campos
         $datos['id_grupo_induccion'] = null;
         $datos['id_grupo_propedeutico'] = null;
     }
 
+    // 3. Eliminamos del arreglo el campo ficticio para que Laravel no intente buscarlo en la BD
     unset($datos['id_grupo_definitivo']);
 
+    // 4. Actualizamos el alumno con las columnas reales de tu tabla
     $alumno->update($datos);
 
     return response()->json([
