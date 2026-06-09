@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('grupos', function (Blueprint $table) {
             $table->id('id_grupo');
             $table->string('nombre_grupo', 25);
+            $table->date('periodo');
 
             // llaves foraneas
             $table->unsignedTinyInteger('id_turno');
