@@ -42,7 +42,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
         Route::post('/grupos/guardar-profesores', [GrupoController::class, 'guardarProfesores'])->name('grupos.guardar_profesores');
         Route::get('/grupos/generados', function () { return view('groups.grupos_generados'); })->name('grupos.generados');
-        
+        Route::post('/grupos/{id_grupo}/cambiar-estado', [GrupoController::class, 'cambiarModoEstado'])->name('grupos.cambiar_estado');
+
         // Cursos Propedéutico e Inducción
         Route::get('/curso_prope', [GrupoController::class, 'showCursoPrope'])->name('curso_prope');
         Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
@@ -62,7 +63,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/cierre', function () { return view('grupos_finales.cierre'); })->name('cierre');
         Route::get('/grupos_final/criterios', function () { return view('grupos_final.criterios'); })->name('grupos_final.criterios');
         Route::get('/grupos_final/grupos_finales', function () { return view('grupos_final.grupos_finales'); })->name('grupos_final.grupos_finales');
-        Route::get('/grupos_final/modo_lectura', function () { return view('grupos_final.modo_lectura'); })->name('grupos_final.modo_lectura');
     });
 
     // ------------------------------------------------------

@@ -50,4 +50,10 @@ class Grupo extends Model
         return $this->belongsTo(Usuario::class, 'id_usuario', 'num_empleado');
     }
 
+    public function estado()
+    {
+        return $this->belongsTo(\App\Models\EstadoGrupo::class, 'id_estado', 'id_estado');
+    }
+
+
 }
