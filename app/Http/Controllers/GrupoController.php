@@ -171,12 +171,24 @@ class GrupoController extends Controller
             $idTurno = ($i < $gruposManana) ? ($turnoMatutino ? $turnoMatutino->id_turno : 1) : ($turnoVespertino ? $turnoVespertino->id_turno : 2); 
             $prefijo = ($tipoGrupo === 'propedeutico') ? 'Prope' : 'Induc';
 
+            $idEstadoActivo = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['activo'])->value('id_estado') ?? 4;
+            
+            // Garantizar que el usuario exista, sino usar el primer administrador disponible
+            $idUsuarioActual = auth()->check() ? auth()->user()->id_usuario : null;
+            $usuarioExiste = $idUsuarioActual ? \App\Models\Usuario::find($idUsuarioActual) : null;
+            
+            $idAdmin = $usuarioExiste 
+                        ? $idUsuarioActual 
+                        : \App\Models\Usuario::whereHas('rol', function($q) {
+                            $q->where('nombre_rol', 'LIKE', '%admin%');
+                          })->value('id_usuario') ?? \App\Models\Usuario::first()->id_usuario;
+
             $gruposCreados[] = Grupo::create([
                 'nombre_grupo' => $prefijo . ' ' . $etiqueta . ' - Gpo ' . $letras[$i],
                 'id_turno'     => $idTurno,
                 'id_curso'     => $idCurso,
-                'id_usuario'   => auth()->user()->id_usuario,
-                'id_estado'    => 1,
+                'id_usuario'   => $idAdmin,
+                'id_estado'    => $idEstadoActivo,
                 'periodo'      => $periodo,
             ]);
         }
