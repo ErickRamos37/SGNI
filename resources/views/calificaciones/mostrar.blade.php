@@ -27,14 +27,16 @@
                             </select>
                         </div>
 
-                        {{-- Boton condicional para descargar el reporte del grupo en Excel --}}
-                        @if ($grupo)
-                            <a href="#" id="btn-descargar-lista"
-                                data-url="{{ route('calificaciones.exportar', $grupo->id_grupo ?? $grupo->id) }}"
-                                class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                Descargar Lista
-                            </a>
-                        @endif
+                        {{-- Botones de Accion --}}
+                        <div class="d-flex gap-2 flex-wrap">
+                            @if ($grupo)
+                                <a href="#" id="btn-descargar-lista"
+                                    data-url="{{ route('calificaciones.exportar', $grupo->id_grupo ?? $grupo->id) }}"
+                                    class="btn btn-outline-dark px-5 fw-semibold rounded-3">
+                                    Descargar Lista
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -85,7 +87,7 @@
                             <div class="d-flex gap-2">
                                 <button type="button" id="btn-guardar-batch"
                                     class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                    Guardar Cambios
+                                    Guardar
                                 </button>
                             </div>
                         </div>
@@ -281,7 +283,7 @@
                             title: '¡Tabla Vacia!',
                             text: 'No hay registros válidos para actualizar.',
                             icon: 'warning',
-                            confirmButtonColor: '#dc3545',
+                            confirmButtonColor: '#00723F',
                             confirmButtonText: 'Aceptar'
                         });
                         return;
@@ -303,12 +305,18 @@
                                 calificaciones: calificacionesPayload
                             })
                         })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Error en el servidor');
-                            return response.json();
+                        .then(async response => {
+                            const isJson = response.headers.get('content-type')?.includes('application/json');
+                            const data = isJson ? await response.json() : null;
+
+                            if (!response.ok) {
+                                const message = (data && data.message) ? data.message : 'Ocurrió un inconveniente al actualizar las calificaciones en el servidor.';
+                                throw new Error(message);
+                            }
+                            return data;
                         })
                         .then(data => {
-                            if (data.status === 'success') {
+                            if (data && data.status === 'success') {
                                 Swal.fire({
                                     title: '¡Carga Exitosa!',
                                     text: 'Las calificaciones se actualizaron con éxito en la base de datos.',
@@ -320,7 +328,8 @@
                                     btn.prop('disabled', false).html('Guardar Cambios');
                                 });
                             } else {
-                                throw new Error(data.message);
+                                const message = (data && data.message) ? data.message : 'Error desconocido al guardar.';
+                                throw new Error(message);
                             }
                         })
                         .catch(error => {
@@ -328,9 +337,9 @@
                             console.error('Error:', error);
                             Swal.fire({
                                 title: '¡Error al Guardar!',
-                                text: 'Ocurrio un inconveniente al actualizar las calificaciones en el servidor.',
+                                text: error.message || 'Ocurrió un inconveniente al actualizar las calificaciones en el servidor.',
                                 icon: 'error',
-                                confirmButtonColor: '#dc3545',
+                                confirmButtonColor: '#00723F',
                                 confirmButtonText: 'Entendido'
                             });
                             btn.prop('disabled', false).html('Guardar Cambios');

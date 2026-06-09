@@ -279,6 +279,33 @@ class GrupoController extends Controller
         return view('groups.crear_grupos_cursos.curso_induc_creado', compact('gruposInduc', 'periodos', 'periodoActual'));
     }
 
+    // ==========================================================
+    // SISTEMA DE SEGURIDAD: CAMBIAR MODO DE GRUPO (LECTURA/EDITABLE)
+    // ==========================================================
+    public function cambiarModoEstado(Request $request, $id_grupo)
+    {
+        $grupo = Grupo::findOrFail($id_grupo);
+        
+        $estadoLectura = DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        $estadoEditable = DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['editable'])->first();
+
+        if (!$estadoLectura || !$estadoEditable) {
+            return redirect()->back()->withErrors(['Faltan los estados requeridos en el catálogo (Lectura/Editable).']);
+        }
+
+        if ($grupo->id_estado == $estadoLectura->id_estado) {
+            $grupo->id_estado = $estadoEditable->id_estado;
+            $mensaje = 'El grupo ha regresado al modo Editable.';
+        } else {
+            $grupo->id_estado = $estadoLectura->id_estado;
+            $mensaje = 'El grupo ha sido bloqueado (Modo Lectura).';
+        }
+
+        $grupo->save();
+
+        return redirect()->back()->with('success', $mensaje);
+    }
+
     // 2. ACTUALIZAR ESTA FUNCIÓN:
     public function showListaGrupo($id_grupo)
     {
@@ -468,7 +495,10 @@ class GrupoController extends Controller
             $q->where('nombre_rol', 'docente');
         })->get();
 
-        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes', 'periodos', 'periodoActual'));
+        $estadoLectura = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        $idEstadoLectura = $estadoLectura ? $estadoLectura->id_estado : null;
+
+        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes', 'periodos', 'periodoActual', 'idEstadoLectura'));
     }
 
     public function guardarProfesores(Request $request)
@@ -482,11 +512,20 @@ class GrupoController extends Controller
         \Illuminate\Support\Facades\DB::beginTransaction();
 
         try {
+            $estadoLectura = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+            $idEstadoLectura = $estadoLectura ? $estadoLectura->id_estado : null;
+
             // 3. Recorremos el arreglo. $id_grupo es la llave, $num_empleado es el valor seleccionado
             foreach ($request->docentes as $id_grupo => $num_empleado) {
                 // Solo actualizamos si el administrador realmente seleccionó un docente (no está vacío)
                 if (!empty($num_empleado)) {
                     $grupo = Grupo::findOrFail($id_grupo);
+
+                    // VALIDACIÓN DE SEGURIDAD: Abortar todo si el grupo está bloqueado
+                    if ($idEstadoLectura && $grupo->id_estado == $idEstadoLectura) {
+                        throw new \Exception('El grupo "' . $grupo->nombre_grupo . '" está en Modo Lectura. No se pueden realizar cambios.');
+                    }
+
                     $grupo->id_usuario = $num_empleado;
                     $grupo->save();
                 }
@@ -499,7 +538,7 @@ class GrupoController extends Controller
         } catch (\Exception $e) {
             // Si algo falla, deshacemos todo para no dejar la base de datos a medias
             \Illuminate\Support\Facades\DB::rollBack();
-            return back()->withErrors(['Error al asignar docentes: ' . $e->getMessage()]);
+            return back()->withErrors([$e->getMessage()]);
         }
     }
 
@@ -526,7 +565,10 @@ class GrupoController extends Controller
             $q->where('nombre_rol', 'docente');
         })->get();
 
-        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes', 'periodos', 'periodoActual'));
+        $estadoLectura = \Illuminate\Support\Facades\DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+        $idEstadoLectura = $estadoLectura ? $estadoLectura->id_estado : null;
+
+        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes', 'periodos', 'periodoActual', 'idEstadoLectura'));
     }
 
     public function storeInduc(Request $request)

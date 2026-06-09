@@ -75,7 +75,9 @@ class CalificacionesImport implements ToCollection
             throw new \Exception("Estructura invalida: No se pudieron localizar las columnas obligatorias de 'Matricula', 'Examen 1' o 'Examen 2'. Asegurese de que los encabezados esten en las filas 6 y 7.");
         }
 
-        // Iniciamos el ciclo a partir de la fila 8 (indice 7)
+        $datosParaImportar = [];
+
+        // 1. Fase de Validación de todas las filas
         foreach ($rows as $numFila => $row) {
             $filaExcel = $numFila + 1;
 
@@ -110,7 +112,14 @@ class CalificacionesImport implements ToCollection
                 throw new \Exception("Fila {$filaExcel}: El alumno '{$alumno->nombre}' (Matricula: {$matricula}) existe, pero NO tiene ningun grupo propedeutico asignado.");
             }
 
-            $this->filasConDatos++;
+            // SEGURIDAD: Verificar si el grupo al que pertenece está en Modo Lectura
+            $grupo = Grupo::find($alumno->id_grupo_propedeutico);
+            if ($grupo) {
+                $estadoLectura = \DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+                if ($estadoLectura && $grupo->id_estado == $estadoLectura->id_estado) {
+                    throw new \Exception("El grupo '{$grupo->nombre_grupo}' se encuentra en modo lectura (Bloqueado) y no puede ser editado actualmente.");
+                }
+            }
 
             // Extraemos las notas utilizando las columnas encontradas dinamicamente
             $examen1 = isset($row[$columnaExamen1]) ? $row[$columnaExamen1] : null;
@@ -123,6 +132,27 @@ class CalificacionesImport implements ToCollection
                 throw new \Exception("Fila {$filaExcel}: Las calificaciones de Examen 1 y Examen 2 deben ser valores numericos entre 0 y 100.");
             }
 
+            $this->filasConDatos++;
+
+            $datosParaImportar[] = [
+                'alumno' => $alumno,
+                'grupo' => $grupo,
+                'examen1' => $examen1,
+                'examen2' => $examen2
+            ];
+        }
+
+        if ($this->filasConDatos === 0) {
+            throw new \Exception("Fila de datos inexistente: El archivo Excel esta vacio o no contiene ningun registro de alumnos valido a partir de la fila 8.");
+        }
+
+        // 2. Fase de Escritura en Base de Datos (solo si todas las validaciones pasaron)
+        foreach ($datosParaImportar as $item) {
+            $alumno = $item['alumno'];
+            $grupo = $item['grupo'];
+            $examen1 = $item['examen1'];
+            $examen2 = $item['examen2'];
+
             // Si el alumno ya tiene registro de notas asignado, se actualiza
             if ($alumno->id_resultados_propedeutico) {
                 ResultadosPropedeutico::where('id_resultados_propedeutico', $alumno->id_resultados_propedeutico)
@@ -132,7 +162,6 @@ class CalificacionesImport implements ToCollection
                     ]);
             } else {
                 $idCursoDefecto = 1;
-                $grupo = Grupo::find($alumno->id_grupo_propedeutico);
                 if ($grupo && $grupo->id_curso) {
                     $idCursoDefecto = $grupo->id_curso;
                 }
@@ -146,10 +175,6 @@ class CalificacionesImport implements ToCollection
                 $alumno->id_resultados_propedeutico = $nuevasNotas->id_resultados_propedeutico ?? $nuevasNotas->id;
                 $alumno->save();
             }
-        }
-
-        if ($this->filasConDatos === 0) {
-            throw new \Exception("Fila de datos inexistente: El archivo Excel esta vacio o no contiene ningun registro de alumnos valido a partir de la fila 8.");
         }
     }
 }

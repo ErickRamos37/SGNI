@@ -307,14 +307,6 @@
                         </li>
                     </ul>
                 </li>
-
-                {{-- Modo Lectura --}}
-                <li class="nav-item mb-1">
-                    <a href="{{ route('grupos_final.modo_lectura') }}"
-                        class="nav-link {{ request()->routeIs('grupos_final.modo_lectura') ? 'text-dark bg-secondary fw-bold shadow-sm' : 'text-white' }}">
-                        Modo Lectura
-                    </a>
-                </li>
                 @endif
 
             </ul>

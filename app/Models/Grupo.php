@@ -2,29 +2,32 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Grupo extends Model
 {
+    use HasFactory;
+
     protected $table = 'grupos';
 
-    protected $primaryKey = 'id_grupo';
+    // CORRECCIÓN CLAVE PARA PREVENIR GRUPOS VACÍOS:
+    protected $primaryKey = 'id_grupo'; 
+    public $incrementing = true;
 
     protected $fillable = [
         'nombre_grupo',
-        'id_curso',
         'id_turno',
-        'id_usuario',
+        'id_curso',
+        'num_empleado',
         'id_estado',
-        'periodo'
     ];
 
-    public function alumnos(): HasMany
+    public function alumnos()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
     }
-    
+
     public function alumnosInduccion()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_induccion', 'id_grupo');
@@ -50,4 +53,8 @@ class Grupo extends Model
         return $this->belongsTo(Usuario::class, 'id_usuario', 'num_empleado');
     }
 
+    public function estado()
+    {
+        return $this->belongsTo(\App\Models\EstadoGrupo::class, 'id_estado', 'id_estado');
+    }
 }

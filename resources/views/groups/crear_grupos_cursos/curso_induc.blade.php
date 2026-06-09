@@ -286,7 +286,10 @@
                                         @endif
                                     </td>
                                     <td class="py-3 border-light-subtle">
-                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle">
+                                        @php
+                                            $esLectura = isset($idEstadoLectura) && $grupo->id_estado == $idEstadoLectura;
+                                        @endphp
+                                        <select name="docentes[{{ $grupo->id_grupo }}]" class="form-select shadow-sm border-light-subtle {{ $esLectura ? 'bg-light text-muted' : '' }}" {{ $esLectura ? 'disabled' : '' }}>
                                             <option value="" selected disabled>Seleccionar docente</option>
                                             @foreach($docentes as $docente)
                                                 <option value="{{ $docente->id_usuario }}" {{ $grupo->id_usuario == $docente->id_usuario ? 'selected' : '' }}>

@@ -48,7 +48,7 @@ class CalificacionController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()->withErrors([
-                'archivo_excel' => 'Error al procesar la estructura interna del archivo: ' . $e->getMessage()
+                'archivo_excel' => $e->getMessage()
             ]);
         }
     }
@@ -190,6 +190,27 @@ class CalificacionController extends Controller
         $data = $request->validated();
 
         try {
+            // ==========================================================
+            // SEGURIDAD ADICIONAL: VERIFICAR MODO LECTURA ANTES DE GUARDAR
+            // ==========================================================
+            $matriculas = array_keys($data['calificaciones'] ?? []);
+            if (!empty($matriculas)) {
+                $alumnoCheck = Alumno::where('matricula', $matriculas[0])->first();
+                if ($alumnoCheck && $alumnoCheck->id_grupo_propedeutico) {
+                    $grupoCheck = Grupo::find($alumnoCheck->id_grupo_propedeutico);
+                    if ($grupoCheck) {
+                        $estadoLectura = \DB::table('estado_grupo')->whereRaw('LOWER(nombre_estado) = ?', ['lectura'])->first();
+                        if ($estadoLectura && $grupoCheck->id_estado == $estadoLectura->id_estado) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'El grupo se encuentra en modo lectura y no puede ser modificado'
+                            ], 403);
+                        }
+                    }
+                }
+            }
+            // ==========================================================
+
             foreach ($data['calificaciones'] as $matricula => $scores) {
                 $alumno = Alumno::where('matricula', $matricula)->first();
 
