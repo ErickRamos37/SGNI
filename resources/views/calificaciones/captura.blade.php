@@ -66,8 +66,7 @@
                         <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
                         <div class="small">
                             <strong>Formato esperado:</strong> El archivo Excel debe contener las columnas:
-                            <span class="text-muted fw-semibold">Matricula, Examen Propedeutico Inicial y Examen
-                                Propedéutico Final</span>
+                            <span class="text-muted fw-semibold">Matricula, Examen1 y Examen2</span>
                         </div>
                     </div>
 
@@ -75,10 +74,10 @@
                     <hr class="my-4 border-light-subtle">
                     {{-- Cambiamos justify-content-end por justify-content-between para mandar los bloques a los extremos --}}
                     <div class="d-flex justify-content-between align-items-center mt-4">
-                        <button type="button" onclick="window.history.back();"
+                        <a href="{{ route('asistencia.paselista') }}"
                             class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
                             <span>Regresar</span>
-                        </button>
+                        </a>
                         <div class="d-flex gap-2">
                             <button type="button" id="btn-cancelar"
                                 class="btn btn-outline-dark px-4 fw-semibold rounded-3">
@@ -104,7 +103,9 @@
                     title: '¡Carga Exitosa!',
                     text: "{{ session('success') }}",
                     icon: 'success',
-                    confirmButtonColor: '#00723F',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    },
                     confirmButtonText: 'Aceptar'
                 });
             });
@@ -120,7 +121,9 @@
                     title: '¡Inconsistencia Detectada!',
                     html: '<p class="text-muted small text-center mb-0">' + errorTexto + '</p>',
                     icon: 'error',
-                    confirmButtonColor: '#dc3545',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    },
                     confirmButtonText: 'Entendido'
                 });
             });
