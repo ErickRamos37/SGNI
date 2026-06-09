@@ -9,7 +9,6 @@
                 {{-- Encabezado de la pantalla --}}
                 <div class="mb-4">
                     <h1 class="fw-bold text-dark mb-1">Criterios para la Creación de Grupos Finales</h1>
-                    {{-- Ajustado a text-dark para un tono gris oscuro de alto contraste --}}
                     <p class="text-dark small mb-0">Configure los criterios para la asignación de grupos finales del primer
                         semestre</p>
                 </div>
@@ -22,7 +21,6 @@
                             <span>Criterios de Asignación</span>
                         </h5>
 
-                        {{-- Ajustado a text-dark para el parrafo informativo --}}
                         <p class="text-dark small mb-4">
                             Defina el balance porcentual para la distribucion de alumnos en cada grupo. El sistema
                             segmentara a los estudiantes basándose en su puntaje de ingreso (900 a 1300 puntos). La suma de
@@ -38,7 +36,6 @@
                                 {{-- Columna Izquierda: Alumnos de Puntaje Alto --}}
                                 <div class="col-12 col-md-6">
                                     <div class="p-4 rounded-3 bg-light border border-light-subtle">
-                                        {{-- Ajustado a text-dark --}}
                                         <label for="porcentaje-alto"
                                             class="form-label text-uppercase fw-bold text-dark small d-block mb-3">
                                             Alumnos con Puntaje Alto (%)
@@ -48,7 +45,6 @@
                                                 class="form-control form-control-lg text-center fw-bold rounded-3 bg-white border-0 py-3 fs-2 shadow-none"
                                                 value="80" min="1" max="99" required>
                                         </div>
-                                        {{-- Ajustado a text-dark --}}
                                         <span class="text-dark small d-block mt-2 text-center-sm">
                                             Estudiantes con los mejores puntajes de admision.
                                         </span>
@@ -58,7 +54,6 @@
                                 {{-- Columna Derecha: Alumnos de Puntaje Bajo --}}
                                 <div class="col-12 col-md-6">
                                     <div class="p-4 rounded-3 bg-light border border-light-subtle">
-                                        {{-- Ajustado a text-dark --}}
                                         <label for="porcentaje-bajo"
                                             class="form-label text-uppercase fw-bold text-dark small d-block mb-3">
                                             Alumnos con Puntaje Bajo (%)
@@ -68,7 +63,6 @@
                                                 class="form-control form-control-lg text-center fw-bold rounded-3 bg-white border-0 py-3 fs-2 shadow-none"
                                                 value="20" min="1" max="99" required>
                                         </div>
-                                        {{-- Ajustado a text-dark --}}
                                         <span class="text-dark small d-block mt-2 text-center-sm">
                                             Estudiantes con puntajes de admision en la terna baja.
                                         </span>
@@ -80,7 +74,8 @@
                             {{-- Pie de tarjeta unificado con botones en los extremos --}}
                             <hr class="my-4 border-light-subtle">
                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                <button type="button" onclick="window.history.back();"
+                                {{-- Boton regresar protegido con historial nativo --}}
+                                <button type="button" id="btn-regresar-dinamico"
                                     class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
                                     <span>Regresar</span>
                                 </button>
@@ -98,48 +93,93 @@
         </div>
     </div>
 
-    {{-- Script de validacion dinamica espejo usando jQuery --}}
+    {{-- Script optimizado para calculo espejo en tiempo real y envio AJAX --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const formCriterios = document.getElementById('form-criterios');
             const btnSubmit = formCriterios.querySelector('button[type="submit"]');
+            const inputAlto = document.getElementById('porcentaje-alto');
+            const inputBajo = document.getElementById('porcentaje-bajo');
 
+            // =========================================================
+            // LÓGICA MODO ESPEJO DINÁMICO (Suma exacta de 100%)
+            // =========================================================
+            inputAlto.addEventListener('input', function() {
+                let valorAlto = parseInt(inputAlto.value) || 0;
+                if (valorAlto >= 1 && valorAlto <= 99) {
+                    inputBajo.value = 100 - valorAlto;
+                }
+            });
+
+            inputBajo.addEventListener('input', function() {
+                let valorBajo = parseInt(inputBajo.value) || 0;
+                if (valorBajo >= 1 && valorBajo <= 99) {
+                    inputAlto.value = 100 - valorBajo;
+                }
+            });
+            // =========================================================
+
+            // Envio del formulario por AJAX mediante Fetch
             formCriterios.addEventListener('submit', function (e) {
-                e.preventDefault(); // Detenemos el viaje normal de HTML
+                e.preventDefault();
 
-                // Desactivamos el botón visualmente para evitar doble clic (Regla del SGNI)
+                const valorAlto = parseInt(inputAlto.value) || 0;
+                const valorBajo = parseInt(inputBajo.value) || 0;
+
+                // Validacion de seguridad local
+                if (valorAlto + valorBajo !== 100) {
+                    alert('Inconsistencia: La suma de ambos porcentajes debe ser exactamente igual a 100%.');
+                    return;
+                }
+
                 btnSubmit.disabled = true;
                 btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Generando...';
 
-                // Recolectamos el 80 y el 20
                 const formData = new FormData(formCriterios);
 
-                // Enviamos los datos al Controlador silenciosamente
                 fetch(formCriterios.action, {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'Accept': 'application/json',        // ¡AGREGA ESTA LÍNEA! (Obligatorio en tu arquitectura SGNI)
-                        'X-Requested-With': 'XMLHttpRequest' // Le avisa a Laravel que es AJAX
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.redirect_url) {
-                            // ¡Aquí ocurre la magia! El servidor nos mandó la URL y JS nos redirige a la tabla
-                            window.location.href = data.redirect_url;
-                        } else if (data.message) {
-                            alert(data.message); // Si hubo un error (ej. la suma no da 100)
-                            btnSubmit.disabled = false;
-                            btnSubmit.innerHTML = 'Generar Distribución';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Ocurrió un error al procesar los grupos.');
+                .then(response => {
+                    if (!response.ok) {
+                        throw response;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.redirect_url) {
+                        // Redirecciona a la vista general de los grupos generados
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert(data.message || 'Distribución completada con éxito.');
                         btnSubmit.disabled = false;
                         btnSubmit.innerHTML = 'Generar Distribución';
-                    });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (error.json) {
+                        error.json().then(errData => {
+                            alert(errData.message || 'Ocurrió un problema al procesar la distribución.');
+                        });
+                    } else {
+                        alert('Ocurrió un error interno en el servidor.');
+                    }
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = 'Generar Distribución';
+                });
+            });
+
+            // Logica del boton regresar basado en longitud del historial
+            document.getElementById('btn-regresar-dinamico').addEventListener('click', function() {
+                if (window.history.length > 1) {
+                    window.history.back();
+                }
             });
         });
     </script>
