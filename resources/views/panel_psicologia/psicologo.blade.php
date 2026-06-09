@@ -85,25 +85,23 @@
             // 1. Inicializar tabla INDUCCIÓN (De MAYOR a MENOR asistencia)
             new DataTable('#tabla-induccion', {
                 ...opcionesEstandar,
-                // ✅ CAMBIO AQUÍ: La columna 6 es 'asistencias'. 'desc' ordena de 100% hacia abajo
                 order: [[6, 'desc']], 
                 ajax: { url: '{{ route('seguimiento.datos') }}?curso=induccion', dataSrc: 'data' },
                 columns: [
-                    { data: 'matricula', className: 'fw-bold px-3' },
-                    { data: 'nombre_completo' },
-                    { data: 'grupo' },
-                    { data: 'carrera', className: 'text-center' }, 
-                    { data: 'contacto' },
-                    { data: 'puntaje_ingreso', className: 'text-center text-dark' },
-                    { data: 'asistencias', className: 'text-center fw-bold' }, // <-- Esta es la columna 6
+                    { data: 'matricula', className: 'fw-bold px-3' }, //0
+                    { data: 'nombre_completo' }, //1
+                    { data: 'grupo' }, //2
+                    { data: 'carrera', className: 'text-center' },  //3
+                    { data: 'contacto' }, //4
+                    { data: 'puntaje_ingreso', className: 'text-center text-dark' },//5
+                    { data: 'asistencias', className: 'text-center fw-bold' }, //6
                     { data: 'riesgo', className: 'text-center', orderable: false }
                 ]
             });
 
             // 2. Inicializar tabla PROPEDÉUTICO (De MENOR a MAYOR asistencia)
             new DataTable('#tabla-propedeutico', {
-                ...opcionesEstandar,
-                // ✅ CAMBIO AQUÍ: La columna 9 es 'asistencias'. 'asc' ordena de 0% hacia arriba
+                ...opcionesEstandar,               
                 order: [[9, 'desc']], 
                 ajax: { url: '{{ route('seguimiento.datos') }}?curso=propedeutico', dataSrc: 'data' },
                 columns: [
@@ -116,7 +114,7 @@
                     { data: 'examen_inicial', className: 'text-center' },
                     { data: 'examen_final', className: 'text-center fw-bold' },
                     { data: 'promedio', className: 'text-center fw-bold text-dark' },
-                    { data: 'asistencias', className: 'text-center fw-bold' }, // <-- Esta es la columna 9
+                    { data: 'asistencias', className: 'text-center fw-bold' }, 
                     { data: 'riesgo', className: 'text-center', orderable: false }
                 ]
             });
