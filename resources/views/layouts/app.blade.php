@@ -303,7 +303,6 @@
                                 </li>
                             </ul>
                         </li>
-                    @endif
                 </ul>
                 <hr>
                 <div class="dropdown">
