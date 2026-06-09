@@ -71,7 +71,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('configurar', [GrupoFinalController::class, 'configurar'])
                 ->name('criterios');
 
-            // 2. Procesar algoritmo -> URL final: /grupos-finales/generar | Nombre: grupos_finales.generar
+            // 2. Nueva vista para subir el Excel
+            Route::get('subir-excel', [GrupoFinalController::class, 'mostrarSubirExcel'])
+                ->name('subir_excel');
+
+            // 3. Procesar algoritmo -> URL final: /grupos-finales/generar | Nombre: grupos_finales.generar
             Route::post('generar', [GrupoFinalController::class, 'generarDistribucion'])
                 ->name('generar');
 

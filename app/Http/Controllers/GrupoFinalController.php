@@ -60,11 +60,24 @@ class GrupoFinalController extends Controller
     }
 
     /**
-     * Algoritmo central de distribucion de grupos (80/20) libre de IDs fijos.
+     * Muestra la pantalla para subir el archivo Excel.
      */
-    public function generarDistribucion(GenerarDistribucionRequest $request)
+    public function mostrarSubirExcel(Request $request)
     {
-        $porcentajeAlto = (int) $request->validated()['porcentaje_alto'];
+        return view('grupos_finales.subir_lista');
+    }
+
+    /**
+     * Algoritmo central de distribucion de grupos (80/20) leyendo desde Excel.
+     */
+    public function generarDistribucion(Request $request)
+    {
+        $request->validate([
+            'porcentaje_alto' => 'required|numeric|min:1|max:99',
+            'archivo_alumnos' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        $porcentajeAlto = (int) $request->porcentaje_alto;
         $limitePorGrupo = 30;
 
         DB::beginTransaction();
@@ -81,18 +94,73 @@ class GrupoFinalController extends Controller
 
             $idEstadoActivo = DB::table('estado_grupo')->where('nombre_estado', 'like', '%activo%')->value('id_estado') ?? 1;
 
+            // LECTURA DEL ARCHIVO EXCEL
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($request->file('archivo_alumnos')->getRealPath());
+            $filas = $spreadsheet->getActiveSheet()->toArray();
+
+            $encabezados = array_map(function($col) {
+                // Quitar espacios y caracteres invisibles (BOM)
+                $col = trim($col, "\xEF\xBB\xBF \t\n\r\0\x0B");
+                return strtolower($col);
+            }, $filas[0]);
+            $mapa = array_flip($encabezados);
+
+            // Validar que al menos las columnas críticas existan
+            $requeridos = ['matricula', 'nombre', 'apellido_paterno', 'apellido_materno'];
+            $faltantes = [];
+            foreach ($requeridos as $req) {
+                if (!isset($mapa[$req])) {
+                    $faltantes[] = $req;
+                }
+            }
+            if (count($faltantes) > 0) {
+                DB::rollBack();
+                return back()->withErrors(['El archivo no tiene el formato correcto. Faltan las columnas: ' . implode(', ', $faltantes) . '. Revisa espacios o acentos (deben escribirse exactamente así).']);
+            }
+
+            $alumnosCollection = collect();
+
+            for ($i = 1; $i < count($filas); $i++) {
+                $fila = $filas[$i];
+                $matricula = isset($mapa['matricula']) ? trim($fila[$mapa['matricula']]) : null;
+                if (empty($matricula)) continue;
+
+                $puntaje = isset($mapa['puntaje']) && !empty(trim($fila[$mapa['puntaje']])) ? trim($fila[$mapa['puntaje']]) : null;
+                $nombre = isset($mapa['nombre']) ? trim($fila[$mapa['nombre']]) : '';
+                $apPat = isset($mapa['apellido_paterno']) ? trim($fila[$mapa['apellido_paterno']]) : '';
+                $apMat = isset($mapa['apellido_materno']) ? trim($fila[$mapa['apellido_materno']]) : '';
+                $correo = isset($mapa['correo']) ? trim($fila[$mapa['correo']]) : null;
+                $correoAlt = isset($mapa['correo_alter']) ? trim($fila[$mapa['correo_alter']]) : null;
+                $tel = isset($mapa['telefono']) ? trim($fila[$mapa['telefono']]) : null;
+
+                $alumno = Alumno::find($matricula);
+                if (!$alumno) {
+                    $alumno = new Alumno();
+                    $alumno->matricula = $matricula;
+                    $alumno->id_carrera = $idCarreraTC; // Asumimos TC si no existía previamente
+                }
+                
+                if (!empty($nombre)) $alumno->nombre = mb_strtoupper(substr($nombre, 0, 45));
+                if (!empty($apPat)) $alumno->ap_pat = mb_strtoupper(substr($apPat, 0, 25));
+                if (!empty($apMat)) $alumno->ap_mat = mb_strtoupper(substr($apMat, 0, 25));
+                if (!empty($correo)) $alumno->correo_institucional = substr($correo, 0, 125);
+                if (!empty($correoAlt)) $alumno->correo_alternativo = substr($correoAlt, 0, 150);
+                if (!empty($tel)) $alumno->telefono = substr($tel, 0, 10);
+                if ($puntaje !== null) $alumno->puntaje_ingreso = $puntaje;
+
+                $alumno->save();
+                $alumnosCollection->push($alumno);
+            }
+
             // 1. LIMPIEZA PREVIA: Sacamos a TODOS de sus grupos definitivos actuales
             Alumno::whereNotNull('id_grupo_definitivo')->update(['id_grupo_definitivo' => null]);
 
-            // 2. Traer el universo de alumnos que vienen de induccion
-            $alumnos = Alumno::whereNotNull('id_grupo_induccion')
-                ->orderBy('puntaje_ingreso', 'desc')
-                ->get();
+            // 2. Ordenar alumnos procesados por puntaje
+            $alumnos = $alumnosCollection->sortByDesc('puntaje_ingreso')->values();
 
             if ($alumnos->isEmpty()) {
-                return response()->json([
-                    'message' => 'No hay alumnos registrados en cursos previos para distribuir.'
-                ], 400);
+                DB::rollBack();
+                return back()->withErrors(['No se detectaron alumnos válidos en el archivo.']);
             }
 
             // 3. DESENREDAR ALUMNOS: Separacion por variables semanticas dinamicas
@@ -123,7 +191,7 @@ class GrupoFinalController extends Controller
                 foreach ($configuracion as $config) {
                     $grupo = Grupo::updateOrCreate(
                         ['nombre_grupo' => $config['nombre'], 'id_curso' => $idCursoFinal],
-                        ['id_turno' => $config['turno'], 'id_usuario' => auth()->id() ?? 1, 'id_estado' => $idEstadoActivo]
+                        ['id_turno' => $config['turno'], 'id_usuario' => auth()->id() ?? 1, 'id_estado' => $idEstadoActivo, 'periodo' => date('Y') . '-1']
                     );
                     $gruposIds[] = $grupo->id_grupo;
                     $conteos[$grupo->id_grupo] = 0;
@@ -166,14 +234,11 @@ class GrupoFinalController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Grupos de Tronco Comun y Arquitectura generados de forma independiente.',
-                'redirect_url' => route('grupos_finales.lista')
-            ], 200);
+            return redirect()->route('grupos_finales.lista')->with('success', 'Grupos definitivos generados exitosamente en base a la lista subida.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Ocurrio un error interno.', 'error' => $e->getMessage()], 500);
+            return back()->withErrors(['Ocurrió un error interno: ' . $e->getMessage()]);
         }
     }
 

@@ -28,8 +28,7 @@
                         </p>
 
                         {{-- Formulario de criterios estructurado en paralelo (lado a lado) --}}
-                        <form action="{{ route('grupos_finales.generar') }}" method="POST" id="form-criterios">
-                            @csrf
+                        <form action="{{ route('grupos_finales.subir_excel') }}" method="GET" id="form-criterios">
 
                             <div class="row g-4">
 
@@ -80,7 +79,7 @@
                                     <span>Regresar</span>
                                 </button>
                                 <button type="submit" class="btn btn-outline-dark px-5 fw-semibold rounded-3">
-                                    Generar Distribución
+                                    Siguiente <i class="bi bi-arrow-right ms-2"></i>
                                 </button>
                             </div>
 
@@ -118,62 +117,6 @@
                 }
             });
             // =========================================================
-
-            // Envio del formulario por AJAX mediante Fetch
-            formCriterios.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const valorAlto = parseInt(inputAlto.value) || 0;
-                const valorBajo = parseInt(inputBajo.value) || 0;
-
-                // Validacion de seguridad local
-                if (valorAlto + valorBajo !== 100) {
-                    alert('Inconsistencia: La suma de ambos porcentajes debe ser exactamente igual a 100%.');
-                    return;
-                }
-
-                btnSubmit.disabled = true;
-                btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Generando...';
-
-                const formData = new FormData(formCriterios);
-
-                fetch(formCriterios.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw response;
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.redirect_url) {
-                        // Redirecciona a la vista general de los grupos generados
-                        window.location.href = data.redirect_url;
-                    } else {
-                        alert(data.message || 'Distribución completada con éxito.');
-                        btnSubmit.disabled = false;
-                        btnSubmit.innerHTML = 'Generar Distribución';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    if (error.json) {
-                        error.json().then(errData => {
-                            alert(errData.message || 'Ocurrió un problema al procesar la distribución.');
-                        });
-                    } else {
-                        alert('Ocurrió un error interno en el servidor.');
-                    }
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = 'Generar Distribución';
-                });
-            });
 
             // Logica del boton regresar basado en longitud del historial
             document.getElementById('btn-regresar-dinamico').addEventListener('click', function() {
