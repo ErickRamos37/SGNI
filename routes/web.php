@@ -9,6 +9,7 @@ use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
 use App\Http\Controllers\SeguimientoController;
+use App\Http\Controllers\GrupoFinalController;
 
 // ==========================================================
 // 1. RUTAS PÚBLICAS Y DE AUTENTICACIÓN
@@ -82,8 +83,34 @@ Route::middleware(['auth'])->group(function () {
 
         // Cierres y grupos finales
         Route::get('/cierre', function () { return view('grupos_finales.cierre'); })->name('cierre');
-        Route::get('/grupos_final/criterios', function () { return view('grupos_final.criterios'); })->name('grupos_final.criterios');
-        Route::get('/grupos_final/grupos_finales', function () { return view('grupos_final.grupos_finales'); })->name('grupos_final.grupos_finales');
+
+        Route::prefix('grupos-finales')->name('grupos_finales.')->group(function () {
+            // 1. Formulario de criterios -> URL final: /grupos-finales/configurar | Nombre: grupos_finales.criterios
+            Route::get('configurar', [GrupoFinalController::class, 'configurar'])
+                ->name('criterios');
+
+            // 2. Procesar algoritmo -> URL final: /grupos-finales/generar | Nombre: grupos_finales.generar
+            Route::post('generar', [GrupoFinalController::class, 'generarDistribucion'])
+                ->name('generar');
+
+            // 3. Tabla de resultados -> URL final: /grupos-finales/lista | Nombre: grupos_finales.lista
+            Route::get('lista', [GrupoFinalController::class, 'gruposFinales'])
+                ->name('lista');
+
+            // 4. Modo lectura -> URL final: /grupos-finales/modo-lectura | Nombre: grupos_finales.modo_lectura
+            Route::get('modo-lectura', function () {
+                return view('grupos_finales.modo_lectura');
+            })->name('modo_lectura');
+
+            Route::get('{id}/lista', [GrupoFinalController::class, 'verListaGrupo'])
+                ->name('lista_grupo_final');
+        });
+
+        // Vista para ver la lista en pantalla
+        Route::get('/grupos-finales/lista/{id}', [GrupoFinalController::class, 'verListaGrupo'])->name('grupos_finales.lista_grupo_final');
+
+        // Acción para descargar el CSV
+        Route::get('/grupos-finales/descargar/{id}', [GrupoFinalController::class, 'descargarLista'])->name('grupos_finales.descargar_lista');
     });
 
     // ------------------------------------------------------
@@ -91,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
     // ------------------------------------------------------
     Route::middleware(['rol:Administrador,Docente'])->group(function () {
 
-        // Listas de grupos
+        // Visualización de Listas
         Route::get('/grupos/{id_grupo}/ver-lista', [GrupoController::class, 'showListaGrupo'])->name('lista_grupo');
         Route::get('/grupos/{id_grupo}/descargar-lista', [GrupoController::class, 'descargarLista'])->name('grupos.descargar_lista');
 
@@ -127,5 +154,4 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
         Route::get('/seguimiento/datos', [SeguimientoController::class, 'getDatosSeguimiento'])->name('seguimiento.datos');
     });
-
 });

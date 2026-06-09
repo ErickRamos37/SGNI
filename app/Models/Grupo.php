@@ -12,7 +12,7 @@ class Grupo extends Model
     protected $table = 'grupos';
 
     // CORRECCIÓN CLAVE PARA PREVENIR GRUPOS VACÍOS:
-    protected $primaryKey = 'id_grupo'; 
+    protected $primaryKey = 'id_grupo';
     public $incrementing = true;
 
     protected $fillable = [
@@ -52,6 +52,12 @@ class Grupo extends Model
     public function turno()
     {
         return $this->belongsTo(Turno::class, 'id_turno', 'id_turno');
+    }
+
+    public function alumnosFinales()
+    {
+        // Asumiendo que la llave foránea en la tabla alumno es 'id_grupo_definitivo'
+        return $this->hasMany(Alumno::class, 'id_grupo_definitivo', 'id_grupo');
     }
 
     /**
