@@ -16,7 +16,8 @@ class Grupo extends Model
         'id_curso',
         'id_turno',
         'id_usuario',
-        'id_estado'
+        'id_estado',
+        'periodo'
     ];
 
     public function alumnos(): HasMany

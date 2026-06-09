@@ -56,6 +56,17 @@
                             Paso 1: Configurar Cantidad de Grupos
                         </h5>
 
+                        {{-- PERIODO / CICLO ESCOLAR --}}
+                        <div class="mb-4">
+                            <label for="periodo" class="form-label fw-bold text-dark text-uppercase fs-6">
+                                <i class="bi bi-calendar-event me-1"></i> Periodo / Ciclo Escolar
+                            </label>
+                            <input type="text" name="periodo" id="periodo" class="form-control shadow-sm fw-bold fs-5 w-50" placeholder="Ej. 2026-1" maxlength="10" required>
+                            <div class="form-text text-muted">Escribe el ciclo escolar para estos grupos (Ej. 2026-1, 2026-2).</div>
+                        </div>
+
+                        <hr class="my-4 border-light-subtle">
+
                         {{-- INGENIERÍA --}}
                         <div class="d-flex align-items-center mb-3">
                             <span class="fw-bold text-dark text-uppercase fs-6">Grupos para Ingeniería</span>
@@ -243,6 +254,32 @@
         {{-- ========================================================= --}}
         {{-- VISTA: ASIGNAR PROFESORES A GRUPOS                        --}}
         {{-- ========================================================= --}}
+
+        {{-- SELECTOR DE PERIODO --}}
+        @if($periodos->count() > 0)
+            <div class="card border border-light-subtle shadow-sm rounded-3 mb-4">
+                <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar-range fs-4 text-primary me-3"></i>
+                        <div>
+                            <span class="fw-bold text-dark">Periodo Activo:</span>
+                            <span class="text-muted small ms-1">Selecciona el ciclo escolar a visualizar</span>
+                        </div>
+                    </div>
+                    <select id="selectorPeriodoPrope" class="form-select w-auto fw-bold shadow-sm">
+                        @foreach($periodos as $p)
+                            <option value="{{ $p }}" @if($p == $periodoActual) selected @endif>{{ $p }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <script>
+                document.getElementById('selectorPeriodoPrope').addEventListener('change', function() {
+                    window.location.href = '?tab=asignar&periodo=' + this.value;
+                });
+            </script>
+        @endif
+
         <form action="{{ route('grupos.guardar_profesores') }}" method="POST">
             @csrf
             
@@ -274,7 +311,7 @@
                                             @php
                                                 $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-success fw-semibold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>
@@ -335,7 +372,7 @@
                                             @php
                                                 $docenteAsignado = $docentes->firstWhere('id_usuario', $grupo->id_usuario);
                                             @endphp
-                                            <span class="text-success fw-semibold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                                            <span class="text-primary fw-semibold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
                                                 <i class="bi bi-check-circle-fill me-1"></i>
                                                 {{ $docenteAsignado ? $docenteAsignado->nombre . ' ' . $docenteAsignado->ap_pat : 'Docente Asignado' }}
                                             </span>

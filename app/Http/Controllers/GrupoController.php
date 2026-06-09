@@ -20,18 +20,7 @@ class GrupoController extends Controller
     public function store(Request $request)
     {
         // =======================================================
-        // 1. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos)
-        // =======================================================
-        $prefijo = ($request->tipo_grupo === 'propedeutico') ? 'Prope' : 'Induc';
-        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%' . $prefijo . '%')->exists();
-
-        if ($gruposExistentes) {
-            // Si ya hay grupos, detenemos la ejecución inmediatamente y mandamos la alerta
-            return redirect()->back()->with('error_grupos_existentes', 'Los grupos iniciales ya fueron generados anteriormente. Si deseas inscribir a más estudiantes, por favor utiliza el módulo de Alta de Alumnos tardíos.');
-        }
-
-        // =======================================================
-        // 2. Si pasó el candado, validamos los datos del formulario
+        // 1. Si pasó el candado, validamos los datos del formulario
         // =======================================================
         $request->validate([
             'grupos_manana_inge'  => 'required|integer|min:0',
@@ -39,8 +28,21 @@ class GrupoController extends Controller
             'grupos_manana_arqui' => 'required|integer|min:0',
             'grupos_tarde_arqui'  => 'required|integer|min:0',
             'archivo_alumnos'     => 'required|mimes:xlsx,xls,csv',
-            'tipo_grupo'          => 'required|string'
+            'tipo_grupo'          => 'required|string',
+            'periodo'             => 'required|string|max:10'
         ]);
+
+        // =======================================================
+        // 2. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos PARA ESTE PERIODO)
+        // =======================================================
+        $prefijo = ($request->tipo_grupo === 'propedeutico') ? 'Prope' : 'Induc';
+        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%' . $prefijo . '%')
+            ->where('periodo', $request->periodo)
+            ->exists();
+
+        if ($gruposExistentes) {
+            return redirect()->back()->with('error_grupos_existentes', 'Los grupos para el periodo ' . $request->periodo . ' ya fueron generados. Si deseas inscribir a más estudiantes, utiliza el módulo de Alumnos Tardíos.');
+        }
 
         try {
             DB::beginTransaction();
@@ -123,8 +125,8 @@ class GrupoController extends Controller
                 }
             }
 
-            $statsInge = $this->procesarGrupos($request->grupos_manana_inge, $request->grupos_tarde_inge, 'Inge', $alumnosInge, $request->tipo_grupo);
-            $statsArqui = $this->procesarGrupos($request->grupos_manana_arqui, $request->grupos_tarde_arqui, 'Arqui', $alumnosArqui, $request->tipo_grupo);
+            $statsInge = $this->procesarGrupos($request->grupos_manana_inge, $request->grupos_tarde_inge, 'Inge', $alumnosInge, $request->tipo_grupo, $request->periodo);
+            $statsArqui = $this->procesarGrupos($request->grupos_manana_arqui, $request->grupos_tarde_arqui, 'Arqui', $alumnosArqui, $request->tipo_grupo, $request->periodo);
 
             $totalNuevos = $statsInge['nuevos'] + $statsArqui['nuevos'];
             $totalRepetidos = $statsInge['repetidos'] + $statsArqui['repetidos'];
@@ -142,7 +144,7 @@ class GrupoController extends Controller
         }
     }
 
-    private function procesarGrupos($gruposManana, $gruposTarde, $etiqueta, $alumnos, $tipoGrupo)
+    private function procesarGrupos($gruposManana, $gruposTarde, $etiqueta, $alumnos, $tipoGrupo, $periodo)
     {
         $totalGrupos = $gruposManana + $gruposTarde;
         
@@ -175,6 +177,7 @@ class GrupoController extends Controller
                 'id_curso'     => $idCurso,
                 'id_usuario'   => auth()->user()->id_usuario,
                 'id_estado'    => 1,
+                'periodo'      => $periodo,
             ]);
         }
 
@@ -234,29 +237,46 @@ class GrupoController extends Controller
 
     public function showPropeCreado()
     {
-        // 1. Buscamos los grupos de Ingeniería (que tengan 'Prope Inge' en el nombre)
-        $gruposInge = Grupo::withCount('alumnos')
-                           ->where('nombre_grupo', 'LIKE', '%Prope Inge%')
-                           ->get();
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Prope%')
+                         ->select('periodo')
+                         ->distinct()
+                         ->whereNotNull('periodo')
+                         ->orderBy('periodo', 'desc')
+                         ->pluck('periodo');
 
-        // 2. Buscamos los grupos de Arquitectura (que tengan 'Prope Arqui' en el nombre)
-        $gruposArqui = Grupo::withCount('alumnos')
-                            ->where('nombre_grupo', 'LIKE', '%Prope Arqui%')
-                            ->get();
+        $periodoActual = request('periodo', $periodos->first());
+
+        // 1. Buscamos los grupos de Ingeniería
+        $queryInge = Grupo::withCount('alumnos')->where('nombre_grupo', 'LIKE', '%Prope Inge%');
+        if ($periodoActual) { $queryInge->where('periodo', $periodoActual); }
+        $gruposInge = $queryInge->get();
+
+        // 2. Buscamos los grupos de Arquitectura
+        $queryArqui = Grupo::withCount('alumnos')->where('nombre_grupo', 'LIKE', '%Prope Arqui%');
+        if ($periodoActual) { $queryArqui->where('periodo', $periodoActual); }
+        $gruposArqui = $queryArqui->get();
 
         // 3. Mandamos las dos listas por separado a la vista
-        return view('groups.crear_grupos_cursos.curso_prope_creado', compact('gruposInge', 'gruposArqui'));
+        return view('groups.crear_grupos_cursos.curso_prope_creado', compact('gruposInge', 'gruposArqui', 'periodos', 'periodoActual'));
     }
 
     public function showInducCreado()
     {
-        // Le pedimos que cuente usando la nueva relación, pero que le ponga el mismo 
-        // apodo 'alumnos_count' para que tu HTML no se rompa y lo lea igualito.
-        $gruposInduc = Grupo::withCount('alumnosInduccion as alumnos_count')
-                            ->where('nombre_grupo', 'LIKE', '%Induc%')
-                            ->get();
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+                         ->select('periodo')
+                         ->distinct()
+                         ->whereNotNull('periodo')
+                         ->orderBy('periodo', 'desc')
+                         ->pluck('periodo');
 
-        return view('groups.crear_grupos_cursos.curso_induc_creado', compact('gruposInduc'));
+        $periodoActual = request('periodo', $periodos->first());
+
+        $queryInduc = Grupo::withCount('alumnosInduccion as alumnos_count')
+                           ->where('nombre_grupo', 'LIKE', '%Induc%');
+        if ($periodoActual) { $queryInduc->where('periodo', $periodoActual); }
+        $gruposInduc = $queryInduc->get();
+
+        return view('groups.crear_grupos_cursos.curso_induc_creado', compact('gruposInduc', 'periodos', 'periodoActual'));
     }
 
     // 2. ACTUALIZAR ESTA FUNCIÓN:
@@ -294,7 +314,7 @@ class GrupoController extends Controller
             $grupo->load('alumnos');
         }
         
-        $docente = \App\Models\Usuario::where('num_empleado', $grupo->id_usuario)->first();
+        $docente = \App\Models\Usuario::find($grupo->id_usuario);
         $nombreDocente = $docente ? mb_strtoupper($docente->nombre . ' ' . $docente->ap_pat . ' ' . $docente->ap_mat) : 'SIN ASIGNAR';
         
         $grupo->load('turno');
@@ -424,16 +444,31 @@ class GrupoController extends Controller
 
     public function showCursoPrope()
     {
-        // 1. Buscamos TODOS los grupos que contengan 'Prope Inge' o 'Prope Arqui'
-        $gruposInge = Grupo::where('nombre_grupo', 'LIKE', '%Prope Inge%')->get();
-        $gruposArqui = Grupo::where('nombre_grupo', 'LIKE', '%Prope Arqui%')->get();
+        // Obtener todos los periodos disponibles de grupos Prope
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Prope%')
+            ->whereNotNull('periodo')
+            ->select('periodo')
+            ->distinct()
+            ->orderBy('periodo', 'desc')
+            ->pluck('periodo');
 
-        // 2. Traemos a los docentes de la tabla usuarios
+        // Tomar el periodo seleccionado por URL o el más reciente
+        $periodoActual = request('periodo', $periodos->first());
+
+        // Filtrar grupos por periodo
+        $gruposInge = Grupo::where('nombre_grupo', 'LIKE', '%Prope Inge%')
+            ->where('periodo', $periodoActual)
+            ->get();
+        $gruposArqui = Grupo::where('nombre_grupo', 'LIKE', '%Prope Arqui%')
+            ->where('periodo', $periodoActual)
+            ->get();
+
+        // Traemos a los docentes
         $docentes = \App\Models\Usuario::whereHas('rol', function($q) {
             $q->where('nombre_rol', 'docente');
         })->get();
 
-        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes'));
+        return view('groups.crear_grupos_cursos.curso_prope', compact('gruposInge', 'gruposArqui', 'docentes', 'periodos', 'periodoActual'));
     }
 
     public function guardarProfesores(Request $request)
@@ -470,33 +505,49 @@ class GrupoController extends Controller
 
     public function showCursoInduc()
     {
-        // Traemos solo los grupos que tengan la palabra 'Induc'
-        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')->get();
+        // Obtener todos los periodos disponibles de grupos Induc
+        $periodos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+            ->whereNotNull('periodo')
+            ->select('periodo')
+            ->distinct()
+            ->orderBy('periodo', 'desc')
+            ->pluck('periodo');
+
+        // Tomar el periodo seleccionado por URL o el más reciente
+        $periodoActual = request('periodo', $periodos->first());
+
+        // Filtrar grupos por periodo
+        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+            ->where('periodo', $periodoActual)
+            ->get();
         
         // Traemos todos los docentes para el menú desplegable
         $docentes = \App\Models\Usuario::whereHas('rol', function($q) {
             $q->where('nombre_rol', 'docente');
         })->get();
 
-        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes'));
+        return view('groups.crear_grupos_cursos.curso_induc', compact('grupos', 'docentes', 'periodos', 'periodoActual'));
     }
 
     public function storeInduc(Request $request)
     {
-        // 1. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos de Inducción)
-        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')->exists();
-
-        if ($gruposExistentes) {
-            return redirect()->back()->with('error_grupos_existentes', 'Los grupos de Inducción iniciales ya fueron generados. Para agregar más estudiantes, utiliza el módulo de Alumnos Tardíos.');
-        }
-
-        // 2. Validar que vengan los datos (ahora solo pedimos 2 cajitas)
+        // 1. Validar que vengan los datos
         $request->validate([
             'grupos_manana'   => 'required|integer|min:0',
             'grupos_tarde'    => 'required|integer|min:0',
             'archivo_alumnos' => 'required|mimes:xlsx,xls,csv',
-            'tipo_grupo'      => 'required|string' // Siempre dirá "Inducción"
+            'tipo_grupo'      => 'required|string',
+            'periodo'         => 'required|string|max:10'
         ]);
+
+        // 2. EL CANDADO DE SEGURIDAD (Verificar si ya hay grupos de Inducción PARA ESTE PERIODO)
+        $gruposExistentes = Grupo::where('nombre_grupo', 'LIKE', '%Induc%')
+            ->where('periodo', $request->periodo)
+            ->exists();
+
+        if ($gruposExistentes) {
+            return redirect()->back()->with('error_grupos_existentes', 'Los grupos de Inducción para el periodo ' . $request->periodo . ' ya fueron generados. Para agregar más estudiantes, utiliza el módulo de Alumnos Tardíos.');
+        }
 
         try {
             DB::beginTransaction();
@@ -577,7 +628,8 @@ class GrupoController extends Controller
                 $request->grupos_tarde, 
                 'Gral', // Etiqueta para el nombre del grupo
                 $alumnosGenerales, 
-                $request->tipo_grupo
+                $request->tipo_grupo,
+                $request->periodo
             );
 
             DB::commit();

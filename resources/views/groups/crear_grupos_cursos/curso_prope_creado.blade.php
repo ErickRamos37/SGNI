@@ -28,6 +28,31 @@
         </div>
     </div>
 
+    {{-- SELECTOR DE PERIODO (HISTORIAL) --}}
+    @if($periodos->count() > 0)
+        <div class="card border border-light-subtle shadow-sm rounded-3 mb-4 bg-light">
+            <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-clock-history fs-4 text-primary me-3"></i>
+                    <div>
+                        <span class="fw-bold text-dark">Historial de Grupos Generados:</span>
+                        <span class="text-muted small ms-1">Selecciona el ciclo escolar para ver sus grupos</span>
+                    </div>
+                </div>
+                <select id="selectorPeriodoPropeCreado" class="form-select w-auto fw-bold shadow-sm">
+                    @foreach($periodos as $p)
+                        <option value="{{ $p }}" @if($p == $periodoActual) selected @endif>{{ $p }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <script>
+            document.getElementById('selectorPeriodoPropeCreado').addEventListener('change', function() {
+                window.location.href = '?periodo=' + this.value;
+            });
+        </script>
+    @endif
+
     {{-- ========================================== --}}
     {{-- TABLA 1: GRUPOS DE INGENIERÍA              --}}
     {{-- ========================================== --}}
