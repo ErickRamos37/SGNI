@@ -19,10 +19,18 @@ class Grupo extends Model
         'nombre_grupo',
         'id_turno',
         'id_curso',
-        'num_empleado',
+        'id_usuario',
         'id_estado',
+        'periodo',
     ];
 
+    // ==========================================
+    // RELACIONES
+    // ==========================================
+
+    /**
+     * Relación con los alumnos (muchos a muchos)
+     */
     public function alumnos()
     {
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
@@ -38,6 +46,9 @@ class Grupo extends Model
         return $this->hasMany(Alumno::class, 'id_grupo_propedeutico', 'id_grupo');
     }
 
+    /**
+     * Relación con el turno (uno a muchos inverso)
+     */
     public function turno()
     {
         return $this->belongsTo(Turno::class, 'id_turno', 'id_turno');
@@ -49,14 +60,20 @@ class Grupo extends Model
         return $this->hasMany(Alumno::class, 'id_grupo_definitivo', 'id_grupo');
     }
 
+    /**
+     * Relación con el curso (uno a muchos inverso)
+     */
     public function curso()
     {
         return $this->belongsTo(Curso::class, 'id_curso', 'id_curso');
     }
 
+    /**
+     * Relación con el usuario/docente asignado (uno a muchos inverso)
+     */
     public function docente()
     {
-        return $this->belongsTo(Usuario::class, 'id_usuario', 'num_empleado');
+        return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
 
     public function estado()

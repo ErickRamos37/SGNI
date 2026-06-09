@@ -78,7 +78,6 @@ class SeguimientoController extends Controller
                 ? $alumno->id_grupo_propedeutico
                 : $alumno->id_grupo_induccion;
 
-            // ✅ CORRECCIÓN BLINDADA: Filtramos limpiando espacios y asegurando los tipos de datos
             $asistenciasAlumno = $asistenciasBD->filter(function ($item) use ($alumno, $idGrupoActual) {
                 return trim($item->matricula) === trim($alumno->matricula)
                     && (int) $item->id_grupo === (int) $idGrupoActual;

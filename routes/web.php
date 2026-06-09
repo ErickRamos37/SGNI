@@ -40,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('usuarios', UsuarioController::class)->except(['show']);
 
         // Creación y Gestión de Grupos
+        Route::get('/crear_grupo', function () { return view('groups.crear_grupos_cursos.crear_grupo'); })->name('crear_grupo');
         Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
         Route::post('/grupos/guardar-profesores', [GrupoController::class, 'guardarProfesores'])->name('grupos.guardar_profesores');
         Route::get('/grupos/generados', function () { return view('groups.grupos_generados'); })->name('grupos.generados');
@@ -52,11 +53,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/grupos-induc/store', [GrupoController::class, 'storeInduc'])->name('grupos_induc.store');
         Route::get('/grupos/induc-creado', [GrupoController::class, 'showInducCreado'])->name('curso_induc_creado');
 
-        // Alumnos (Altas e Importación)
-        Route::get('/alumnos/nuevo', function () { return view('alumnos.nuealum'); })->name('alumnos.nuevo');
+        // Alumnos (Altas, Edición e Importación)
+        Route::get('/alumnos/nuevo', [AlumnoController::class, 'create'])->name('alumnos.nuevo');
         Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
-
-        // * RUTAS INTEGRADAS DEL MERGE *
+        Route::get('/alumnos/{alumno}/editar', [AlumnoController::class, 'edit'])->name('alumnos.edit');
+        Route::put('/alumnos/{alumno}', [AlumnoController::class, 'update'])->name('alumnos.update');
+        
+        // Importación de excel para la creación de los grupos
         Route::get('/grupos/importar', function () { return view('groups.importar_alumnos'); })->name('grupos.importar');
         Route::post('/grupos/importar', [AlumnoController::class, 'importar'])->name('alumnos.importar.post');
 
@@ -94,7 +97,7 @@ Route::middleware(['auth'])->group(function () {
 
     // ------------------------------------------------------
     // B. COMPARTIDO: ADMINISTRADOR Y DOCENTE
-    // Listas, Calificaciones y Asistencias (Admin puede corregir, Docente opera)
+    // Listas, Calificaciones y Asistencias
     // ------------------------------------------------------
     Route::middleware(['rol:Administrador,Docente'])->group(function () {
 
@@ -107,18 +110,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/asistencia/paselista', [AsistenciaController::class, 'paselista'])->name('asistencia.paselista');
         Route::get('/asistencia/grupal', [AsistenciaController::class, 'grupal'])->name('asistencia.grupal');
 
-        // Calificaciones
+        // Calificaciones (Agrupadas correctamente bajo un solo prefijo)
         Route::prefix('calificaciones')->name('calificaciones.')->group(function () {
             Route::get('/captura', [CalificacionController::class, 'showCaptura'])->name('captura');
             Route::post('/upload', [CalificacionController::class, 'upload'])->name('upload');
             Route::get('/mostrar/{id_grupo?}', [CalificacionController::class, 'indexByGrupo'])->name('mostrar');
             Route::post('/update-batch', [CalificacionController::class, 'updateBatch'])->name('updateBatch');
+            Route::post('/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('guardarTablaDirecto');
+            Route::get('/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('exportar');
+            Route::get('/descargar-formato-base', [CalificacionController::class, 'descargarFormatoBase'])->name('descargarFormatoBase');
+            Route::get('/data/{id_grupo}', [CalificacionController::class, 'getAlumnosData'])->name('data');
         });
-        Route::post('/calificaciones/guardar-tabla-directo', [CalificacionController::class, 'guardarTabla'])->name('calificaciones.guardarTablaDirecto');
-        Route::get('/calificaciones/exportar/{id_grupo}', [CalificacionController::class, 'exportarGrupo'])->name('calificaciones.exportar');
-        Route::get('/calificaciones/descargar-formato-base', [CalificacionController::class, 'descargarFormatoBase'])->name('calificaciones.descargarFormatoBase');
-        Route::get('/calificaciones/data/{id_grupo}', [CalificacionController::class, 'getAlumnosData'])->name('calificaciones.data');
-    });
+    }); // <-- ESTE ERA EL CORCHETE PRINCIPAL QUE FALTABA
 
     // ------------------------------------------------------
     // C. COMPARTIDO: ADMINISTRADOR Y PSICOPEDAGÓGICO
@@ -128,8 +131,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/alumnos/info', function () { return view('alumnos.info'); })->name('alumnos.info');
         Route::post('/alumnos/buscar', [AlumnoController::class, 'buscar'])->name('alumnos.buscar');
         Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');
-
-        // * RUTA INTEGRADA DEL MERGE *
         Route::get('/seguimiento/datos', [SeguimientoController::class, 'getDatosSeguimiento'])->name('seguimiento.datos');
     });
 });

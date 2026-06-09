@@ -10,15 +10,18 @@ class AlumnosImport implements ToModel, WithHeadingRow
 {
     public function model(array $row)
     {
+        // WithHeadingRow convierte encabezados a snake_case minúsculas
+        // Orden real del Excel: matricula|Nombre|apellido_paterno|apellido_materno|puntaje|correo|correo_alter|telefono
         return new Alumno([
-            'matricula'          => $row['matricula'],
-            'nombre'             => $row['nombre'],
-            'ap_pat'             => $row['apellido_paterno'],
-            'ap_mat'             => $row['apellido_materno'],
-            'correo_alternativo' => $row['correo_alter'],
-            'correo_institucional' => $row['correo'],
-            'telefono'           => $row['telefono'],
-            'id_carrera'         => $row['programaestudios'],
+            'matricula'            => $row['matricula'],
+            'nombre'               => $row['nombre'],
+            'ap_pat'               => $row['apellido_paterno'],
+            'ap_mat'               => !empty($row['apellido_materno']) ? $row['apellido_materno'] : null,
+            'puntaje_ingreso'      => !empty($row['puntaje']) ? (int)$row['puntaje'] : null,
+            'correo_institucional' => !empty($row['correo']) ? trim($row['correo']) : null,
+            'correo_alternativo'   => trim($row['correo_alter']),
+            'telefono'             => trim($row['telefono']),
+            'id_carrera'           => $row['programaestudios'],
         ]);
     }
 }
