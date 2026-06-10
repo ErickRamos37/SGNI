@@ -6,6 +6,8 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\GrupoPropedeuticoController;
+use App\Http\Controllers\GrupoInduccionController;
 use App\Http\Controllers\CalificacionController;
 use App\Http\Controllers\CierreController;
 use App\Http\Controllers\SeguimientoController;
@@ -42,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
         // Creación y Gestión de Grupos
         Route::get('/crear_grupo', function () { return view('groups.crear_grupos_cursos.crear_grupo'); })->name('crear_grupo');
         // Creación y gestión de grupos
-        Route::post('/grupos/crear', [GrupoController::class, 'store'])->name('grupos.store');
+        Route::post('/grupos/crear', [GrupoPropedeuticoController::class, 'store'])->name('grupos.store');
         Route::post('/grupos/guardar-profesores', [GrupoController::class, 'guardarProfesores'])->name('grupos.guardar_profesores');
         Route::get('/grupos/generados', function () { return view('groups.grupos_generados'); })->name('grupos.generados');
         Route::get('/crear_grupo', function () { return view('groups.crear_grupos_cursos.crear_grupo'); })->name('crear_grupo');
@@ -51,13 +53,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/grupos/{id_grupo}/cambiar-estado', [GrupoController::class, 'cambiarModoEstado'])->name('grupos.cambiar_estado');
 
         // Cursos Propedéutico e Inducción
-        Route::get('/curso_prope', [GrupoController::class, 'showCursoPrope'])->name('curso_prope');
-        Route::get('/grupos/prope-creado', [GrupoController::class, 'showPropeCreado'])->name('curso_prope_creado');
+        Route::get('/curso_prope', [GrupoPropedeuticoController::class, 'showCursoPrope'])->name('curso_prope');
+        Route::get('/grupos/prope-creado', [GrupoPropedeuticoController::class, 'showPropeCreado'])->name('curso_prope_creado');
 
         // Curso inducción
-        Route::get('/curso_induc', [GrupoController::class, 'showCursoInduc'])->name('curso_induc');
-        Route::post('/grupos-induc/store', [GrupoController::class, 'storeInduc'])->name('grupos_induc.store');
-        Route::get('/grupos/induc-creado', [GrupoController::class, 'showInducCreado'])->name('curso_induc_creado');
+        Route::get('/curso_induc', [GrupoInduccionController::class, 'showCursoInduc'])->name('curso_induc');
+        Route::post('/grupos-induc/store', [GrupoInduccionController::class, 'storeInduc'])->name('grupos_induc.store');
+        Route::get('/grupos/induc-creado', [GrupoInduccionController::class, 'showInducCreado'])->name('curso_induc_creado');
 
         // Alumnos (Altas, Edición e Importación)
         Route::get('/alumnos/nuevo', [AlumnoController::class, 'create'])->name('alumnos.nuevo');
@@ -152,7 +154,7 @@ Route::middleware(['auth'])->group(function () {
     // ------------------------------------------------------
     // C. COMPARTIDO: ADMINISTRADOR Y PSICOPEDAGÓGICO
     // ------------------------------------------------------
-    Route::middleware(['rol:Administrador,Psicopedagogico'])->group(function () {
+    Route::middleware(['rol:Administrador,Psicopedagogico,Psicologo'])->group(function () {
         Route::get('/alumnos/info', function () { return view('alumnos.info'); })->name('alumnos.info');
         Route::post('/alumnos/buscar', [AlumnoController::class, 'buscar'])->name('alumnos.buscar');
         Route::get('/psicologo', [SeguimientoController::class, 'index'])->name('psicologo');

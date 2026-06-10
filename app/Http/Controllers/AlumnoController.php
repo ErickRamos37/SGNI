@@ -37,8 +37,12 @@ class AlumnoController extends Controller
      */
     public function gruposPorCarrera($id_carrera)
     {
-        // 1. Buscamos directamente el id_estado = 1 (Editable) basándonos en tu BD
-        $gruposEditables = Grupo::with('curso')->where('id_estado', 1)->get();
+        // 1. Buscamos el id del estado "Activo" dinámicamente y obtenemos los grupos
+        $idEstadoActivo = \Illuminate\Support\Facades\DB::table('estado_grupo')
+                            ->where('nombre_estado', 'like', '%activo%')
+                            ->value('id_estado') ?? 1;
+        
+        $gruposEditables = Grupo::with('curso')->where('id_estado', $idEstadoActivo)->get();
 
         $propedeuticos = [];
         $inducciones = [];

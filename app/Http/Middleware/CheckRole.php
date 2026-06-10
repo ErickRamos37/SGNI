@@ -18,8 +18,11 @@ class CheckRole
             // return redirect()->route('login');
         }
 
-        // 2. Obtener el nombre del rol del usuario
-        $userRole = Auth::user()->rol->nombre_rol;
+        // 2. Obtener el nombre del rol del usuario (en minúsculas para evitar problemas de mayúsculas)
+        $userRole = strtolower(Auth::user()->rol->nombre_rol);
+
+        // Convertir los roles permitidos a minúsculas también
+        $roles = array_map('strtolower', $roles);
 
         // 3. Verifica si el rol del usuario está dentro de los roles permitidos
         if (!in_array($userRole, $roles)) {

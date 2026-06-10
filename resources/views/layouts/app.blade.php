@@ -67,13 +67,13 @@
                 @auth
                 {{-- Guardamos el rol en una variable para mantener el código limpio --}}
                 @php
-                    $rolUsuario = Auth::user()->rol->nombre_rol;
+                    $rolUsuario = strtolower(Auth::user()->rol->nombre_rol);
                 @endphp
 
                 {{-- ========================================================== --}}
                 {{-- EXCLUSIVO ADMINISTRADOR --}}
                 {{-- ========================================================== --}}
-                @if($rolUsuario === 'Administrador')
+                @if(in_array($rolUsuario, ['administrador', 'admin']))
 
                 {{-- Crear Grupos --}}
                 <li class="nav-item mb-1 dropdown dropend">
@@ -150,7 +150,7 @@
                 {{-- ========================================================== --}}
                 {{-- COMPARTIDO: ADMINISTRADOR Y PSICOPEDAGÓGICO --}}
                 {{-- ========================================================== --}}
-                @if(in_array($rolUsuario, ['Administrador', 'psicopedagogico']))
+                @if(in_array($rolUsuario, ['administrador', 'admin', 'psicopedagogico', 'psicologo', 'psicóloga']))
                 {{-- Alumnos --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"
@@ -166,7 +166,7 @@
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
 
                         {{-- Alta exclusiva para Administrador --}}
-                        @if($rolUsuario === 'Administrador')
+                        @if(in_array($rolUsuario, ['administrador', 'admin']))
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('alumnos.nuevo') ? 'text-primary bg-light' : 'text-dark' }}"
@@ -198,7 +198,7 @@
                 {{-- ========================================================== --}}
                 {{-- COMPARTIDO: ADMINISTRADOR Y DOCENTE --}}
                 {{-- ========================================================== --}}
-                @if(in_array($rolUsuario, ['Administrador', 'Docente']))
+                @if(in_array($rolUsuario, ['administrador', 'admin', 'docente', 'profesor']))
 
                 {{-- Capturar Asistencia --}}
                 <li class="nav-item mb-1 dropdown dropend">
@@ -209,11 +209,11 @@
                                    : 'text-white' }}"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        <span>{{ $rolUsuario === 'Administrador' ? 'Asistencias' : 'Capturar Asistencia' }}</span>
+                        <span>{{ in_array($rolUsuario, ['administrador', 'admin']) ? 'Asistencias' : 'Capturar Asistencia' }}</span>
                         <i class="bi bi-chevron-right toggle-icon ms-3 flex-shrink-0"></i>
                     </a>
                     <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2">
-                        @if($rolUsuario !== 'Administrador')
+                        @if(!in_array($rolUsuario, ['administrador', 'admin']))
                         <li>
                             <a class="dropdown-item fw-bold py-2 rounded-2
                                       {{ request()->routeIs('asistencia.paselista') ? 'text-primary bg-light' : 'text-dark' }}"
@@ -267,7 +267,7 @@
                 {{-- ========================================================== --}}
                 {{-- ADMINISTRADOR (MÓDULOS FINALES) --}}
                 {{-- ========================================================== --}}
-                @if($rolUsuario === 'Administrador')
+                @if(in_array($rolUsuario, ['administrador', 'admin']))
                 {{-- Personal --}}
                 <li class="nav-item mb-1 dropdown dropend">
                     <a href="#"

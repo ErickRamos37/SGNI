@@ -111,21 +111,37 @@ class CalificacionController extends Controller
         return $response;
     }
 
-    // Inicializa la vista de calificaciones y filtra los grupos semanticamente por su nombre
     public function indexByGrupo($id_grupo = null)
     {
-        // Se buscan grupos cuyo nombre contenga "prope"
-        $grupos = Grupo::where('nombre_grupo', 'LIKE', '%prope%')->get();
+        $usuario = auth()->user();
+        $rol = strtolower($usuario->rol->nombre_rol ?? '');
+
+        // Construir la consulta base
+        $queryGrupos = Grupo::where('nombre_grupo', 'LIKE', '%prope%');
+
+        // Si NO es administrador, filtrar solo por los grupos que tiene asignados
+        if ($rol !== 'administrador' && $rol !== 'admin') {
+            $queryGrupos->where('id_usuario', $usuario->id_usuario);
+        }
+
+        $grupos = $queryGrupos->get();
         $grupo = null;
-        $alumnos = collect(); // Coleccion vacia; la carga de alumnos ahora se delega a DataTables por AJAX
+        $alumnos = collect(); 
 
         if ($id_grupo) {
-            $grupo = Grupo::where('nombre_grupo', 'LIKE', '%prope%')->find($id_grupo);
+            // Reutilizamos la misma lógica de filtrado para evitar que inyecten un ID por URL
+            $queryUnico = Grupo::where('nombre_grupo', 'LIKE', '%prope%');
+            if ($rol !== 'administrador' && $rol !== 'admin') {
+                $queryUnico->where('id_usuario', $usuario->id_usuario);
+            }
+            
+            $grupo = $queryUnico->find($id_grupo);
 
             if (!$grupo) {
+                // Si intenta ver un grupo que no es suyo o no existe, lo regresamos con un error o mensaje
                 $grupo = (object) [
                     'id_grupo' => $id_grupo,
-                    'nombre_grupo' => 'Grupo ' . $id_grupo . ' (Temporal)',
+                    'nombre_grupo' => 'Grupo ' . $id_grupo . ' (No Autorizado o No Existe)',
                     'id_curso' => 2
                 ];
             }

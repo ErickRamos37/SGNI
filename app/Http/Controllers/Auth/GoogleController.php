@@ -48,6 +48,8 @@ class GoogleController extends Controller
 
             case 'psicologo':
             case 'psicóloga':
+            case 'psicopedagogico':
+            case 'psicopedagógica':
                 return redirect()->route('psicologo');
 
             default:
