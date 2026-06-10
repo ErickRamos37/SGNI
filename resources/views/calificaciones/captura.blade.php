@@ -65,11 +65,7 @@
 
                     {{-- Botones de accion del formulario --}}
                     <hr class="my-4 border-light-subtle">
-                    <div class="d-flex justify-content-between align-items-center mt-4">
-                        <a href="{{ route('calificaciones.mostrar') }}"
-                            class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
-                            <span>Regresar</span>
-                        </a>
+                    <div class="d-flex justify-content-end align-items-right mt-4">
                         <div class="d-flex gap-2">
                             <button type="button" id="btn-cancelar"
                                 class="btn btn-outline-dark px-4 fw-semibold rounded-3">
@@ -96,7 +92,7 @@
                     title: '¡Carga Exitosa!',
                     text: "{{ session('success') }}",
                     icon: 'success',
-                    confirmButtonColor: '#00723F',
+                    confirmButtonColor: 'var(--bs-primary)',
                     confirmButtonText: 'Aceptar'
                 });
             });
@@ -117,7 +113,7 @@
                     title: titulo,
                     html: '<p class="text-muted small text-center mb-0">' + errorTexto + '</p>',
                     icon: 'error',
-                    confirmButtonColor: '#00723F',
+                    confirmButtonColor: 'var(--bs-primary)',
                     confirmButtonText: 'Entendido'
                 });
             });

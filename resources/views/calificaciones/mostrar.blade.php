@@ -80,10 +80,6 @@
 
                         {{-- Pie de tarjeta unificado con los botones alineados a los extremos --}}
                         <div class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
-                            <button type="button" onclick="window.history.back();"
-                                class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
-                                <span>Regresar</span>
-                            </button>
                             <div class="d-flex gap-2">
                                 <button type="button" id="btn-guardar-batch"
                                     class="btn btn-outline-dark px-5 fw-semibold rounded-3">
@@ -108,10 +104,7 @@
                         </div>
 
                         {{-- Pie de tarjeta unificado para el estado vacio alineado a la izquierda --}}
-                        <div class="card-footer bg-white d-flex justify-content-start align-items-center px-4 py-3 border-top border-light rounded-bottom-3">
-                            <button type="button" onclick="window.history.back();"
-                                class="btn btn-outline-dark px-4 fw-semibold rounded-3 d-inline-flex align-items-center gap-2">
-                                <span>Regresar</span>
+        +
                             </button>
                         </div>
                     </div>
@@ -131,7 +124,7 @@
                     title: '¡Carga Exitosa!',
                     text: "{{ session('success') }}",
                     icon: 'success',
-                    confirmButtonColor: '#00723F',
+                    confirmButtonColor: 'var(--bs-primary)',
                     confirmButtonText: 'Aceptar'
                 });
             });
@@ -283,7 +276,7 @@
                             title: '¡Tabla Vacia!',
                             text: 'No hay registros válidos para actualizar.',
                             icon: 'warning',
-                            confirmButtonColor: '#00723F',
+                            confirmButtonColor: 'var(--bs-primary)',
                             confirmButtonText: 'Aceptar'
                         });
                         return;
@@ -321,7 +314,7 @@
                                     title: '¡Carga Exitosa!',
                                     text: 'Las calificaciones se actualizaron con éxito en la base de datos.',
                                     icon: 'success',
-                                    confirmButtonColor: '#00723F',
+                                    confirmButtonColor: 'var(--bs-primary)',
                                     confirmButtonText: 'Aceptar'
                                 }).then(() => {
                                     // Restablece el boton a su estado original listo para volver a usarse
@@ -339,7 +332,7 @@
                                 title: '¡Error al Guardar!',
                                 text: error.message || 'Ocurrió un inconveniente al actualizar las calificaciones en el servidor.',
                                 icon: 'error',
-                                confirmButtonColor: '#00723F',
+                                confirmButtonColor: 'var(--bs-primary)',
                                 confirmButtonText: 'Entendido'
                             });
                             btn.prop('disabled', false).html('Guardar Cambios');
