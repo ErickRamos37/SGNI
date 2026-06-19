@@ -161,3 +161,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/seguimiento/datos', [SeguimientoController::class, 'getDatosSeguimiento'])->name('seguimiento.datos');
     });
 });
+
+Route::get('/asistencia', function () {
+    return view('Asistencia.Asistencia');
+});
